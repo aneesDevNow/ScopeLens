@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html class="" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Scope Lens - System Health</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#ffffff", "background-light": "#f7f7f7", "background-dark": "#191919", "surface-dark": "#1a2632", "border-dark": "#2c3b4a"}, fontFamily: {display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+<style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111a21; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2c3b4a; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1990e6; 
+        }
+        
+        /* Toggle Switch CSS */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #1990e6;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #1990e6;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display overflow-hidden">
+<div class="flex h-screen w-full overflow-hidden">
+<!-- SideNavBar -->
+<aside class="w-64 flex-shrink-0 flex flex-col justify-between bg-surface-dark border-r border-border-dark hidden md:flex">
+<div class="flex flex-col gap-4 p-4">
+<div class="flex items-center gap-3 px-2 py-2 mb-4">
+<div class="bg-center bg-no-repeat bg-cover rounded-xl size-10 shadow-lg shadow-primary/20" data-alt="Abstract blue geometric logo representing AI vision" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAOJBCnVXqcKGVOe4HBMsP_5dqP0vA5fMB7WPF3DuCv-f9kq0i7wS-b6kn3_N6-Aj-nNDTwwQ458XYwVO9g8VW2-7JJqll6VKuk_hjy-hQN1z1enCvUu3vz_ku4Ty37INsav_pAgUck4S1kKQS5wIBlCQSKLpjomdCJ3sCqKltEYLHeNgBF28Y1d1tPLh58GfnZEW-TkSRFtL_TmFnKRKyEZqXZ6hcGgXzrtgnOObskia4g8IcoI17Cq6yAsLCLl-2X-xAZ5G1WiPw");'></div>
+<div class="flex flex-col">
+<h1 class="text-white text-base font-bold leading-none tracking-tight">Scope Lens</h1>
+<p class="text-slate-400 text-xs font-normal mt-1">Admin Console</p>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">dashboard</span>
+<p class="text-sm font-medium">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary border-l-4 border-primary transition-all" href="#">
+<span class="material-symbols-outlined text-2xl fill-1">monitor_heart</span>
+<p class="text-sm font-bold">System Health</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">history</span>
+<p class="text-sm font-medium">Logs</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">vpn_key</span>
+<p class="text-sm font-medium">API Keys</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">settings</span>
+<p class="text-sm font-medium">Settings</p>
+</a>
+</div>
+</div>
+<div class="p-4 border-t border-border-dark">
+<div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer">
+<div class="size-8 rounded-full bg-slate-700 flex items-center justify-center text-slate-300">
+<span class="material-symbols-outlined text-sm">person</span>
+</div>
+<div class="flex flex-col">
+<p class="text-white text-sm font-medium">Admin User</p>
+<p class="text-slate-500 text-xs">admin@scopelens.ai</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col relative min-w-0 overflow-hidden bg-background-dark">
+<!-- TopNavBar -->
+<header class="flex items-center justify-between border-b border-border-dark bg-background-dark/80 backdrop-blur-md px-6 py-3 z-10 sticky top-0">
+<div class="flex items-center gap-4 md:hidden">
+<button class="text-white">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h2 class="text-white text-lg font-bold">System Health</h2>
+</div>
+<!-- Desktop Title (Hidden on mobile) -->
+<div class="hidden md:flex flex-col">
+<h2 class="text-white text-lg font-bold">Monitor</h2>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<div class="hidden md:flex relative group">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+<span class="material-symbols-outlined text-xl">search</span>
+</div>
+<input class="block w-full min-w-[300px] p-2 pl-10 text-sm text-white border border-border-dark rounded-lg bg-surface-dark focus:ring-primary focus:border-primary placeholder-slate-500" placeholder="Search logs, IPs or Request IDs..." type="text"/>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center size-9 rounded-lg hover:bg-white/10 text-slate-300 transition-colors relative">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border border-background-dark"></span>
+</button>
+<button class="flex items-center justify-center size-9 rounded-lg hover:bg-white/10 text-slate-300 transition-colors">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Scrollable Content -->
+<div class="flex-1 overflow-y-auto p-4 md:p-8">
+<div class="max-w-7xl mx-auto flex flex-col gap-8">
+<!-- Page Heading & Controls -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="flex flex-col gap-2">
+<h1 class="text-white text-3xl md:text-4xl font-black tracking-tight">System Monitor</h1>
+<p class="text-slate-400 text-base max-w-2xl">Real-time engine performance metrics, maintenance controls, and request logging for the Scope Lens AI detection engine.</p>
+</div>
+<!-- System Controls -->
+<div class="flex items-center gap-4 bg-surface-dark border border-border-dark p-2 rounded-xl">
+<div class="flex items-center gap-3 px-3 py-1 border-r border-border-dark">
+<span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Status</span>
+<span class="flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs font-bold border border-emerald-500/20">
+<span class="size-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                    OPERATIONAL
+                                </span>
+</div>
+<div class="flex items-center gap-3 px-2">
+<label class="flex items-center cursor-pointer" for="maintenance-toggle">
+<div class="relative">
+<input class="sr-only" id="maintenance-toggle" type="checkbox"/>
+<div class="w-10 h-6 bg-slate-700 rounded-full shadow-inner"></div>
+<div class="dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition transform duration-200 ease-in-out"></div>
+</div>
+<div class="ml-3 text-sm text-slate-300 font-medium">
+                                        Maintenance Mode
+                                    </div>
+</label>
+</div>
+</div>
+</div>
+<!-- Style for simple toggle interaction via CSS (since JS is forbidden) -->
+<style>
+                        #maintenance-toggle:checked ~ .dot {
+                            transform: translateX(100%);
+                            background-color: #1990e6;
+                        }
+                    </style>
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors group">
+<div class="flex justify-between items-start">
+<p class="text-slate-400 text-sm font-medium">Server Uptime</p>
+<span class="material-symbols-outlined text-emerald-400 text-xl bg-emerald-400/10 p-1 rounded">dns</span>
+</div>
+<div class="flex items-end gap-2 mt-1">
+<p class="text-white text-2xl font-bold tracking-tight">99.98%</p>
+<p class="text-emerald-400 text-xs font-medium mb-1.5 flex items-center">
+<span class="material-symbols-outlined text-[14px]">trending_up</span> 0.01%
+                                </p>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start">
+<p class="text-slate-400 text-sm font-medium">Avg API Latency</p>
+<span class="material-symbols-outlined text-primary text-xl bg-primary/10 p-1 rounded">speed</span>
+</div>
+<div class="flex items-end gap-2 mt-1">
+<p class="text-white text-2xl font-bold tracking-tight">145ms</p>
+<p class="text-emerald-400 text-xs font-medium mb-1.5 flex items-center">
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span> 12ms
+                                </p>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start">
+<p class="text-slate-400 text-sm font-medium">Error Rate (24h)</p>
+<span class="material-symbols-outlined text-orange-400 text-xl bg-orange-400/10 p-1 rounded">warning</span>
+</div>
+<div class="flex items-end gap-2 mt-1">
+<p class="text-white text-2xl font-bold tracking-tight">0.05%</p>
+<p class="text-emerald-400 text-xs font-medium mb-1.5 flex items-center">
+<span class="material-symbols-outlined text-[14px]">arrow_downward</span> 0.02%
+                                </p>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-surface-dark border border-border-dark hover:border-primary/50 transition-colors">
+<div class="flex justify-between items-start">
+<p class="text-slate-400 text-sm font-medium">Active Nodes</p>
+<span class="material-symbols-outlined text-blue-400 text-xl bg-blue-400/10 p-1 rounded">hub</span>
+</div>
+<div class="flex items-end gap-2 mt-1">
+<p class="text-white text-2xl font-bold tracking-tight">12</p>
+<p class="text-emerald-400 text-xs font-medium mb-1.5 flex items-center">
+<span class="material-symbols-outlined text-[14px]">add</span> 2 Auto-scaled
+                                </p>
+</div>
+</div>
+</div>
+<!-- Charts Section -->
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+<!-- Latency Chart -->
+<div class="flex flex-col rounded-xl border border-border-dark bg-surface-dark p-6">
+<div class="flex justify-between items-start mb-6">
+<div>
+<p class="text-slate-400 text-sm font-medium mb-1">Latency Trends (ms)</p>
+<div class="flex items-baseline gap-3">
+<p class="text-white text-2xl font-bold">145ms <span class="text-lg font-normal text-slate-500">Avg</span></p>
+<span class="text-emerald-400 text-xs font-medium bg-emerald-400/10 px-2 py-0.5 rounded">-5% vs last 24h</span>
+</div>
+</div>
+<button class="text-slate-400 hover:text-white"><span class="material-symbols-outlined">more_horiz</span></button>
+</div>
+<div class="relative w-full h-[200px] mt-auto">
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 500 150">
+<defs>
+<lineargradient id="latencyGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#1990e6" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#1990e6" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Grid Lines -->
+<line stroke="#2c3b4a" stroke-dasharray="4" x1="0" x2="500" y1="0" y2="0"></line>
+<line stroke="#2c3b4a" stroke-dasharray="4" x1="0" x2="500" y1="75" y2="75"></line>
+<line stroke="#2c3b4a" stroke-dasharray="4" x1="0" x2="500" y1="150" y2="150"></line>
+<!-- Chart Path -->
+<path d="M0 100 Q 50 80, 100 110 T 200 90 T 300 120 T 400 60 T 500 80 V 150 H 0 Z" fill="url(#latencyGradient)"></path>
+<path d="M0 100 Q 50 80, 100 110 T 200 90 T 300 120 T 400 60 T 500 80" fill="none" stroke="#1990e6" stroke-linecap="round" stroke-width="3"></path>
+</svg>
+</div>
+<div class="flex justify-between text-xs text-slate-500 font-medium mt-4 pt-4 border-t border-border-dark">
+<span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span>
+</div>
+</div>
+<!-- RPM Chart -->
+<div class="flex flex-col rounded-xl border border-border-dark bg-surface-dark p-6">
+<div class="flex justify-between items-start mb-6">
+<div>
+<p class="text-slate-400 text-sm font-medium mb-1">Requests per Minute</p>
+<div class="flex items-baseline gap-3">
+<p class="text-white text-2xl font-bold">4.2k <span class="text-lg font-normal text-slate-500">RPM</span></p>
+<span class="text-emerald-400 text-xs font-medium bg-emerald-400/10 px-2 py-0.5 rounded">+12% vs last 24h</span>
+</div>
+</div>
+<button class="text-slate-400 hover:text-white"><span class="material-symbols-outlined">more_horiz</span></button>
+</div>
+<div class="flex items-end justify-between h-[200px] gap-2 px-2 mt-auto">
+<!-- Bars -->
+<div class="w-full bg-slate-700/30 rounded-t-sm relative group" style="height: 40%">
+<div class="absolute inset-x-0 bottom-0 bg-primary/80 group-hover:bg-primary transition-colors rounded-t-sm" style="height: 100%"></div>
+</div>
+<div class="w-full bg-slate-700/30 rounded-t-sm relative group" style="height: 65%">
+<div class="absolute inset-x-0 bottom-0 bg-primary/80 group-hover:bg-primary transition-colors rounded-t-sm" style="height: 100%"></div>
+</div>
+<div class="w-full bg-slate-700/30 rounded-t-sm relative group" style="height: 45%">
+<div class="absolute inset-x-0 bottom-0 bg-primary/80 group-hover:bg-primary transition-colors rounded-t-sm" style="height: 100%"></div>
+</div>
+<div class="w-full bg-slate-700/30 rounded-t-sm relative group" style="height: 80%">
+<div class="absolute inset-x-0 bottom-0 bg-primary/80 group-hover:bg-primary transition-colors rounded-t-sm" style="height: 100%"></div>
+</div>
+<div class="w-full bg-slate-700/30 rounded-t-sm relative group" style="height: 55%">
+<div class="absolute inset-x-0 bottom-0 bg-primary/80 group-hover:bg-primary transition-colors rounded-t-sm" style="height: 100%"></div>
+</div>
+<div class="w-full bg-slate-700/30 rounded-t-sm relative group" style="height: 90%">
+<div class="absolute inset-x-0 bottom-0 bg-primary/80 group-hover:bg-primary transition-colors rounded-t-sm" style="height: 100%"></div>
+</div>
+<div class="w-full bg-slate-700/30 rounded-t-sm relative group" style="height: 70%">
+<div class="absolute inset-x-0 bottom-0 bg-primary/80 group-hover:bg-primary transition-colors rounded-t-sm" style="height: 100%"></div>
+</div>
+<div class="w-full bg-slate-700/30 rounded-t-sm relative group" style="height: 35%">
+<div class="absolute inset-x-0 bottom-0 bg-primary/80 group-hover:bg-primary transition-colors rounded-t-sm" style="height: 100%"></div>
+</div>
+</div>
+<div class="flex justify-between text-xs text-slate-500 font-medium mt-4 pt-4 border-t border-border-dark">
+<span>00:00</span><span>06:00</span><span>12:00</span><span>18:00</span><span>Now</span>
+</div>
+</div>
+</div>
+<!-- Logs Table Section -->
+<div class="flex flex-col gap-4 rounded-xl border border-border-dark bg-surface-dark overflow-hidden">
+<div class="flex items-center justify-between p-6 border-b border-border-dark">
+<h3 class="text-white text-lg font-bold">Recent Detection Requests</h3>
+<div class="flex gap-2">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-600 hover:bg-slate-700 text-slate-300 text-sm font-medium transition-colors">
+<span class="material-symbols-outlined text-base">filter_list</span> Filter
+                                </button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-600 hover:bg-slate-700 text-slate-300 text-sm font-medium transition-colors">
+<span class="material-symbols-outlined text-base">download</span> Export
+                                </button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead class="bg-slate-800/50 text-xs uppercase text-slate-400 font-semibold">
+<tr>
+<th class="px-6 py-4">Request ID</th>
+<th class="px-6 py-4">Timestamp</th>
+<th class="px-6 py-4">Endpoint</th>
+<th class="px-6 py-4">Latency</th>
+<th class="px-6 py-4">AI Score</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="text-sm text-slate-300 divide-y divide-border-dark">
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-mono text-xs text-slate-400">req_8f92j29s</td>
+<td class="px-6 py-4">Oct 24, 10:42:01</td>
+<td class="px-6 py-4"><span class="bg-slate-700 px-2 py-0.5 rounded text-xs font-mono">POST /v1/detect</span></td>
+<td class="px-6 py-4">124ms</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+<div class="bg-red-500 h-full w-[92%]"></div>
+</div>
+<span class="text-xs font-bold text-white">92%</span>
+</div>
+</td>
+<td class="px-6 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Success</span></td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-500 hover:text-white"><span class="material-symbols-outlined text-lg">open_in_new</span></button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-mono text-xs text-slate-400">req_1b92k88x</td>
+<td class="px-6 py-4">Oct 24, 10:41:55</td>
+<td class="px-6 py-4"><span class="bg-slate-700 px-2 py-0.5 rounded text-xs font-mono">POST /v1/detect</span></td>
+<td class="px-6 py-4">142ms</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+<div class="bg-emerald-500 h-full w-[12%]"></div>
+</div>
+<span class="text-xs font-bold text-white">12%</span>
+</div>
+</td>
+<td class="px-6 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Success</span></td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-500 hover:text-white"><span class="material-symbols-outlined text-lg">open_in_new</span></button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-mono text-xs text-slate-400">req_7c22m11q</td>
+<td class="px-6 py-4">Oct 24, 10:41:42</td>
+<td class="px-6 py-4"><span class="bg-slate-700 px-2 py-0.5 rounded text-xs font-mono">GET /v1/status</span></td>
+<td class="px-6 py-4">45ms</td>
+<td class="px-6 py-4"><span class="text-slate-500 text-xs italic">N/A</span></td>
+<td class="px-6 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Success</span></td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-500 hover:text-white"><span class="material-symbols-outlined text-lg">open_in_new</span></button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-mono text-xs text-slate-400">req_5x11p99z</td>
+<td class="px-6 py-4">Oct 24, 10:40:12</td>
+<td class="px-6 py-4"><span class="bg-slate-700 px-2 py-0.5 rounded text-xs font-mono">POST /v1/detect</span></td>
+<td class="px-6 py-4 text-orange-400 font-bold">890ms</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+<div class="bg-yellow-500 h-full w-[65%]"></div>
+</div>
+<span class="text-xs font-bold text-white">65%</span>
+</div>
+</td>
+<td class="px-6 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-orange-500/10 text-orange-400 border border-orange-500/20">Timeout Warning</span></td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-500 hover:text-white"><span class="material-symbols-outlined text-lg">open_in_new</span></button>
+</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors group">
+<td class="px-6 py-4 font-mono text-xs text-slate-400">req_9k00l22m</td>
+<td class="px-6 py-4">Oct 24, 10:39:58</td>
+<td class="px-6 py-4"><span class="bg-slate-700 px-2 py-0.5 rounded text-xs font-mono">POST /v1/detect</span></td>
+<td class="px-6 py-4">22ms</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-16 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+<div class="bg-slate-500 h-full w-[0%]"></div>
+</div>
+<span class="text-xs font-bold text-white">Error</span>
+</div>
+</td>
+<td class="px-6 py-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-500/10 text-red-400 border border-red-500/20">Failed (401)</span></td>
+<td class="px-6 py-4 text-right">
+<button class="text-slate-500 hover:text-white"><span class="material-symbols-outlined text-lg">open_in_new</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 border-t border-border-dark flex items-center justify-between">
+<p class="text-slate-500 text-sm">Showing <span class="text-white font-medium">5</span> of <span class="text-white font-medium">1,204</span> results</p>
+<div class="flex gap-2">
+<button class="px-3 py-1 text-sm bg-slate-800 text-slate-400 rounded hover:bg-slate-700 hover:text-white disabled:opacity-50">Previous</button>
+<button class="px-3 py-1 text-sm bg-primary/20 text-primary border border-primary/30 rounded font-medium hover:bg-primary/30">Next</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Spacer -->
+<div class="h-10"></div>
+</div>
+</main>
+</div>
+</body></html>

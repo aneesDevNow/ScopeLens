@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Scope Lens Admin - Reseller Management</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;family=Noto+Sans:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1313ec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101022",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a1a2e",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#111118] dark:text-white min-h-screen flex flex-col overflow-x-hidden">
+<!-- TopNavBar -->
+<header class="sticky top-0 z-50 bg-surface-light dark:bg-surface-dark border-b border-[#f0f0f4] dark:border-gray-800 px-10 py-3 flex items-center justify-between whitespace-nowrap">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary">
+<svg class="w-full h-full" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M44 11.2727C44 14.0109 39.8386 16.3957 33.69 17.6364C39.8386 18.877 44 21.2618 44 24C44 26.7382 39.8386 29.123 33.69 30.3636C39.8386 31.6043 44 33.9891 44 36.7273C44 40.7439 35.0457 44 24 44C12.9543 44 4 40.7439 4 36.7273C4 33.9891 8.16144 31.6043 14.31 30.3636C8.16144 29.123 4 26.7382 4 24C4 21.2618 8.16144 18.877 14.31 17.6364C8.16144 16.3957 4 14.0109 4 11.2727C4 7.25611 12.9543 4 24 4C35.0457 4 44 7.25611 44 11.2727Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-[#111118] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Scope Lens Admin</h2>
+</div>
+<nav class="flex items-center gap-9 hidden lg:flex">
+<a class="text-[#616189] dark:text-gray-400 hover:text-primary text-sm font-medium leading-normal" href="#">Dashboard</a>
+<a class="text-primary text-sm font-bold leading-normal" href="#">Resellers</a>
+<a class="text-[#616189] dark:text-gray-400 hover:text-primary text-sm font-medium leading-normal" href="#">Users</a>
+<a class="text-[#616189] dark:text-gray-400 hover:text-primary text-sm font-medium leading-normal" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-8 items-center">
+<label class="flex flex-col min-w-40 !h-10 max-w-64 hidden md:flex">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-[#616189] dark:text-gray-400 flex border-none bg-[#f0f0f4] dark:bg-gray-800 items-center justify-center pl-4 rounded-l-lg border-r-0">
+<span class="material-symbols-outlined text-[24px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#111118] dark:text-white focus:outline-0 focus:ring-0 border-none bg-[#f0f0f4] dark:bg-gray-800 focus:border-none h-full placeholder:text-[#616189] dark:placeholder:text-gray-500 px-4 rounded-l-none border-l-0 pl-2 text-base font-normal leading-normal" placeholder="Search resellers..." value=""/>
+</div>
+</label>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 ring-2 ring-white dark:ring-gray-800 cursor-pointer" data-alt="User profile picture showing a person in professional attire" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuChFXv3DPR658ZrO7G-VlYYEAdaHTNMyKE8kI7V-jvxfR2p8bmZCA24rBSyQGj5yLHUAxB0Hk_bXf19SyGSQYOtxvI8W2qy36hcbewHI_t7jfWUxv2-2k0QD34bbKLIIstxxomkx7e1VXGR8IypmWZsIFjmI8zxB__n3b52wRD71QIfzViRzc0cwXAXKCRFFmKLz2VIII613UaO4SYZo7IvqutUpWY8swwsoAtOH8jJf1Dn8r1BJiBXiOkjpv_qGD4P04PaNiYj6tc");'></div>
+</div>
+</header>
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 md:px-10 lg:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[1200px] flex-1">
+<!-- PageHeading -->
+<div class="flex flex-wrap justify-between gap-3 p-4">
+<div class="flex min-w-72 flex-col gap-2">
+<p class="text-[#111118] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Reseller Management</p>
+<p class="text-[#616189] dark:text-gray-400 text-base font-normal leading-normal">Manage your network of distributors, tiers, and credit approvals.</p>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-blue-700 transition-colors">
+<span class="material-symbols-outlined mr-2 text-[20px]">add</span>
+                            Add New Reseller
+                        </button>
+</div>
+</div>
+<!-- Stats -->
+<div class="flex flex-wrap gap-4 p-4">
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-[#dbdbe6] dark:border-gray-700 bg-surface-light dark:bg-surface-dark shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-[#616189] dark:text-gray-400 text-sm font-medium leading-normal">Total Resellers</p>
+<span class="material-symbols-outlined text-[#616189] dark:text-gray-400 text-[20px]">groups</span>
+</div>
+<p class="text-[#111118] dark:text-white tracking-light text-2xl font-bold leading-tight">142</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[#078841] text-[16px]">trending_up</span>
+<p class="text-[#078841] text-xs font-bold leading-normal">+12% this month</p>
+</div>
+</div>
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-[#dbdbe6] dark:border-gray-700 bg-surface-light dark:bg-surface-dark shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-[#616189] dark:text-gray-400 text-sm font-medium leading-normal">Pending Approvals</p>
+<span class="material-symbols-outlined text-[#616189] dark:text-gray-400 text-[20px]">pending_actions</span>
+</div>
+<p class="text-[#111118] dark:text-white tracking-light text-2xl font-bold leading-tight">8</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[#e74008] text-[16px]">priority_high</span>
+<p class="text-[#e74008] text-xs font-bold leading-normal">Requires attention</p>
+</div>
+</div>
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-[#dbdbe6] dark:border-gray-700 bg-surface-light dark:bg-surface-dark shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-[#616189] dark:text-gray-400 text-sm font-medium leading-normal">Total Revenue</p>
+<span class="material-symbols-outlined text-[#616189] dark:text-gray-400 text-[20px]">payments</span>
+</div>
+<p class="text-[#111118] dark:text-white tracking-light text-2xl font-bold leading-tight">$1.2M</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[#078841] text-[16px]">trending_up</span>
+<p class="text-[#078841] text-xs font-bold leading-normal">+5% vs last month</p>
+</div>
+</div>
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 border border-[#dbdbe6] dark:border-gray-700 bg-surface-light dark:bg-surface-dark shadow-sm">
+<div class="flex items-center justify-between">
+<p class="text-[#616189] dark:text-gray-400 text-sm font-medium leading-normal">Active Credits</p>
+<span class="material-symbols-outlined text-[#616189] dark:text-gray-400 text-[20px]">credit_card</span>
+</div>
+<p class="text-[#111118] dark:text-white tracking-light text-2xl font-bold leading-tight">45,200</p>
+<p class="text-[#616189] dark:text-gray-500 text-xs font-medium leading-normal">Credits in circulation</p>
+</div>
+</div>
+<!-- Tabs -->
+<div class="pb-3 px-4">
+<div class="flex border-b border-[#dbdbe6] dark:border-gray-700 gap-8">
+<button class="flex flex-col items-center justify-center border-b-[3px] border-primary text-[#111118] dark:text-white pb-[13px] pt-4 px-2 hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<p class="text-primary text-sm font-bold leading-normal tracking-[0.015em]">Active Resellers</p>
+</button>
+<button class="flex flex-col items-center justify-center border-b-[3px] border-transparent text-[#616189] dark:text-gray-400 pb-[13px] pt-4 px-2 hover:text-primary hover:border-primary/30 transition-all">
+<p class="text-sm font-bold leading-normal tracking-[0.015em]">Approve Applications <span class="ml-2 rounded-full bg-red-100 text-red-700 text-xs py-0.5 px-2">8</span></p>
+</button>
+</div>
+</div>
+<!-- ActionsBar -->
+<div class="px-4 py-2">
+<div class="flex flex-wrap justify-between items-center gap-4">
+<div class="flex flex-wrap justify-start gap-2">
+<button class="flex items-center gap-2 bg-surface-light dark:bg-surface-dark border border-[#dbdbe6] dark:border-gray-700 rounded-lg px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-[#111118] dark:text-white text-[20px]">filter_list</span>
+<span class="text-[#111118] dark:text-white text-sm font-medium">Filter</span>
+</button>
+<button class="flex items-center gap-2 bg-surface-light dark:bg-surface-dark border border-[#dbdbe6] dark:border-gray-700 rounded-lg px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-[#111118] dark:text-white text-[20px]">sort</span>
+<span class="text-[#111118] dark:text-white text-sm font-medium">Sort</span>
+</button>
+<button class="flex items-center gap-2 bg-surface-light dark:bg-surface-dark border border-[#dbdbe6] dark:border-gray-700 rounded-lg px-4 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-[#111118] dark:text-white text-[20px]">download</span>
+<span class="text-[#111118] dark:text-white text-sm font-medium">Export</span>
+</button>
+</div>
+<div class="text-sm text-[#616189] dark:text-gray-400 font-medium">
+                            Showing 1-10 of 142
+                        </div>
+</div>
+</div>
+<!-- Table Section -->
+<div class="px-4 py-4">
+<div class="overflow-hidden rounded-xl border border-[#dbdbe6] dark:border-gray-700 bg-surface-light dark:bg-surface-dark shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#f9fafb] dark:bg-[#1f1f35] border-b border-[#dbdbe6] dark:border-gray-700">
+<th class="px-6 py-4 text-xs font-bold text-[#616189] dark:text-gray-400 uppercase tracking-wider">Reseller Name</th>
+<th class="px-6 py-4 text-xs font-bold text-[#616189] dark:text-gray-400 uppercase tracking-wider">Tier</th>
+<th class="px-6 py-4 text-xs font-bold text-[#616189] dark:text-gray-400 uppercase tracking-wider text-right">Revenue</th>
+<th class="px-6 py-4 text-xs font-bold text-[#616189] dark:text-gray-400 uppercase tracking-wider">Last Purchase</th>
+<th class="px-6 py-4 text-xs font-bold text-[#616189] dark:text-gray-400 uppercase tracking-wider text-center">Discount %</th>
+<th class="px-6 py-4 text-xs font-bold text-[#616189] dark:text-gray-400 uppercase tracking-wider">Status</th>
+<th class="px-6 py-4 text-xs font-bold text-[#616189] dark:text-gray-400 uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#dbdbe6] dark:divide-gray-700">
+<!-- Row 1 -->
+<tr class="group hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-cover bg-center border border-gray-200 dark:border-gray-600" data-alt="Company logo for TechVision Inc" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBcQKHysugPmDzTdPDoA-H7dKoQ7IGFJ7JVfN-o9vQJmq6s_9K2Xtcc_MDMAyn9YRc356gNHv1rJNQP3njK_X9DetK9hA_uHQBYJwx6OBPhkUIw2VOy7g1rvCSr0Xba7HXls_NmhM1TSlDXMpXRaYbmFi66M3ZXsV3ubCMJuU6Kiw9ELpzPOed_AZGPUYJeXxLx8Kcoc8JoF5HIxK2eINKCPwvIscDgBcxA3ZUk0ZhlQVQNfX87TBhZT40-kvvqZj98d48H0Dy4CH8");'></div>
+<div>
+<div class="font-bold text-[#111118] dark:text-white">TechVision Inc.</div>
+<div class="text-sm text-[#616189] dark:text-gray-400">ID: #RES-9021</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-0.5 text-xs font-bold text-yellow-800 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-700">
+<span class="material-symbols-outlined text-[14px] mr-1">workspace_premium</span>
+                                                Gold
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right font-medium text-[#111118] dark:text-white">$342,000</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-[#111118] dark:text-white">Oct 24, 2023</div>
+<div class="text-xs text-[#616189] dark:text-gray-400">500 Credits</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<div class="inline-flex items-center gap-2 border border-gray-200 dark:border-gray-600 rounded-md px-2 py-1 bg-white dark:bg-black/20">
+<input class="w-12 p-0 text-center text-sm font-medium bg-transparent border-none focus:ring-0 text-[#111118] dark:text-white" type="number" value="15"/>
+<span class="text-xs text-gray-500">%</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:text-green-400">Active</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<button class="text-[#616189] dark:text-gray-400 hover:text-primary dark:hover:text-primary p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="group hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-cover bg-center border border-gray-200 dark:border-gray-600" data-alt="Company logo for BlueSky Systems" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDE3sxCj7RYTOA4TK75Ey9WRxoQQn8gQQ38bBKWzzXUjBUONsHhTcz7wyUb2lEH6_qeIUmPqlvFI0dRHI5ckrBKABeV-u-ziTCYLIbWLRApGFRC8a4braVocdAWgZaMn70x5RMLPwhryPbwG5SXv53dqbymc-vktAmvySxJ07a5LeuvX0iQVuNV6h--WN15VOVdyaE0eKtOLcxImhMdYqH9xcR6lrurdpDx8xIoulwwH8sYPdHTZPttIUE_Jay3tobaVuq9kEJ9x_c");'></div>
+<div>
+<div class="font-bold text-[#111118] dark:text-white">BlueSky Systems</div>
+<div class="text-sm text-[#616189] dark:text-gray-400">ID: #RES-8842</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-bold text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+<span class="material-symbols-outlined text-[14px] mr-1">verified</span>
+                                                Silver
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right font-medium text-[#111118] dark:text-white">$124,500</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-[#111118] dark:text-white">Oct 20, 2023</div>
+<div class="text-xs text-[#616189] dark:text-gray-400">120 Credits</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<div class="inline-flex items-center gap-2 border border-gray-200 dark:border-gray-600 rounded-md px-2 py-1 bg-white dark:bg-black/20">
+<input class="w-12 p-0 text-center text-sm font-medium bg-transparent border-none focus:ring-0 text-[#111118] dark:text-white" type="number" value="10"/>
+<span class="text-xs text-gray-500">%</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:text-green-400">Active</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<button class="text-[#616189] dark:text-gray-400 hover:text-primary dark:hover:text-primary p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="group hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-cover bg-center border border-gray-200 dark:border-gray-600" data-alt="Company logo for Orbit Analytics" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBcHtr59cd4vaJhpxr0bDiF3N431RFJ7a6t8zR6ivUIESnMvX7peKCuV_qcuZJA8FxOiqECbZAtujGfaZ6CSRe7CuDJ_--hgdvDYtWqiuLvAPp-ivnmYWF3BZA7w8tDZMIjSkRR7oUxY7vqSp7yxsIGM2wgoBC6m17c6HUHlxnd-h38MND9WFe7uv6eu3_n-sxYFW6ua1Re0g7x2FxrCsj3wK9JTMO0Jdph-ewu-AsEgAKQ0-n1zxRvehwdKxI9If3lyFRPIrAYIyI");'></div>
+<div>
+<div class="font-bold text-[#111118] dark:text-white">Orbit Analytics</div>
+<div class="text-sm text-[#616189] dark:text-gray-400">ID: #RES-7210</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-amber-700/10 dark:bg-amber-900/30 px-2.5 py-0.5 text-xs font-bold text-amber-800 dark:text-amber-500 border border-amber-200 dark:border-amber-800">
+<span class="material-symbols-outlined text-[14px] mr-1">stars</span>
+                                                Bronze
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right font-medium text-[#111118] dark:text-white">$45,800</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-[#111118] dark:text-white">Sep 28, 2023</div>
+<div class="text-xs text-[#616189] dark:text-gray-400">50 Credits</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<div class="inline-flex items-center gap-2 border border-gray-200 dark:border-gray-600 rounded-md px-2 py-1 bg-white dark:bg-black/20">
+<input class="w-12 p-0 text-center text-sm font-medium bg-transparent border-none focus:ring-0 text-[#111118] dark:text-white" type="number" value="5"/>
+<span class="text-xs text-gray-500">%</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/30 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:text-red-400">Suspended</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<button class="text-[#616189] dark:text-gray-400 hover:text-primary dark:hover:text-primary p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="group hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-cover bg-center border border-gray-200 dark:border-gray-600" data-alt="Company logo for Quantum Leap" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCKzlN0ZIRmypeXYg9Yy8f7ExORZ_kqAmfaUF5u9z6ksWgUvdKlOmAEtgM5j9Rttk5z4Xk0tFDLhLpvJimthxb6B8HxGDIH9FS-OEM2StTZVq8uOlKqCXEi-iwDSlaytbqThJbvQI5XiJMgvQq94uxvfKQOUTm4DG1cFYNz5wkoRfTho5TIG67JhZ1aiQSm5Pz4Cuv4bQZK6xJOnNjTgj_PZfOymBBj1oGBRYg3x-51n9ZGilGTcMl5YIJzt0bkB2JuswCWjSnP9lY");'></div>
+<div>
+<div class="font-bold text-[#111118] dark:text-white">Quantum Leap</div>
+<div class="text-sm text-[#616189] dark:text-gray-400">ID: #RES-3349</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-0.5 text-xs font-bold text-yellow-800 dark:text-yellow-400 border border-yellow-200 dark:border-yellow-700">
+<span class="material-symbols-outlined text-[14px] mr-1">workspace_premium</span>
+                                                Gold
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right font-medium text-[#111118] dark:text-white">$892,100</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-[#111118] dark:text-white">Oct 24, 2023</div>
+<div class="text-xs text-[#616189] dark:text-gray-400">1000 Credits</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<div class="inline-flex items-center gap-2 border border-gray-200 dark:border-gray-600 rounded-md px-2 py-1 bg-white dark:bg-black/20">
+<input class="w-12 p-0 text-center text-sm font-medium bg-transparent border-none focus:ring-0 text-[#111118] dark:text-white" type="number" value="18"/>
+<span class="text-xs text-gray-500">%</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:text-green-400">Active</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<button class="text-[#616189] dark:text-gray-400 hover:text-primary dark:hover:text-primary p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="group hover:bg-gray-50 dark:hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-cover bg-center border border-gray-200 dark:border-gray-600" data-alt="Company logo for Apex Solutions" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC597uwjMAqWqT5IqFNkt5hovvSQ87-ABe5Mq4tPG8qenqC04kHYW8K8kru5EE8zZc8yz-mcM7O9Q1oK1fTvUFmEdBzCXiLDeBunISGHZm759BHXF2VgUikURSqmF-cd1Q3PqCe10abVYR51xMoiifqadsHdabdd0-mhNY1TimCR5DgyG93c2EKF-li1_tOXmHVpgiZNFnnCDbDTtiOSFa0sWTXi0Zi149u1dhGNgx4sreecj6vE4LdSirZMXO7ijOMn4MAxfeoocI");'></div>
+<div>
+<div class="font-bold text-[#111118] dark:text-white">Apex Solutions</div>
+<div class="text-sm text-[#616189] dark:text-gray-400">ID: #RES-5591</div>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-700 px-2.5 py-0.5 text-xs font-bold text-gray-800 dark:text-gray-300 border border-gray-200 dark:border-gray-600">
+<span class="material-symbols-outlined text-[14px] mr-1">verified</span>
+                                                Silver
+                                            </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right font-medium text-[#111118] dark:text-white">$104,200</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="text-sm text-[#111118] dark:text-white">Oct 15, 2023</div>
+<div class="text-xs text-[#616189] dark:text-gray-400">80 Credits</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-center">
+<div class="inline-flex items-center gap-2 border border-gray-200 dark:border-gray-600 rounded-md px-2 py-1 bg-white dark:bg-black/20">
+<input class="w-12 p-0 text-center text-sm font-medium bg-transparent border-none focus:ring-0 text-[#111118] dark:text-white" type="number" value="10"/>
+<span class="text-xs text-gray-500">%</span>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:text-green-400">Active</span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<button class="text-[#616189] dark:text-gray-400 hover:text-primary dark:hover:text-primary p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="flex items-center justify-between border-t border-[#dbdbe6] dark:border-gray-700 bg-surface-light dark:bg-surface-dark px-4 py-3 sm:px-6">
+<div class="flex flex-1 justify-between sm:hidden">
+<a class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" href="#">Previous</a>
+<a class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50" href="#">Next</a>
+</div>
+<div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+<div>
+<p class="text-sm text-[#616189] dark:text-gray-400">
+                                        Showing <span class="font-medium">1</span> to <span class="font-medium">10</span> of <span class="font-medium">142</span> results
+                                    </p>
+</div>
+<div>
+<nav aria-label="Pagination" class="isolate inline-flex -space-x-px rounded-md shadow-sm">
+<a class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 focus:z-20 focus:outline-offset-0" href="#">
+<span class="sr-only">Previous</span>
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</a>
+<a aria-current="page" class="relative z-10 inline-flex items-center bg-primary px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" href="#">1</a>
+<a class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 focus:z-20 focus:outline-offset-0" href="#">2</a>
+<a class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 focus:z-20 focus:outline-offset-0 md:inline-flex" href="#">3</a>
+<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-700 dark:text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 focus:outline-offset-0">...</span>
+<a class="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 focus:z-20 focus:outline-offset-0 md:inline-flex" href="#">15</a>
+<a class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 dark:ring-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 focus:z-20 focus:outline-offset-0" href="#">
+<span class="sr-only">Next</span>
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</a>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

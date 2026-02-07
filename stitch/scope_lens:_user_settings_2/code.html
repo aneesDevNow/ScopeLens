@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>2FA Setup &amp; Verification</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1313ec",
+                        "teal-accent": "#0d9488",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101022",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#111118] dark:text-white overflow-hidden">
+<div class="flex h-screen w-full">
+<aside class="w-64 hidden md:flex flex-col border-r border-[#dbdbe6] dark:border-gray-800 bg-white dark:bg-[#1a1a2e]">
+<div class="p-6 pb-2">
+<div class="flex flex-col">
+<h1 class="text-primary dark:text-indigo-400 text-xl font-bold leading-normal flex items-center gap-2">
+<span class="material-symbols-outlined">center_focus_weak</span>
+                        Scope Lens
+                    </h1>
+<p class="text-[#616189] dark:text-gray-400 text-xs font-normal leading-normal mt-1">AI Detection SaaS</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#616189] dark:text-gray-400 hover:bg-[#f0f0f4] dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">person</span>
+<p class="text-sm font-medium leading-normal">Profile</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg bg-primary/10 dark:bg-primary/20 text-primary dark:text-indigo-300 group transition-colors" href="#">
+<span class="material-symbols-outlined fill">shield</span>
+<p class="text-sm font-medium leading-normal">Security</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#616189] dark:text-gray-400 hover:bg-[#f0f0f4] dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">credit_card</span>
+<p class="text-sm font-medium leading-normal">Billing</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#616189] dark:text-gray-400 hover:bg-[#f0f0f4] dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">api</span>
+<p class="text-sm font-medium leading-normal">API Keys</p>
+</a>
+</nav>
+<div class="p-4 border-t border-[#dbdbe6] dark:border-gray-800">
+<a class="flex items-center gap-3 px-3 py-2 text-[#616189] dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium">Sign Out</p>
+</a>
+</div>
+</aside>
+<main class="flex-1 h-full overflow-y-auto relative bg-[#f8f9fc] dark:bg-[#101022]">
+<div class="min-h-full flex items-center justify-center p-4 md:p-8">
+<div class="max-w-xl w-full bg-white dark:bg-[#1a1a2e] rounded-2xl shadow-xl border border-[#dbdbe6] dark:border-gray-800 overflow-hidden">
+<div class="bg-gradient-to-r from-primary/5 to-indigo-500/5 dark:from-primary/20 dark:to-indigo-500/10 p-8 text-center border-b border-[#dbdbe6] dark:border-gray-800">
+<div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-4 shadow-sm ring-4 ring-white dark:ring-[#1a1a2e]">
+<span class="material-symbols-outlined text-[32px] fill">lock_person</span>
+</div>
+<h2 class="text-2xl font-black tracking-tight text-[#111118] dark:text-white">Enable 2FA</h2>
+<p class="text-[#616189] dark:text-gray-400 mt-2 text-sm max-w-sm mx-auto">
+                            Secure your Scope Lens account by setting up two-factor authentication.
+                        </p>
+</div>
+<div class="p-8 space-y-8">
+<div class="flex flex-col items-center">
+<div class="flex items-center gap-2 mb-4">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-primary dark:text-indigo-400 text-xs font-bold">1</span>
+<span class="text-sm font-bold text-[#111118] dark:text-white uppercase tracking-wider">Scan QR Code</span>
+</div>
+<div class="p-4 bg-white rounded-xl border-2 border-[#dbdbe6] dark:border-gray-700 shadow-sm relative group">
+<svg class="w-48 h-48 text-gray-900" fill="currentColor" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 0h30v30H0V0zm35 0h5v5h-5V0zm10 0h5v5h-5V0zm10 0h5v5h-5V0zm15 0h30v30H70V0zM5 5v20h20V5H5zm70 0v20h20V5H75zM35 10h5v5h-5v-5zm10 0h5v5h-5v-5zm10 0h5v5h-5v-5zm-55 25h5v5H0v-5zm10 0h5v5h-5v-5zm15 0h5v5h-5v-5zm10 0h5v5h-5v-5zm10 0h5v5h-5v-5zm10 0h5v5h-5v-5zm10 0h5v5h-5v-5zm10 0h5v5h-5v-5zM0 70h30v30H0V70zm5 5v20h20V75H5zm30-40h5v5h-5v-5zm5 0h5v5h-5v-5zm15 0h5v5h-5v-5zm5 0h5v5h-5v-5zm5 0h5v5h-5v-5zm25 0h5v5h-5v-5zm-65 5h5v5h-5v-5zm20 0h5v5h-5v-5zm5 0h5v5h-5v-5zm10 0h5v5h-5v-5zm10 0h5v5h-5v-5zm-45 5h5v5h-5v-5zm10 0h5v5h-5v-5zm5 0h5v5h-5v-5zm5 0h5v5h-5v-5zm5 0h5v5h-5v-5zm5 0h5v5h-5v-5zm5 0h5v5h-5v-5zm10 0h5v5h-5v-5zm-45 5h5v5h-5v-5zm15 0h5v5h-5v-5zm25 0h5v5h-5v-5zm10 0h5v5h-5v-5zm-55 5h5v5h-5v-5zm20 0h5v5h-5v-5zm5 0h5v5h-5v-5zm5 0h5v5h-5v-5zm5 0h5v5h-5v-5zm5 0h5v5h-5v-5zm5 0h5v5h-5v-5zm5 0h5v5h-5v-5zm-50 5h5v5h-5v-5zm5 0h5v5h-5v-5zm15 0h5v5h-5v-5zm10 0h5v5h-5v-5zm20 0h5v5h-5v-5zm10 0h5v5h-5v-5zm-55 5h5v5h-5v-5zm5 0h5v5h-5v-5zm10 0h5v5h-5v-5zm5 0h5v5h-5v-5zm10 0h5v5h-5v-5zm10 0h5v5h-5v-5zm5 0h5v5h-5v-5z"></path>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 backdrop-blur-sm">
+<span class="text-xs font-bold text-gray-800">Use Authenticator App</span>
+</div>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-primary dark:text-indigo-400 text-xs font-bold">2</span>
+<span class="text-sm font-bold text-[#111118] dark:text-white uppercase tracking-wider">Manual Entry</span>
+</div>
+</div>
+<div class="relative group">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-gray-400 text-[20px]">key</span>
+</div>
+<input class="form-input w-full pl-10 pr-12 rounded-lg border border-[#dbdbe6] dark:border-gray-700 bg-background-light dark:bg-[#101022] text-[#111118] dark:text-white font-mono text-center tracking-widest text-sm h-11 focus:outline-none focus:ring-0 cursor-text" readonly="" type="text" value="JBSW Y3DP EHPK 3PXP"/>
+<button class="absolute inset-y-0 right-0 px-3 flex items-center text-[#616189] hover:text-primary transition-colors tooltip" title="Copy code">
+<span class="material-symbols-outlined text-[20px]">content_copy</span>
+</button>
+</div>
+<p class="text-xs text-[#616189] dark:text-gray-500 text-center">Can't scan? Enter this code into your authenticator app.</p>
+</div>
+<div class="space-y-3 pt-2">
+<div class="flex items-center gap-2 mb-1">
+<span class="flex items-center justify-center w-6 h-6 rounded-full bg-indigo-100 dark:bg-indigo-900/50 text-primary dark:text-indigo-400 text-xs font-bold">3</span>
+<span class="text-sm font-bold text-[#111118] dark:text-white uppercase tracking-wider">Verify Code</span>
+</div>
+<input class="w-full h-14 text-center text-3xl font-mono tracking-[0.5em] text-[#111118] dark:text-white bg-white dark:bg-[#1a1a2e] border-2 border-[#dbdbe6] dark:border-gray-700 rounded-lg focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-gray-200 dark:placeholder:text-gray-800" maxlength="6" placeholder="000 000" type="text"/>
+</div>
+<div class="flex flex-col gap-4 pt-2">
+<button class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3.5 rounded-lg shadow-lg shadow-teal-900/20 flex items-center justify-center gap-2 transition-all transform active:scale-[0.99]">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+<span>Verify &amp; Enable</span>
+</button>
+<div class="flex items-center justify-center gap-6 pt-2">
+<a class="text-sm font-medium text-[#616189] dark:text-gray-400 hover:text-primary dark:hover:text-white flex items-center gap-1.5 transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">download</span>
+                                    Backup Codes
+                                </a>
+<div class="w-1 h-1 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
+<a class="text-sm font-medium text-[#616189] dark:text-gray-400 hover:text-red-500 transition-colors" href="#">
+                                    Cancel Setup
+                                </a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+
+</body></html>

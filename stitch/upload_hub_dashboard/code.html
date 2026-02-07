@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Upload Hub Dashboard</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom scrollbar for better look */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cfd7e7; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#0d121b] dark:text-[#f8f9fc] font-display antialiased overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- Side Navigation -->
+<aside class="w-64 flex-shrink-0 flex flex-col justify-between border-r border-[#cfd7e7] dark:border-gray-800 bg-white dark:bg-[#161b26] transition-colors duration-200">
+<div class="flex flex-col h-full p-4">
+<!-- Header / Logo -->
+<div class="flex gap-3 mb-8 px-2 mt-2">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 flex-shrink-0 bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" style="font-size: 24px;">verified_user</span>
+</div>
+<div class="flex flex-col justify-center">
+<h1 class="text-[#0d121b] dark:text-white text-base font-bold leading-normal">Upload Hub</h1>
+<p class="text-[#4c669a] dark:text-gray-400 text-xs font-normal leading-normal">AI Detector SaaS</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<nav class="flex flex-col gap-2 flex-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary group transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 24px;">upload</span>
+<p class="text-sm font-medium leading-normal">Upload</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#0d121b] dark:text-gray-300 hover:bg-[#f0f2f5] dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 24px;">history</span>
+<p class="text-sm font-medium leading-normal">History</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#0d121b] dark:text-gray-300 hover:bg-[#f0f2f5] dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-size: 24px;">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[#0d121b] dark:text-gray-300 hover:bg-[#f0f2f5] dark:hover:bg-gray-800 transition-colors" href="#">
+<span class="material-symbols-outlined text-amber-500" style="font-size: 24px;">star</span>
+<p class="text-sm font-medium leading-normal">Upgrade</p>
+</a>
+</nav>
+<!-- New Scan Button -->
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary hover:bg-blue-700 text-white text-sm font-bold leading-normal tracking-[0.015em] transition-colors mt-auto shadow-sm">
+<span class="truncate">New Scan</span>
+</button>
+<!-- User Profile Snippet (Optional addition for realism) -->
+<div class="mt-6 flex items-center gap-3 px-2 py-3 border-t border-[#cfd7e7] dark:border-gray-800">
+<div class="size-8 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden bg-cover bg-center" data-alt="User avatar profile picture" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDw3IVnGD03L0jd9BP6tpleM4PLbmYc4cvxqptHv9gcTc7mvos-AVOZb81bZlw0KD6xh_6jP7b-c2IoISTsXQHsmi7lLbux_9L3n8lOjtwjGkoKsErvrECL_cCRNBk7OLGFglcVr2ay4Elmh8E2j8fYfFHIHELBOAbZF6Kk4bNesevPSylQtdONpkxm1TgZjpO4GrzYiMUPQCSCHy90XCDsgc28vSqNgRID6zbrbIC9rBQ_e6v3X7krVLK5oxtcdYaztKikl0JoM_Q')"></div>
+<div class="flex flex-col">
+<p class="text-xs font-semibold dark:text-gray-200">Jane Cooper</p>
+<p class="text-[10px] text-gray-500">Free Plan</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 h-full overflow-y-auto bg-background-light dark:bg-background-dark relative">
+<!-- Content Container -->
+<div class="max-w-[1100px] mx-auto w-full flex flex-col p-6 md:p-10 gap-8">
+<!-- Page Heading -->
+<header class="flex flex-wrap justify-between items-end gap-4">
+<div class="flex flex-col gap-2">
+<h2 class="text-[#0d121b] dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Dashboard</h2>
+<p class="text-[#4c669a] dark:text-gray-400 text-base font-normal leading-normal">Analyze documents for AI-generated text.</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-sm text-gray-500 dark:text-gray-400">Credits remaining: <strong class="text-primary">12</strong></span>
+<button class="text-xs font-medium text-primary hover:underline">Buy more</button>
+</div>
+</header>
+<!-- Upload Zone (EmptyState) -->
+<section class="flex flex-col rounded-xl bg-white dark:bg-[#161b26] shadow-sm border border-[#cfd7e7] dark:border-gray-800 p-1">
+<div class="flex flex-col items-center justify-center gap-6 rounded-lg border-2 border-dashed border-[#cfd7e7] dark:border-gray-700 bg-background-light/50 dark:bg-background-dark/30 px-6 py-16 hover:bg-blue-50 dark:hover:bg-blue-900/10 transition-colors group cursor-pointer">
+<div class="rounded-full bg-blue-100 dark:bg-blue-900/30 p-4 text-primary mb-2 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined" style="font-size: 40px;">cloud_upload</span>
+</div>
+<div class="flex max-w-[480px] flex-col items-center gap-2 text-center">
+<p class="text-[#0d121b] dark:text-white text-xl font-bold leading-tight tracking-[-0.015em]">Upload your document</p>
+<p class="text-[#4c669a] dark:text-gray-400 text-sm font-normal leading-relaxed">
+                                Drag &amp; drop PDF, DOCX, or TXT files here to start analyzing.
+                            </p>
+</div>
+<button class="flex min-w-[140px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-6 bg-white dark:bg-gray-800 border border-[#cfd7e7] dark:border-gray-600 hover:border-primary text-[#0d121b] dark:text-white text-sm font-bold leading-normal tracking-[0.015em] shadow-sm hover:shadow transition-all">
+<span class="truncate">Select File</span>
+</button>
+</div>
+</section>
+<!-- Recent Activity Section -->
+<section class="flex flex-col gap-4">
+<div class="flex items-center justify-between px-1">
+<h2 class="text-[#0d121b] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Recent Activity</h2>
+<a class="text-sm font-medium text-primary hover:text-blue-600" href="#">View all</a>
+</div>
+<!-- Table -->
+<div class="w-full overflow-hidden rounded-xl border border-[#cfd7e7] dark:border-gray-800 bg-white dark:bg-[#161b26] shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full">
+<thead class="bg-[#f8f9fc] dark:bg-[#1f2937] border-b border-[#cfd7e7] dark:border-gray-800">
+<tr>
+<th class="px-6 py-4 text-left text-[#4c669a] dark:text-gray-400 text-xs font-semibold uppercase tracking-wider">File Name</th>
+<th class="px-6 py-4 text-left text-[#4c669a] dark:text-gray-400 text-xs font-semibold uppercase tracking-wider w-40">Date</th>
+<th class="px-6 py-4 text-left text-[#4c669a] dark:text-gray-400 text-xs font-semibold uppercase tracking-wider w-32">AI Score</th>
+<th class="px-6 py-4 text-right text-[#4c669a] dark:text-gray-400 text-xs font-semibold uppercase tracking-wider w-32">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#cfd7e7] dark:divide-gray-800">
+<!-- Row 1 -->
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="text-blue-500 bg-blue-50 dark:bg-blue-900/30 p-2 rounded-lg">
+<span class="material-symbols-outlined" style="font-size: 20px;">description</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[#0d121b] dark:text-gray-200 text-sm font-medium">History_Essay_Final.docx</span>
+<span class="text-xs text-gray-500">1.2 MB</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-[#4c669a] dark:text-gray-400">Oct 24, 2023</td>
+<td class="px-6 py-4">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold">
+<span class="size-1.5 rounded-full bg-green-500"></span>
+                                                12% AI
+                                            </div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-[#4c669a] hover:text-primary dark:text-gray-400 dark:hover:text-white text-sm font-medium transition-colors">
+                                                View Report
+                                            </button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="text-red-500 bg-red-50 dark:bg-red-900/30 p-2 rounded-lg">
+<span class="material-symbols-outlined" style="font-size: 20px;">picture_as_pdf</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[#0d121b] dark:text-gray-200 text-sm font-medium">Research_Paper_v2.pdf</span>
+<span class="text-xs text-gray-500">4.5 MB</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-[#4c669a] dark:text-gray-400">Oct 23, 2023</td>
+<td class="px-6 py-4">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400 text-xs font-bold">
+<span class="size-1.5 rounded-full bg-red-500"></span>
+                                                88% AI
+                                            </div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-[#4c669a] hover:text-primary dark:text-gray-400 dark:hover:text-white text-sm font-medium transition-colors">
+                                                View Report
+                                            </button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="text-gray-500 bg-gray-100 dark:bg-gray-700 p-2 rounded-lg">
+<span class="material-symbols-outlined" style="font-size: 20px;">article</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[#0d121b] dark:text-gray-200 text-sm font-medium">Creative_Writing.txt</span>
+<span class="text-xs text-gray-500">15 KB</span>
+</div>
+</div>
+</td>
+<td class="px-6 py-4 text-sm text-[#4c669a] dark:text-gray-400">Oct 22, 2023</td>
+<td class="px-6 py-4">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold">
+<span class="size-1.5 rounded-full bg-green-500"></span>
+                                                2% AI
+                                            </div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="text-[#4c669a] hover:text-primary dark:text-gray-400 dark:hover:text-white text-sm font-medium transition-colors">
+                                                View Report
+                                            </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+</div>
+</main>
+</div>
+</body></html>

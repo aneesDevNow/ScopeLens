@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin: License Key Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1313ec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101022",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for better aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased overflow-hidden">
+<div class="flex h-screen w-full overflow-hidden">
+<!-- Side Navigation -->
+<aside class="flex w-64 flex-col border-r border-slate-200 bg-white dark:bg-[#1e1e2d] dark:border-slate-800 flex-shrink-0 h-full overflow-y-auto z-20 hidden md:flex">
+<div class="flex h-full flex-col justify-between p-4">
+<div class="flex flex-col gap-4">
+<!-- User Profile / Brand -->
+<div class="flex gap-3 items-center mb-6">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-slate-100 dark:border-slate-700 shadow-sm" data-alt="Abstract geometric purple gradient representing AI" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAwZ_GoArV8ptA_eBn1ewzWGVmzHrPCSNmlC5Rfn9ElDiJfc9Z9RwOJJnWfl8r2T3g7KHLORWWcutOu00i-sPc4nKTbjOJRIcnWzHVCyFP9Iv0g9YUZ_2WUdrg0-3yxwraPfxHvRevx4wPkF4fMkO-gC1NeB_y0fiM5n_WodWhR9-FJahk-8buoj-BQRaQ0ELwvfbuROvub9Qcm2hBIUyd4G36z21BMtnfyqOqZDmzjbKHYRrezNhjLF8nJpHEhuxtxzTqjB2pYX3o");'></div>
+<div class="flex flex-col">
+<h1 class="text-slate-900 dark:text-white text-base font-bold leading-normal">Scope Lens</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">Admin Console</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors">donut_large</span>
+<p class="text-sm font-medium leading-normal">Overview</p>
+</a>
+<!-- Active State -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg bg-primary/10 text-primary dark:text-white dark:bg-primary/20 transition-colors" href="#">
+<span class="material-symbols-outlined text-primary dark:text-white fill-current">vpn_key</span>
+<p class="text-sm font-medium leading-normal">License Keys</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors">group</span>
+<p class="text-sm font-medium leading-normal">Users</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors">extension</span>
+<p class="text-sm font-medium leading-normal">Integrations</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</a>
+</div>
+</div>
+<!-- Bottom Links -->
+<div class="flex flex-col gap-2 border-t border-slate-100 dark:border-slate-800 pt-4">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">help</span>
+<p class="text-sm font-medium leading-normal">Support</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined text-slate-500 dark:text-slate-400">logout</span>
+<p class="text-sm font-medium leading-normal">Sign Out</p>
+</a>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col h-full overflow-hidden relative">
+<!-- Mobile Header Trigger -->
+<div class="md:hidden flex items-center p-4 bg-white dark:bg-[#1e1e2d] border-b border-slate-200 dark:border-slate-800">
+<button class="text-slate-500 dark:text-slate-300 mr-4">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="text-lg font-bold">Scope Lens</h1>
+</div>
+<!-- Scrollable Content Area -->
+<div class="flex-1 overflow-y-auto p-4 md:p-8 lg:p-12">
+<div class="max-w-6xl mx-auto flex flex-col gap-8">
+<!-- Page Heading -->
+<div class="flex flex-wrap justify-between items-start gap-4">
+<div class="flex min-w-72 flex-col gap-2">
+<h1 class="text-slate-900 dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">License Key Generator</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal leading-normal">Generate and manage access keys for Scope Lens AI detection plans.</p>
+</div>
+<div class="flex gap-2">
+<button class="flex items-center justify-center gap-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[20px]">file_download</span>
+                                Export CSV
+                            </button>
+</div>
+</div>
+<!-- Generator Form Card -->
+<div class="bg-white dark:bg-[#1e1e2d] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="border-b border-slate-100 dark:border-slate-800 px-6 py-4">
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Generate New Batch</h2>
+</div>
+<div class="p-6">
+<div class="flex flex-col md:flex-row gap-6 items-end">
+<!-- Plan Selection -->
+<label class="flex flex-col w-full md:w-1/3 gap-2">
+<span class="text-slate-900 dark:text-slate-200 text-sm font-medium leading-normal">Plan Type</span>
+<div class="relative">
+<select class="appearance-none w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white h-12 px-4 pr-10 text-base focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all cursor-pointer">
+<option disabled="" selected="" value="">Select a plan</option>
+<option value="50_scans">Starter (50 Scans)</option>
+<option value="100_scans">Pro (100 Scans)</option>
+<option value="500_scans">Business (500 Scans)</option>
+<option value="unlimited">Enterprise (Unlimited)</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-500 dark:text-slate-400">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</label>
+<!-- Quantity Input -->
+<label class="flex flex-col w-full md:w-1/3 gap-2">
+<span class="text-slate-900 dark:text-slate-200 text-sm font-medium leading-normal">Quantity</span>
+<input class="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-900 dark:text-white h-12 px-4 text-base placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all" max="100" min="1" placeholder="e.g. 10" type="number"/>
+</label>
+<!-- Generate Button -->
+<div class="w-full md:w-auto mt-4 md:mt-0">
+<button class="w-full md:w-auto h-12 inline-flex items-center justify-center gap-2 rounded-lg bg-primary text-white px-8 text-base font-medium shadow-lg shadow-primary/20 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all">
+<span class="material-symbols-outlined">auto_fix_high</span>
+                                        Generate Keys
+                                    </button>
+</div>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-xs mt-3 flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">info</span>
+                                Bulk generation is limited to 100 keys per batch.
+                            </p>
+</div>
+</div>
+<!-- Data Table Section -->
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-center px-1">
+<h3 class="text-slate-900 dark:text-white text-xl font-bold">Active Keys</h3>
+<div class="flex gap-2">
+<div class="relative group">
+<span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 dark:text-slate-500">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</span>
+<input class="pl-10 pr-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1e1e2d] text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/30 w-64 transition-all" placeholder="Search keys..." type="text"/>
+</div>
+<button class="p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#1e1e2d] text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">
+<span class="material-symbols-outlined text-[20px]">filter_list</span>
+</button>
+</div>
+</div>
+<div class="bg-white dark:bg-[#1e1e2d] rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-slate-50 dark:bg-white/5 border-b border-slate-200 dark:border-slate-700">
+<th class="p-4 pl-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">License Key</th>
+<th class="p-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Associated Plan</th>
+<th class="p-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Status</th>
+<th class="p-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Created Date</th>
+<th class="p-4 pr-6 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="p-4 pl-6">
+<div class="flex items-center gap-2">
+<span class="font-mono text-sm font-medium text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded select-all">SL-8X29-M4K1-P9L2</span>
+<button class="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity" title="Copy">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+</td>
+<td class="p-4">
+<div class="text-sm font-medium text-slate-700 dark:text-slate-300">Pro (100 Scans)</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+<span class="size-1.5 rounded-full bg-emerald-500"></span>
+                                                    Available
+                                                </span>
+</td>
+<td class="p-4">
+<div class="text-sm text-slate-500 dark:text-slate-400">Oct 24, 2023</div>
+</td>
+<td class="p-4 pr-6 text-right">
+<button class="text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="p-4 pl-6">
+<div class="flex items-center gap-2">
+<span class="font-mono text-sm font-medium text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded select-all">SL-3B71-Q9Z5-R2W8</span>
+<button class="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity" title="Copy">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+</td>
+<td class="p-4">
+<div class="text-sm font-medium text-slate-700 dark:text-slate-300">Business (500 Scans)</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-600">
+<span class="size-1.5 rounded-full bg-slate-400"></span>
+                                                    Redeemed
+                                                </span>
+</td>
+<td class="p-4">
+<div class="text-sm text-slate-500 dark:text-slate-400">Oct 23, 2023</div>
+</td>
+<td class="p-4 pr-6 text-right">
+<button class="text-slate-400 hover:text-red-500 transition-colors" disabled="" title="Cannot delete redeemed key">
+<span class="material-symbols-outlined text-[20px] opacity-50">block</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="p-4 pl-6">
+<div class="flex items-center gap-2">
+<span class="font-mono text-sm font-medium text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded select-all">SL-9K44-V2X7-J1N0</span>
+<button class="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity" title="Copy">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+</td>
+<td class="p-4">
+<div class="text-sm font-medium text-slate-700 dark:text-slate-300">Starter (50 Scans)</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20">
+<span class="size-1.5 rounded-full bg-emerald-500"></span>
+                                                    Available
+                                                </span>
+</td>
+<td class="p-4">
+<div class="text-sm text-slate-500 dark:text-slate-400">Oct 22, 2023</div>
+</td>
+<td class="p-4 pr-6 text-right">
+<button class="text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors group">
+<td class="p-4 pl-6">
+<div class="flex items-center gap-2">
+<span class="font-mono text-sm font-medium text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded select-all">SL-7T11-L5P4-H8Y3</span>
+<button class="text-slate-400 hover:text-primary opacity-0 group-hover:opacity-100 transition-opacity" title="Copy">
+<span class="material-symbols-outlined text-[16px]">content_copy</span>
+</button>
+</div>
+</td>
+<td class="p-4">
+<div class="text-sm font-medium text-slate-700 dark:text-slate-300">Enterprise</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20">
+<span class="size-1.5 rounded-full bg-amber-500"></span>
+                                                    Revoked
+                                                </span>
+</td>
+<td class="p-4">
+<div class="text-sm text-slate-500 dark:text-slate-400">Sep 15, 2023</div>
+</td>
+<td class="p-4 pr-6 text-right">
+<button class="text-slate-400 hover:text-red-500 transition-colors">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="border-t border-slate-100 dark:border-slate-800 px-6 py-4 flex items-center justify-between">
+<p class="text-sm text-slate-500 dark:text-slate-400">Showing <span class="font-medium text-slate-900 dark:text-white">1</span> to <span class="font-medium text-slate-900 dark:text-white">4</span> of <span class="font-medium text-slate-900 dark:text-white">128</span> results</p>
+<div class="flex gap-2">
+<button class="px-3 py-1 rounded border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50" disabled="">Previous</button>
+<button class="px-3 py-1 rounded border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Next</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

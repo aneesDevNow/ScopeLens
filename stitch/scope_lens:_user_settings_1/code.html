@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Scope Lens: User Settings</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#1313ec",
+                        "teal-accent": "#0d9488",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101022",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #334155;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-[#111118] dark:text-white overflow-hidden">
+<div class="flex h-screen w-full">
+<!-- Sidebar Navigation -->
+<aside class="w-64 hidden md:flex flex-col border-r border-[#dbdbe6] dark:border-gray-800 bg-white dark:bg-[#1a1a2e]">
+<div class="p-6 pb-2">
+<div class="flex flex-col">
+<h1 class="text-primary dark:text-indigo-400 text-xl font-bold leading-normal flex items-center gap-2">
+<span class="material-symbols-outlined">center_focus_weak</span>
+                        Scope Lens
+                    </h1>
+<p class="text-[#616189] dark:text-gray-400 text-xs font-normal leading-normal mt-1">AI Detection SaaS</p>
+</div>
+</div>
+<nav class="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg bg-primary/10 dark:bg-primary/20 text-primary dark:text-indigo-300 group transition-colors" href="#">
+<span class="material-symbols-outlined fill">person</span>
+<p class="text-sm font-medium leading-normal">Profile</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#616189] dark:text-gray-400 hover:bg-[#f0f0f4] dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">shield</span>
+<p class="text-sm font-medium leading-normal">Security</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#616189] dark:text-gray-400 hover:bg-[#f0f0f4] dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">credit_card</span>
+<p class="text-sm font-medium leading-normal">Billing</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-3 rounded-lg text-[#616189] dark:text-gray-400 hover:bg-[#f0f0f4] dark:hover:bg-white/5 transition-colors" href="#">
+<span class="material-symbols-outlined">api</span>
+<p class="text-sm font-medium leading-normal">API Keys</p>
+</a>
+</nav>
+<div class="p-4 border-t border-[#dbdbe6] dark:border-gray-800">
+<a class="flex items-center gap-3 px-3 py-2 text-[#616189] dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400 transition-colors" href="#">
+<span class="material-symbols-outlined">logout</span>
+<p class="text-sm font-medium">Sign Out</p>
+</a>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 h-full overflow-y-auto relative">
+<div class="max-w-[1024px] mx-auto w-full pb-20">
+<!-- Page Heading -->
+<div class="px-6 py-8 md:px-10 md:py-10">
+<div class="flex flex-col gap-2">
+<h2 class="text-[#111118] dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">User Settings</h2>
+<p class="text-[#616189] dark:text-gray-400 text-base font-normal leading-normal">Manage your account details, security preferences, and credits.</p>
+</div>
+</div>
+<div class="px-6 md:px-10 flex flex-col gap-8">
+<!-- Section 1: Account Info -->
+<section class="flex flex-col gap-4">
+<div class="border-b border-[#dbdbe6] dark:border-gray-800 pb-2">
+<h3 class="text-[#111118] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Account Info</h3>
+</div>
+<!-- Profile Header Card -->
+<div class="bg-white dark:bg-[#1a1a2e] rounded-xl border border-[#dbdbe6] dark:border-gray-800 p-6 shadow-sm">
+<div class="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+<div class="flex items-center gap-5">
+<div class="bg-center bg-no-repeat bg-cover rounded-full h-24 w-24 border-4 border-background-light dark:border-[#2d2d45]" data-alt="User profile picture placeholder with abstract gradient" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA9NAUdELUN48PROnuYTWYeiYTs0zejHihAGu9HkCk_83Yur2iEfKRS6fh5bHcZqnhPZE-6s4k0_slSSmYqraYIsGzctq2_1AnuTwUzXBj03AQ4yhaupew8OmDf1Rkvs5X_Kjv0R1LgR0lRYiWiO-G8rQEli3YCrc_KL1mrw6eb35E-omWQ4duT1R82OJ71kQTX6-cXSx_cU6ydIk-sMnvMISmzLcB2Kv6n2spkOPpyz-s9tykLsF38BoiKFPl-zDT0E6aOL3j0GXU");'>
+</div>
+<div class="flex flex-col">
+<p class="text-[#111118] dark:text-white text-xl font-bold leading-tight">Jane Doe</p>
+<p class="text-[#616189] dark:text-gray-400 text-sm font-normal">jane.doe@scopelens.ai</p>
+<p class="text-teal-600 dark:text-teal-400 text-xs font-semibold mt-1">PRO PLAN</p>
+</div>
+</div>
+<button class="flex cursor-pointer items-center justify-center rounded-lg h-10 px-6 bg-background-light dark:bg-[#2d2d45] hover:bg-[#eaeaef] dark:hover:bg-[#363654] text-[#111118] dark:text-white text-sm font-bold transition-colors w-full md:w-auto">
+<span class="material-symbols-outlined text-[20px] mr-2">upload</span>
+                                    Change Picture
+                                </button>
+</div>
+</div>
+<!-- Text Fields -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-1">
+<label class="flex flex-col flex-1">
+<p class="text-[#111118] dark:text-gray-200 text-sm font-medium leading-normal pb-2">Full Name</p>
+<input class="form-input flex w-full rounded-lg text-[#111118] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-[#dbdbe6] dark:border-gray-700 bg-white dark:bg-[#1a1a2e] h-12 px-4 text-base font-normal placeholder:text-[#616189]" value="Jane Doe"/>
+</label>
+<label class="flex flex-col flex-1">
+<p class="text-[#111118] dark:text-gray-200 text-sm font-medium leading-normal pb-2">Email Address</p>
+<input class="form-input flex w-full rounded-lg text-[#111118] dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-[#dbdbe6] dark:border-gray-700 bg-white dark:bg-[#1a1a2e] h-12 px-4 text-base font-normal placeholder:text-[#616189]" value="jane.doe@scopelens.ai"/>
+</label>
+</div>
+</section>
+<!-- Section 2: Security -->
+<section class="flex flex-col gap-4 pt-4">
+<div class="border-b border-[#dbdbe6] dark:border-gray-800 pb-2">
+<h3 class="text-[#111118] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Security</h3>
+</div>
+<div class="bg-white dark:bg-[#1a1a2e] rounded-xl border border-[#dbdbe6] dark:border-gray-800 shadow-sm divide-y divide-[#dbdbe6] dark:divide-gray-800">
+<!-- 2FA Toggle -->
+<div class="p-6 flex items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="p-2 rounded-lg bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400">
+<span class="material-symbols-outlined">lock_person</span>
+</div>
+<div class="flex flex-col">
+<p class="text-[#111118] dark:text-white text-base font-bold">Two-Factor Authentication</p>
+<p class="text-[#616189] dark:text-gray-400 text-sm">Add an extra layer of security to your account.</p>
+</div>
+</div>
+<!-- Toggle Switch -->
+<button aria-checked="true" class="relative inline-flex h-7 w-12 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2" role="switch">
+<span class="sr-only">Use setting</span>
+<span aria-hidden="true" class="pointer-events-none inline-block h-6 w-6 translate-x-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</button>
+</div>
+<!-- Change Password -->
+<div class="p-6 flex items-center justify-between gap-4">
+<div class="flex items-start gap-4">
+<div class="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-900/20 text-primary dark:text-indigo-400">
+<span class="material-symbols-outlined">key</span>
+</div>
+<div class="flex flex-col">
+<p class="text-[#111118] dark:text-white text-base font-bold">Change Password</p>
+<p class="text-[#616189] dark:text-gray-400 text-sm">Last changed 3 months ago.</p>
+</div>
+</div>
+<button class="text-sm font-bold text-[#111118] dark:text-white hover:text-primary dark:hover:text-indigo-400 transition-colors">
+                                    Update
+                                </button>
+</div>
+</div>
+</section>
+<!-- Section 3: Credits & License -->
+<section class="flex flex-col gap-4 pt-4">
+<div class="border-b border-[#dbdbe6] dark:border-gray-800 pb-2">
+<h3 class="text-[#111118] dark:text-white text-[22px] font-bold leading-tight tracking-[-0.015em]">Credits &amp; License</h3>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Balance Card -->
+<div class="bg-gradient-to-br from-primary to-indigo-700 rounded-xl p-6 text-white shadow-lg lg:col-span-1 flex flex-col justify-between min-h-[160px] relative overflow-hidden group">
+<div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-all"></div>
+<div class="relative z-10">
+<p class="text-indigo-100 text-sm font-medium mb-1">Current Balance</p>
+<div class="flex items-baseline gap-1">
+<span class="text-4xl font-black tracking-tight">1,250</span>
+<span class="text-indigo-200 text-sm">credits</span>
+</div>
+</div>
+<div class="relative z-10 mt-4 pt-4 border-t border-white/20">
+<div class="flex items-center justify-between text-xs font-medium text-indigo-100">
+<span>Plan renews in 12 days</span>
+<span class="bg-white/20 px-2 py-0.5 rounded text-white">Pro</span>
+</div>
+</div>
+</div>
+<!-- License Input -->
+<div class="bg-white dark:bg-[#1a1a2e] rounded-xl border border-[#dbdbe6] dark:border-gray-800 p-6 shadow-sm lg:col-span-2 flex flex-col justify-center">
+<div class="max-w-xl">
+<label class="block mb-3">
+<span class="text-[#111118] dark:text-white text-base font-bold">Redeem License Key</span>
+<p class="text-[#616189] dark:text-gray-400 text-sm font-normal mt-1">Enter your license key below to add credits to your account immediately.</p>
+</label>
+<div class="flex flex-col sm:flex-row gap-3">
+<div class="relative flex-1">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-gray-400">vpn_key</span>
+</div>
+<input class="form-input w-full pl-10 rounded-lg border border-[#dbdbe6] dark:border-gray-700 bg-background-light dark:bg-[#101022] text-[#111118] dark:text-white h-12 focus:ring-2 focus:ring-teal-500/50 focus:border-teal-500 transition-all placeholder:text-[#616189]" placeholder="XXXX-XXXX-XXXX-XXXX" type="text"/>
+</div>
+<button class="bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-6 rounded-lg h-12 transition-colors shadow-md shadow-teal-900/10 flex items-center justify-center gap-2">
+<span>Redeem</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Save Actions -->
+<div class="flex items-center justify-end pt-6 pb-10 border-t border-[#dbdbe6] dark:border-gray-800 gap-4">
+<button class="px-6 py-3 rounded-lg text-[#616189] dark:text-gray-400 font-bold text-sm hover:bg-[#f0f0f4] dark:hover:bg-white/5 transition-colors">
+                            Cancel
+                        </button>
+<button class="px-8 py-3 rounded-lg bg-primary hover:bg-indigo-700 text-white font-bold text-sm shadow-lg shadow-indigo-500/20 transition-all transform active:scale-95">
+                            Save Changes
+                        </button>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

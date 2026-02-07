@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Scope Lens - Analysis Report</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#0f766e", // Teal 700
+            "primary-hover": "#115e59", // Teal 800
+            "accent": "#4f46e5", // Indigo 600
+            "background-light": "#f6f6f8",
+            "background-dark": "#101622",
+          },
+          fontFamily: {
+            "display": ["Inter", "sans-serif"]
+          },
+          borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+        },
+      },
+    }
+  </script>
+<style>.custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 20px;
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+      background-color: #334155;
+    }.mark-ai {
+      background-color: rgba(79, 70, 229, 0.15);border-bottom: 2px solid #4f46e5;
+      padding: 2px 0;
+    }
+    .mark-human {
+      background-color: rgba(20, 184, 166, 0.15);border-bottom: 2px solid #14b8a6;
+      padding: 2px 0;
+    }
+    .mark-mixed {
+      background-color: rgba(168, 85, 247, 0.15);border-bottom: 2px solid #a855f7;
+      padding: 2px 0;
+    }
+  </style>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-[#0d121b] dark:text-white min-h-screen flex flex-col overflow-x-hidden">
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-solid border-[#e7ebf3] dark:border-[#2a3441] bg-[#f8f9fc] dark:bg-[#101622] px-10 py-3">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary">
+<span class="material-symbols-outlined text-3xl">center_focus_strong</span>
+</div>
+<h2 class="text-[#0d121b] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Scope Lens</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<div class="hidden md:flex items-center gap-9">
+<a class="text-[#0d121b] dark:text-gray-300 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Dashboard</a>
+<a class="text-[#0d121b] dark:text-gray-300 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">My Documents</a>
+<a class="text-[#0d121b] dark:text-gray-300 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Billing</a>
+<a class="text-[#0d121b] dark:text-gray-300 text-sm font-medium leading-normal hover:text-primary transition-colors" href="#">Settings</a>
+</div>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-gray-200 dark:border-gray-700" data-alt="User profile avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD44fuvEtihGID39CE5DTken8EQSoXP8gH30y4queCJ99Of1JW1gG9W8WOEtAwpqCooXGsFqiOiFq5sRAX4r8Xm4n8u35QIgV182irZw10xNUWCRaJ9RUMHeQKb5CYQ0IasRth9L503tboUU2nZ5s25hZs5u0eXfrSCU--0RCHYuwMYa4IwgTUW_mORzNblo_6-4M7MrXvVYW_IU_3hxTJQ9bWDyZw9FAZZcbG07jmoEPH6LC-cLNDn6h63rmwLIaUfTO4aYf-sqPc");'>
+</div>
+</div>
+</header>
+<main class="flex-grow flex justify-center py-8 px-4 sm:px-8 lg:px-12">
+<div class="w-full max-w-[1280px] flex flex-col gap-6">
+<div class="flex flex-col md:flex-row flex-wrap justify-between items-start md:items-center gap-4 border-b border-[#e7ebf3] dark:border-[#2a3441] pb-6">
+<div class="flex flex-col gap-2">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary text-3xl">description</span>
+<h1 class="text-[#0d121b] dark:text-white tracking-tight text-2xl md:text-3xl font-bold leading-tight">European_History_Essay_Final.docx</h1>
+</div>
+<p class="text-[#4c669a] dark:text-gray-400 text-sm font-normal leading-normal pl-11">Analyzed on Oct 24, 2023 • 1,240 words • English (US)</p>
+</div>
+<div class="flex gap-3 pl-11 md:pl-0">
+<button class="flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-5 bg-white dark:bg-[#1e293b] border border-[#e7ebf3] dark:border-[#2a3441] text-[#0d121b] dark:text-white text-sm font-medium leading-normal hover:bg-gray-50 dark:hover:bg-[#2a3441] transition-colors shadow-sm">
+<span class="material-symbols-outlined text-base">share</span>
+<span class="truncate">Share</span>
+</button>
+<button class="flex cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-5 bg-primary hover:bg-primary-hover text-white text-sm font-medium leading-normal transition-colors shadow-sm">
+<span class="material-symbols-outlined text-base">picture_as_pdf</span>
+<span class="truncate">Export PDF</span>
+</button>
+</div>
+</div>
+<div class="flex flex-col lg:flex-row gap-8 items-start h-full">
+<div class="flex-1 w-full lg:w-2/3 bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-[#e7ebf3] dark:border-[#2a3441] overflow-hidden flex flex-col min-h-[600px]">
+<div class="flex items-center justify-between px-6 py-3 border-b border-[#e7ebf3] dark:border-[#2a3441] bg-gray-50/50 dark:bg-[#101622]/50">
+<div class="flex gap-4">
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-teal-500"></div>
+<span class="text-xs font-medium text-gray-600 dark:text-gray-300">Human</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-indigo-500"></div>
+<span class="text-xs font-medium text-gray-600 dark:text-gray-300">Likely AI</span>
+</div>
+<div class="flex items-center gap-2">
+<div class="w-3 h-3 rounded-full bg-purple-500"></div>
+<span class="text-xs font-medium text-gray-600 dark:text-gray-300">Mixed</span>
+</div>
+</div>
+<div class="text-xs text-gray-400">Page 1 of 3</div>
+</div>
+<div class="p-8 md:p-12 text-[#0d121b] dark:text-gray-200 text-lg leading-relaxed font-serif custom-scrollbar overflow-y-auto max-h-[800px]">
+<h2 class="text-2xl font-bold mb-6 text-black dark:text-white">The Impact of the Industrial Revolution on European Society</h2>
+<p class="mb-6">
+<span class="mark-human" title="Likelihood: 98% Human">The Industrial Revolution marks a major turning point in history; almost every aspect of daily life was influenced in some way. In particular, average income and population began to exhibit unprecedented sustained growth.</span> 
+              Some economists say that the major impact of the Industrial Revolution was that the standard of living for the general population began to increase consistently for the first time in history, although others have said that it did not begin to meaningfully improve until the late 19th and 20th centuries.
+            </p>
+<p class="mb-6">
+<span class="mark-ai" title="Likelihood: 85% AI">Textile manufacture was the first to use modern production methods, and textiles became the dominant industry in terms of employment, value of output and capital invested. The textile industry was also the first to use modern production methods.</span> 
+              The transition to machine power drastically increased productivity and efficiency. <span class="mark-mixed" title="Likelihood: 50% Mixed">Before this era, most manufacturing was done in small workshops or homes, often referred to as cottage industries.</span>
+</p>
+<p class="mb-6">
+<span class="mark-human" title="Likelihood: 92% Human">This shift brought about significant social changes as people moved from rural areas to rapidly growing cities in search of work in the new factories. This urbanization led to overcrowding, poor sanitation, and difficult living conditions for the working class. However, it also gave rise to a new middle class of industrialists and businessmen who benefited greatly from the economic boom.</span>
+</p>
+<p class="mb-6">
+<span class="mark-ai" title="Likelihood: 89% AI">Furthermore, the revolution spurred advancements in transportation and communication. The development of steam-powered locomotives and ships facilitated the movement of goods and people across long distances, effectively shrinking the world and connecting previously isolated markets.</span> 
+              The telegraph later revolutionized communication, allowing for near-instantaneous transmission of information.
+            </p>
+<p class="mb-6">
+<span class="mark-human" title="Likelihood: 95% Human">It is crucial to recognize that while the macroeconomic indicators showed growth, the individual experience varied greatly depending on social class, geography, and gender. The labor movements that emerged in response to these conditions laid the groundwork for modern labor laws and workers' rights.</span>
+</p>
+<p class="mb-6">
+<span class="mark-ai" title="Likelihood: 82% AI">Ultimately, the legacy of the Industrial Revolution is complex, characterized by both remarkable technological progress and significant social upheaval. Its effects are still felt today in the global economy and the ongoing debates about industrialization and environmental sustainability.</span>
+</p>
+</div>
+</div>
+<aside class="w-full lg:w-1/3 flex flex-col gap-6 sticky top-24">
+<div class="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-[#e7ebf3] dark:border-[#2a3441] p-6">
+<h3 class="text-[#0d121b] dark:text-white text-lg font-bold mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">analytics</span>
+              Analysis Results
+            </h3>
+<div class="flex items-center justify-between mb-6">
+<div class="relative size-32">
+<svg class="size-full" height="36" viewBox="0 0 36 36" width="36" xmlns="http://www.w3.org/2000/svg">
+<path class="text-gray-200 dark:text-gray-700" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3.8"></path>
+<path class="text-teal-500" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="85, 100" stroke-linecap="round" stroke-width="3.8"></path>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-3xl font-bold text-[#0d121b] dark:text-white">85%</span>
+<span class="text-xs text-gray-500 font-medium">Human</span>
+</div>
+</div>
+<div class="flex-1 pl-6 flex flex-col gap-3">
+<div class="flex flex-col">
+<span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold">Classification</span>
+<span class="text-lg font-bold text-teal-600 dark:text-teal-400">Highly Human</span>
+</div>
+<div class="flex flex-col">
+<span class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide font-semibold">Confidence</span>
+<span class="text-sm font-medium text-[#0d121b] dark:text-white">High (92%)</span>
+</div>
+</div>
+</div>
+<div class="space-y-3">
+<div class="flex justify-between items-center text-sm">
+<span class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+<span class="w-2 h-2 rounded-full bg-teal-500"></span> Human Content
+                </span>
+<span class="font-bold text-[#0d121b] dark:text-white">85%</span>
+</div>
+<div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+<div class="bg-teal-500 h-1.5 rounded-full" style="width: 85%"></div>
+</div>
+<div class="flex justify-between items-center text-sm pt-1">
+<span class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+<span class="w-2 h-2 rounded-full bg-indigo-500"></span> Likely AI
+                </span>
+<span class="font-bold text-[#0d121b] dark:text-white">10%</span>
+</div>
+<div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+<div class="bg-indigo-500 h-1.5 rounded-full" style="width: 10%"></div>
+</div>
+<div class="flex justify-between items-center text-sm pt-1">
+<span class="flex items-center gap-2 text-gray-600 dark:text-gray-300">
+<span class="w-2 h-2 rounded-full bg-purple-500"></span> Mixed Signals
+                </span>
+<span class="font-bold text-[#0d121b] dark:text-white">5%</span>
+</div>
+<div class="w-full bg-gray-100 dark:bg-gray-700 rounded-full h-1.5">
+<div class="bg-purple-500 h-1.5 rounded-full" style="width: 5%"></div>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-[#e7ebf3] dark:border-[#2a3441] p-6">
+<h3 class="text-[#0d121b] dark:text-white text-base font-bold mb-4">Sentence Statistics</h3>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-3 rounded-lg bg-background-light dark:bg-[#101622] border border-[#e7ebf3] dark:border-[#2a3441]">
+<p class="text-2xl font-bold text-[#0d121b] dark:text-white">42</p>
+<p class="text-xs text-gray-500 mt-1">Total Sentences</p>
+</div>
+<div class="p-3 rounded-lg bg-background-light dark:bg-[#101622] border border-[#e7ebf3] dark:border-[#2a3441]">
+<p class="text-2xl font-bold text-indigo-500">4</p>
+<p class="text-xs text-gray-500 mt-1">Flagged AI</p>
+</div>
+<div class="p-3 rounded-lg bg-background-light dark:bg-[#101622] border border-[#e7ebf3] dark:border-[#2a3441]">
+<p class="text-2xl font-bold text-[#0d121b] dark:text-white">14.2</p>
+<p class="text-xs text-gray-500 mt-1">Avg Words/Sent</p>
+</div>
+<div class="p-3 rounded-lg bg-background-light dark:bg-[#101622] border border-[#e7ebf3] dark:border-[#2a3441]">
+<p class="text-2xl font-bold text-[#0d121b] dark:text-white">58</p>
+<p class="text-xs text-gray-500 mt-1">Perplexity Score</p>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-[#1e293b] rounded-xl shadow-sm border border-[#e7ebf3] dark:border-[#2a3441] p-6">
+<h3 class="text-[#0d121b] dark:text-white text-base font-bold mb-4">Detection Insights</h3>
+<div class="space-y-4">
+<div class="flex gap-3 items-start">
+<span class="material-symbols-outlined text-indigo-500 mt-0.5 text-lg">warning</span>
+<div>
+<p class="text-sm font-semibold text-[#0d121b] dark:text-white">Repetitive Sentence Structure</p>
+<p class="text-xs text-gray-500 mt-1 leading-relaxed">Several consecutive sentences in the second paragraph follow a predictable Subject-Verb-Object pattern common in AI models.</p>
+</div>
+</div>
+<div class="flex gap-3 items-start">
+<span class="material-symbols-outlined text-indigo-500 mt-0.5 text-lg">psychology</span>
+<div>
+<p class="text-sm font-semibold text-[#0d121b] dark:text-white">Low Burstiness</p>
+<p class="text-xs text-gray-500 mt-1 leading-relaxed">The flagged sections lack the natural variation in sentence length and complexity typically found in human writing.</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-4 py-2 text-primary text-sm font-medium hover:bg-primary/5 rounded-lg transition-colors">
+              View Full Technical Details
+            </button>
+</div>
+</aside>
+</div>
+</div>
+</main>
+
+</body></html>

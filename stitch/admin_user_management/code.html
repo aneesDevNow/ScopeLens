@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin User Management</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased transition-colors duration-200">
+<!-- Main Layout Wrapper -->
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 flex items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-[#151c2b]/80 backdrop-blur-md px-6 py-3">
+<div class="flex items-center gap-4">
+<div class="flex items-center justify-center size-8 rounded-lg bg-primary/10 text-primary">
+<span class="material-symbols-outlined">verified_user</span>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-tight text-slate-900 dark:text-white">Admin Panel</h2>
+</div>
+<div class="flex gap-3">
+<button class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[20px]">notifications</span>
+</button>
+<button class="flex size-10 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-[20px]">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 px-4 sm:px-8 py-8 w-full max-w-[1200px] mx-auto">
+<!-- Page Heading & Primary Action -->
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+<div class="flex flex-col gap-1">
+<h1 class="text-3xl font-black leading-tight tracking-tight text-slate-900 dark:text-white">User Management</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal">Manage registered users, their plans, and account status.</p>
+</div>
+<button class="flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-5 text-sm font-bold text-white shadow-md shadow-primary/20 hover:bg-blue-700 transition-all">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>Add New User</span>
+</button>
+</div>
+<!-- Toolbar: Search, Filters, Bulk Actions -->
+<div class="mb-6 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center bg-white dark:bg-[#151c2b] p-2 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+<!-- Left: Search -->
+<div class="w-full lg:w-auto min-w-[320px] flex-1">
+<label class="flex w-full items-center gap-2 rounded-lg bg-slate-50 dark:bg-slate-900 px-3 h-10 border border-slate-200 dark:border-slate-700 focus-within:ring-2 focus-within:ring-primary/20 focus-within:border-primary transition-all">
+<span class="material-symbols-outlined text-slate-400">search</span>
+<input class="w-full bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none border-none p-0" placeholder="Search by name, email, or user ID"/>
+</label>
+</div>
+<!-- Right: Filters & Actions -->
+<div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+<!-- Filters Group -->
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+<button class="flex h-9 shrink-0 items-center gap-2 rounded-lg bg-slate-100 dark:bg-slate-800 px-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span>Status: All</span>
+<span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+</button>
+<button class="flex h-9 shrink-0 items-center gap-2 rounded-lg bg-slate-100 dark:bg-slate-800 px-3 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+<span>Plan: All</span>
+<span class="material-symbols-outlined text-[18px]">keyboard_arrow_down</span>
+</button>
+</div>
+<div class="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+<!-- Bulk Action -->
+<button class="flex h-9 shrink-0 items-center gap-2 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 text-sm font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors ml-auto lg:ml-0">
+<span class="material-symbols-outlined text-[18px]">playlist_add_check</span>
+<span>Bulk Actions</span>
+</button>
+</div>
+</div>
+<!-- Data Table Card -->
+<div class="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#151c2b] shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm text-slate-500 dark:text-slate-400">
+<thead class="bg-slate-50 dark:bg-slate-900/50 text-xs uppercase text-slate-500 dark:text-slate-400 font-bold border-b border-slate-200 dark:border-slate-800">
+<tr>
+<th class="p-4 w-4" scope="col">
+<div class="flex items-center">
+<input class="h-4 w-4 rounded border-slate-300 bg-slate-100 text-primary focus:ring-2 focus:ring-primary dark:border-slate-600 dark:bg-slate-700 dark:ring-offset-slate-800" type="checkbox"/>
+</div>
+</th>
+<th class="px-6 py-4" scope="col">User Name</th>
+<th class="px-6 py-4" scope="col">Email Address</th>
+<th class="px-6 py-4" scope="col">Plan Type</th>
+<th class="px-6 py-4 text-center" scope="col">Total Scans</th>
+<th class="px-6 py-4" scope="col">Status</th>
+<th class="px-6 py-4 text-right" scope="col">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<!-- Row 1 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+<td class="p-4 w-4">
+<div class="flex items-center">
+<input class="h-4 w-4 rounded border-slate-300 bg-slate-100 text-primary focus:ring-2 focus:ring-primary dark:border-slate-600 dark:bg-slate-700 dark:ring-offset-slate-800" type="checkbox"/>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-9 w-9 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700 shrink-0">
+<img class="h-full w-full object-cover" data-alt="Portrait of Sarah Jenkins" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCM3SS76HxZygxSrLE0sGoq5eZ3PsKZYC5ezUXWhYUAd81bdNULnCM4Y4fi8unEF5Zu8bMyBUREogBEIdfJvPMWQ2nY_ieUhPHlClDwIIKK0KZDaMmJK0YMBuN0Hj5GDJlAOOVAl8FYXKcYATkiuqK3772oS2OArkDVaZ3w_64-aeDEfiihv2ncK2g4Gti0SAMbGQKmishBotrnOjjo-J6PNfHits20IirJG7c5hs8QhgpdcZ7xk34yVASZx23UmaCly-XGfkWsMYU"/>
+</div>
+<div class="font-semibold text-slate-900 dark:text-white">Sarah Jenkins</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400 font-medium">
+                                    sarah.j@techinnovate.com
+                                </td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10 dark:bg-purple-900/30 dark:text-purple-400 dark:ring-purple-400/30">
+                                        Institution
+                                    </span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="font-mono text-slate-700 dark:text-slate-300">1,240</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-emerald-500"></div>
+<span class="text-emerald-700 dark:text-emerald-400 font-medium text-xs">Active</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+<td class="p-4 w-4">
+<div class="flex items-center">
+<input class="h-4 w-4 rounded border-slate-300 bg-slate-100 text-primary focus:ring-2 focus:ring-primary dark:border-slate-600 dark:bg-slate-700 dark:ring-offset-slate-800" type="checkbox"/>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-9 w-9 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700 shrink-0">
+<img class="h-full w-full object-cover" data-alt="Portrait of Michael Chen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC0dRyYaGKwqxhxYiwhreB1fOPK1zkMNYRH94vBp6nTDp9h02K2tZCFtmYQomOJthzsKG5PPpDQMdwoMXMzdJ2Gn4I4ZPHqcKiR1_LZ-6P_FCWM3PEXMY8xpDCxPVArZQ4iQAzTunPHIPqz851-x9sRXWeF1PLbmPR4pUemikR9IlUD3ELN72TCb4VmvEFaQvPQOGk6Lyl0N1oU_liXE8RHTGk7jTlUyfodKzU39L6VKPoL7eCGH-lNM1qNgQOwIVojSKPaqeLJlqU"/>
+</div>
+<div class="font-semibold text-slate-900 dark:text-white">Michael Chen</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400 font-medium">
+                                    m.chen@freelancer.io
+                                </td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-400/30">
+                                        Pro Plan
+                                    </span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="font-mono text-slate-700 dark:text-slate-300">452</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-emerald-500"></div>
+<span class="text-emerald-700 dark:text-emerald-400 font-medium text-xs">Active</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+<td class="p-4 w-4">
+<div class="flex items-center">
+<input class="h-4 w-4 rounded border-slate-300 bg-slate-100 text-primary focus:ring-2 focus:ring-primary dark:border-slate-600 dark:bg-slate-700 dark:ring-offset-slate-800" type="checkbox"/>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-9 w-9 flex items-center justify-center rounded-full bg-primary/20 text-primary font-bold shrink-0">
+                                            AL
+                                        </div>
+<div class="font-semibold text-slate-900 dark:text-white">Alex Larson</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400 font-medium">
+                                    alex.larson@gmail.com
+                                </td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-1 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-500/10 dark:bg-slate-800 dark:text-slate-400 dark:ring-slate-400/20">
+                                        Free
+                                    </span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="font-mono text-slate-700 dark:text-slate-300">12</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-amber-500"></div>
+<span class="text-amber-700 dark:text-amber-400 font-medium text-xs">Suspended</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+<td class="p-4 w-4">
+<div class="flex items-center">
+<input class="h-4 w-4 rounded border-slate-300 bg-slate-100 text-primary focus:ring-2 focus:ring-primary dark:border-slate-600 dark:bg-slate-700 dark:ring-offset-slate-800" type="checkbox"/>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-9 w-9 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700 shrink-0">
+<img class="h-full w-full object-cover" data-alt="Portrait of Emily Davis" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCemTmmmb2cL2ps2zwiGmQ3yYyYBaS-ASX-fVeLEvZgWxmU3QPtkEim7moaVcxJZAS8wfAzK5I1uJXCGjV054l_8fGYl7XxeouduV9mSQNYj4gT7laLzrVPVy1jIU6j36WB8Jeusze2cGjLRjVTTE3fv6Ysd3gxI7i6U3p3Ve7HdGV2st0xNdkFktxc2Fg1G5Clabte43UbQvJBtLx924W-NVc9dnW0-BDUetdld9TyMRDh4xMrTeMlU_aLI6BLvsiH3eg1mcg2Exo"/>
+</div>
+<div class="font-semibold text-slate-900 dark:text-white">Emily Davis</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400 font-medium">
+                                    e.davis@contentcorp.net
+                                </td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10 dark:bg-purple-900/30 dark:text-purple-400 dark:ring-purple-400/30">
+                                        Institution
+                                    </span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="font-mono text-slate-700 dark:text-slate-300">3,892</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-emerald-500"></div>
+<span class="text-emerald-700 dark:text-emerald-400 font-medium text-xs">Active</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+<td class="p-4 w-4">
+<div class="flex items-center">
+<input class="h-4 w-4 rounded border-slate-300 bg-slate-100 text-primary focus:ring-2 focus:ring-primary dark:border-slate-600 dark:bg-slate-700 dark:ring-offset-slate-800" type="checkbox"/>
+</div>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-9 w-9 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-700 shrink-0">
+<img class="h-full w-full object-cover" data-alt="Portrait of David Kim" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7ZOcQy8Irhn5m1AHo3Z662yxjxV_RldvXWKoo3OmKf8DVbf6DA5LCPU6cdIgDH_4jP8A3UP7f0o1CI4TM57YsOWUXm4hsblNQRo_83FhJUgg6rKlAGMl0CEv3wBbaBBT-HKy4xQQ16kcyLW1MUHU2rZ2xxDUUJcYgAWZJQuQ4EaGciK7YBi-9bNtMrvlFdmFP02nrbos9Soc4M6y-mgF-ftOH6pW5scTzmFEJE105RwX58SSbeZ62ZXmc-GPGRfyzGUGJP4OPEJA"/>
+</div>
+<div class="font-semibold text-slate-900 dark:text-white">David Kim</div>
+</div>
+</td>
+<td class="px-6 py-4 text-slate-500 dark:text-slate-400 font-medium">
+                                    kim.david@startuphub.co
+                                </td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-900/30 dark:text-blue-400 dark:ring-blue-400/30">
+                                        Pro Plan
+                                    </span>
+</td>
+<td class="px-6 py-4 text-center">
+<span class="font-mono text-slate-700 dark:text-slate-300">89</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="h-2 w-2 rounded-full bg-slate-400"></div>
+<span class="text-slate-600 dark:text-slate-400 font-medium text-xs">Inactive</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<div class="flex items-center justify-end gap-2">
+<button class="text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Footer / Pagination -->
+<div class="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#151c2b] px-4 py-3 sm:px-6">
+<div class="flex flex-1 justify-between sm:hidden">
+<button class="relative inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-300">Previous</button>
+<button class="relative ml-3 inline-flex items-center rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-300">Next</button>
+</div>
+<div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+<div>
+<p class="text-sm text-slate-700 dark:text-slate-400">
+                                Showing <span class="font-medium">1</span> to <span class="font-medium">5</span> of <span class="font-medium">42</span> results
+                            </p>
+</div>
+<div>
+<nav aria-label="Pagination" class="isolate inline-flex -space-x-px rounded-md shadow-sm">
+<button class="relative inline-flex items-center rounded-l-md px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 focus:z-20 focus:outline-offset-0">
+<span class="sr-only">Previous</span>
+<span class="material-symbols-outlined text-[20px]">chevron_left</span>
+</button>
+<button aria-current="page" class="relative z-10 inline-flex items-center bg-primary px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">1</button>
+<button class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 focus:z-20 focus:outline-offset-0">2</button>
+<button class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 focus:z-20 focus:outline-offset-0">3</button>
+<span class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-700 dark:text-slate-400 ring-1 ring-inset ring-slate-300 dark:ring-slate-700 focus:outline-offset-0">...</span>
+<button class="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-900 dark:text-white ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 focus:z-20 focus:outline-offset-0">8</button>
+<button class="relative inline-flex items-center rounded-r-md px-2 py-2 text-slate-400 ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 focus:z-20 focus:outline-offset-0">
+<span class="sr-only">Next</span>
+<span class="material-symbols-outlined text-[20px]">chevron_right</span>
+</button>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

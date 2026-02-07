@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>File History &amp; Archive - AI Detector Pro</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem", 
+                        "lg": "0.5rem", 
+                        "xl": "0.75rem", 
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white min-h-screen flex flex-col overflow-x-hidden">
+<header class="sticky top-0 z-50 w-full border-b border-slate-200 dark:border-slate-800 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md px-4 sm:px-10 py-3">
+<div class="max-w-[1200px] mx-auto flex items-center justify-between whitespace-nowrap">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined !text-3xl">radar</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">AI Detector Pro</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-8 items-center">
+<nav class="flex items-center gap-6">
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Analyze</a>
+<a class="text-primary font-bold text-sm leading-normal" href="#">History</a>
+<a class="text-slate-600 dark:text-slate-300 hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Settings</a>
+</nav>
+<div class="h-6 w-px bg-slate-200 dark:bg-slate-700"></div>
+<div class="flex items-center gap-4">
+<button class="flex cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary text-white text-sm font-bold shadow-sm hover:bg-blue-600 transition-colors">
+<span class="truncate">Log Out</span>
+</button>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-slate-200 dark:border-slate-700" data-alt="User profile avatar showing a smiling person" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCrNaupANVdnqiXvqlBDY6vkVnaH3t7l7i1TUXgVUpmJ7hxABiwIKHDz2W1PIQN90kzyAMFT_zcU0BTeCiOy_NMuF2C0gI4kXHFYAM4B4l5dHX6UUfopWs2UlBZWuVSS0EqnTtGJrSqCCpgx4COe7dDUNqUU2hXCk5v1rWSbYtklcS0_mAkKMdGjWDWgabYDODuoZvYYYTjFeo2R2Sod8NeW_Sc7X_MVET1gljdBEi1Ds0w5VxoWZ5u0SX7gRVPtv092ykkGuD5i-o");'>
+</div>
+</div>
+</div>
+<div class="md:hidden flex items-center">
+<span class="material-symbols-outlined text-slate-900 dark:text-white cursor-pointer">menu</span>
+</div>
+</div>
+</header>
+<main class="layout-container flex flex-col flex-grow items-center w-full py-8 px-4 sm:px-6 lg:px-8">
+<div class="layout-content-container flex flex-col w-full max-w-[1024px] gap-6">
+<div class="flex flex-col gap-2 pb-4 border-b border-slate-200 dark:border-slate-800">
+<h1 class="text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em] text-slate-900 dark:text-white">
+                File History &amp; Archive
+            </h1>
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal max-w-2xl">
+                View and manage your previously analyzed documents. Access detailed reports or re-analyze updated versions.
+            </p>
+</div>
+<div class="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
+<div class="w-full md:w-96">
+<label class="flex w-full items-center gap-2 rounded-lg h-10 bg-slate-100 dark:bg-slate-800 px-3 focus-within:ring-2 focus-within:ring-primary transition-all">
+<span class="material-symbols-outlined text-slate-400">search</span>
+<input class="w-full bg-transparent border-none text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-0 text-sm font-medium h-full" placeholder="Search by file name..." value=""/>
+</label>
+</div>
+<div class="flex gap-2 flex-wrap items-center">
+<span class="text-xs font-semibold text-slate-400 uppercase tracking-wider mr-1 hidden sm:block">Filters:</span>
+<button class="group flex h-9 items-center justify-center gap-x-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 hover:border-primary hover:text-primary transition-colors">
+<span class="text-sm font-medium">Date Range</span>
+<span class="material-symbols-outlined text-lg">expand_more</span>
+</button>
+<button class="group flex h-9 items-center justify-center gap-x-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 hover:border-primary hover:text-primary transition-colors">
+<span class="text-sm font-medium">Score: Any</span>
+<span class="material-symbols-outlined text-lg">expand_more</span>
+</button>
+<button class="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-500 hover:text-primary hover:border-primary transition-colors" title="Clear Filters">
+<span class="material-symbols-outlined text-lg">filter_alt_off</span>
+</button>
+</div>
+</div>
+<div class="w-full overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm bg-white dark:bg-slate-900">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+<th class="py-4 px-6 text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider w-[40%]">File Name</th>
+<th class="py-4 px-6 text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">Date Uploaded</th>
+<th class="py-4 px-6 text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider">AI Probability</th>
+<th class="py-4 px-6 text-xs font-bold uppercase text-slate-500 dark:text-slate-400 tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex flex-col">
+<span class="font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Essay_Final_Draft.docx</span>
+<span class="text-xs text-slate-500">2.4 MB • Word Document</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">
+                            Oct 24, 2023
+                        </td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<div class="h-2 w-16 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-green-500 w-[12%]"></div>
+</div>
+<span class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900/20 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20">12% AI</span>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-blue-700 dark:hover:text-blue-400 transition-colors">
+                                Download Report
+                                <span class="material-symbols-outlined text-base">download</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+</div>
+<div class="flex flex-col">
+<span class="font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors">History_Assignment_V2.pdf</span>
+<span class="text-xs text-slate-500">1.8 MB • PDF</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">
+                            Oct 23, 2023
+                        </td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<div class="h-2 w-16 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-red-500 w-[94%]"></div>
+</div>
+<span class="inline-flex items-center rounded-md bg-red-50 dark:bg-red-900/20 px-2 py-1 text-xs font-medium text-red-700 dark:text-red-400 ring-1 ring-inset ring-red-600/20">94% AI</span>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-blue-700 dark:hover:text-blue-400 transition-colors">
+                                Download Report
+                                <span class="material-symbols-outlined text-base">download</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">article</span>
+</div>
+<div class="flex flex-col">
+<span class="font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Research_Notes_Raw.txt</span>
+<span class="text-xs text-slate-500">12 KB • Text File</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">
+                            Oct 22, 2023
+                        </td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<div class="h-2 w-16 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-yellow-500 w-[48%]"></div>
+</div>
+<span class="inline-flex items-center rounded-md bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 text-xs font-medium text-yellow-700 dark:text-yellow-400 ring-1 ring-inset ring-yellow-600/20">48% AI</span>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-blue-700 dark:hover:text-blue-400 transition-colors">
+                                Download Report
+                                <span class="material-symbols-outlined text-base">download</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400">
+<span class="material-symbols-outlined">description</span>
+</div>
+<div class="flex flex-col">
+<span class="font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Creative_Writing_Unit_3.docx</span>
+<span class="text-xs text-slate-500">5.1 MB • Word Document</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">
+                            Oct 20, 2023
+                        </td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<div class="h-2 w-16 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-green-500 w-[2%]"></div>
+</div>
+<span class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900/20 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20">2% AI</span>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-blue-700 dark:hover:text-blue-400 transition-colors">
+                                Download Report
+                                <span class="material-symbols-outlined text-base">download</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors border-none">
+<td class="py-4 px-6">
+<div class="flex items-center gap-3">
+<div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400">
+<span class="material-symbols-outlined">picture_as_pdf</span>
+</div>
+<div class="flex flex-col">
+<span class="font-semibold text-slate-900 dark:text-white group-hover:text-primary transition-colors">Term_Paper_Draft_1.pdf</span>
+<span class="text-xs text-slate-500">2.2 MB • PDF</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-6 text-sm text-slate-600 dark:text-slate-300">
+                            Oct 18, 2023
+                        </td>
+<td class="py-4 px-6">
+<div class="flex items-center gap-2">
+<div class="h-2 w-16 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
+<div class="h-full bg-green-500 w-[15%]"></div>
+</div>
+<span class="inline-flex items-center rounded-md bg-green-50 dark:bg-green-900/20 px-2 py-1 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-600/20">15% AI</span>
+</div>
+</td>
+<td class="py-4 px-6 text-right">
+<button class="inline-flex items-center gap-1 text-sm font-medium text-primary hover:text-blue-700 dark:hover:text-blue-400 transition-colors">
+                                Download Report
+                                <span class="material-symbols-outlined text-base">download</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="flex items-center justify-between border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 px-6 py-3">
+<p class="text-sm text-slate-500 dark:text-slate-400">
+                    Showing <span class="font-bold text-slate-900 dark:text-white">1-5</span> of <span class="font-bold text-slate-900 dark:text-white">24</span> files
+                </p>
+<div class="flex gap-2">
+<button class="flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-50" disabled="">
+                        Previous
+                    </button>
+<button class="flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700">
+                        Next
+                    </button>
+</div>
+</div>
+</div>
+<div class="w-full h-8"></div> 
+</div>
+</main>
+
+</body></html>

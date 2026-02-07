@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html class="" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Scope Lens - Subscription Analytics</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;family=Noto+Sans:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">tailwind.config = {darkMode: "class", theme: {extend: {colors: {primary: "#f7f7f7", "background-light": "#f7f7f7", "background-dark": "#191919"}, fontFamily: {display: "Inter"}, borderRadius: {DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px"}}}};</script>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display">
+<div class="relative flex h-screen w-full flex-row overflow-hidden text-slate-900 dark:text-white">
+<!-- Side Navigation -->
+<div class="hidden w-64 flex-col justify-between border-r border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-background-dark md:flex">
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3 px-2">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10" data-alt="Abstract geometric logo in teal and blue" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA8AW0IxvxgEnkg_sHNZD1mbiusp7ctcidaMOG8BQd_51uXhkXxqcWSUDpwLrJ8U52_ZbT22855ObsdNGekSCJc9oNfjS9CVrG30nA40GW8RtWEza33BNPXdf4_dtofZE0xz-Wny4LgjqZMSF54cLsSvTKAUOUvF3FgtIJED77Qkb3_XdFUJiXArumEoiqvQaRspWVrCrFPFiybDq4q5u20ovwswm52ds-5KK5EdxGfEHaowDHxFalIXUAHSGF2UZNtY1BCWbsi1Ak");'></div>
+<div class="flex flex-col">
+<h1 class="text-base font-bold leading-normal text-slate-900 dark:text-white">Scope Lens</h1>
+<p class="text-sm font-normal text-slate-500 dark:text-slate-400">Admin Panel</p>
+</div>
+</div>
+<div class="flex flex-col gap-2 mt-4">
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined" style="font-size: 24px;">dashboard</span>
+<p class="text-sm font-medium">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 rounded-lg bg-primary/10 px-3 py-2 text-primary dark:bg-primary/20" href="#">
+<span class="material-symbols-outlined fill-1" style="font-size: 24px;">analytics</span>
+<p class="text-sm font-medium">Analytics</p>
+</a>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined" style="font-size: 24px;">credit_card</span>
+<p class="text-sm font-medium">Subscriptions</p>
+</a>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined" style="font-size: 24px;">group</span>
+<p class="text-sm font-medium">Users</p>
+</a>
+<a class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800" href="#">
+<span class="material-symbols-outlined" style="font-size: 24px;">settings</span>
+<p class="text-sm font-medium">Settings</p>
+</a>
+</div>
+</div>
+<div class="flex items-center gap-3 rounded-lg px-3 py-2 text-slate-700 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 cursor-pointer">
+<span class="material-symbols-outlined" style="font-size: 24px;">logout</span>
+<p class="text-sm font-medium">Log out</p>
+</div>
+</div>
+<!-- Main Content Area -->
+<div class="flex flex-1 flex-col overflow-y-auto bg-background-light dark:bg-background-dark">
+<div class="mx-auto flex w-full max-w-[1200px] flex-col gap-6 p-6 md:p-10">
+<!-- Page Heading -->
+<div class="flex flex-wrap justify-between gap-4">
+<div class="flex flex-col gap-1">
+<h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white md:text-4xl">Subscription Analytics</h1>
+<p class="text-base text-slate-500 dark:text-slate-400">Overview of MRR, churn, and subscriber tiers.</p>
+</div>
+<div class="flex items-center gap-3">
+<button class="flex items-center justify-center gap-2 rounded-lg bg-white border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-700">
+<span class="material-symbols-outlined" style="font-size: 20px;">calendar_today</span>
+<span>Last 30 Days</span>
+</button>
+<button class="flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-primary/90">
+<span class="material-symbols-outlined" style="font-size: 20px;">download</span>
+<span>Export Report</span>
+</button>
+</div>
+</div>
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+<div class="flex flex-col justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+<div class="flex items-center justify-between">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400">Total MRR</p>
+<span class="material-symbols-outlined text-primary" style="font-size: 24px;">attach_money</span>
+</div>
+<div>
+<p class="text-2xl font-bold text-slate-900 dark:text-white">$42,500</p>
+<div class="flex items-center gap-1 text-sm text-green-500">
+<span class="material-symbols-outlined" style="font-size: 16px;">trending_up</span>
+<span class="font-medium">+12%</span>
+<span class="text-slate-400 dark:text-slate-500 ml-1">vs last month</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+<div class="flex items-center justify-between">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400">Active Subscribers</p>
+<span class="material-symbols-outlined text-primary" style="font-size: 24px;">person</span>
+</div>
+<div>
+<p class="text-2xl font-bold text-slate-900 dark:text-white">1,240</p>
+<div class="flex items-center gap-1 text-sm text-green-500">
+<span class="material-symbols-outlined" style="font-size: 16px;">trending_up</span>
+<span class="font-medium">+5%</span>
+<span class="text-slate-400 dark:text-slate-500 ml-1">vs last month</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+<div class="flex items-center justify-between">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400">Churn Rate</p>
+<span class="material-symbols-outlined text-primary" style="font-size: 24px;">trending_down</span>
+</div>
+<div>
+<p class="text-2xl font-bold text-slate-900 dark:text-white">2.1%</p>
+<div class="flex items-center gap-1 text-sm text-green-500">
+<span class="material-symbols-outlined" style="font-size: 16px;">arrow_downward</span>
+<span class="font-medium">-0.5%</span>
+<span class="text-slate-400 dark:text-slate-500 ml-1">vs last month</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col justify-between gap-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-800">
+<div class="flex items-center justify-between">
+<p class="text-sm font-medium text-slate-500 dark:text-slate-400">Net Revenue</p>
+<span class="material-symbols-outlined text-primary" style="font-size: 24px;">account_balance_wallet</span>
+</div>
+<div>
+<p class="text-2xl font-bold text-slate-900 dark:text-white">$38,200</p>
+<div class="flex items-center gap-1 text-sm text-green-500">
+<span class="material-symbols-outlined" style="font-size: 16px;">trending_up</span>
+<span class="font-medium">+10%</span>
+<span class="text-slate-400 dark:text-slate-500 ml-1">vs last month</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Chart Section -->
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+<div class="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800 lg:col-span-2">
+<div class="flex items-center justify-between">
+<div>
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Monthly Recurring Revenue (MRR)</h3>
+<p class="text-sm text-slate-500 dark:text-slate-400">Growth over the last 12 months</p>
+</div>
+<div class="text-right">
+<p class="text-2xl font-bold text-slate-900 dark:text-white">$42,500</p>
+<p class="text-sm font-medium text-green-500">+12%</p>
+</div>
+</div>
+<div class="relative h-64 w-full mt-4">
+<!-- SVG Chart Representation -->
+<svg class="h-full w-full overflow-visible" preserveaspectratio="none" viewbox="0 0 800 200">
+<defs>
+<lineargradient id="gradientPrimary" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#13c8ec" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#13c8ec" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Grid lines -->
+<line class="text-slate-200 dark:text-slate-700" stroke="currentColor" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="800" y1="0" y2="0"></line>
+<line class="text-slate-200 dark:text-slate-700" stroke="currentColor" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="800" y1="50" y2="50"></line>
+<line class="text-slate-200 dark:text-slate-700" stroke="currentColor" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="800" y1="100" y2="100"></line>
+<line class="text-slate-200 dark:text-slate-700" stroke="currentColor" stroke-dasharray="4 4" stroke-width="1" x1="0" x2="800" y1="150" y2="150"></line>
+<line class="text-slate-200 dark:text-slate-700" stroke="currentColor" stroke-width="1" x1="0" x2="800" y1="200" y2="200"></line>
+<!-- Data path -->
+<path d="M0 150 C 50 140, 100 160, 150 130 C 200 100, 250 110, 300 90 C 350 70, 400 80, 450 60 C 500 40, 550 50, 600 30 C 650 10, 700 40, 750 20 L 800 10" fill="none" stroke="#13c8ec" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path>
+<path d="M0 150 C 50 140, 100 160, 150 130 C 200 100, 250 110, 300 90 C 350 70, 400 80, 450 60 C 500 40, 550 50, 600 30 C 650 10, 700 40, 750 20 L 800 10 V 200 H 0 Z" fill="url(#gradientPrimary)" opacity="0.5"></path>
+</svg>
+<div class="mt-4 flex justify-between text-xs font-medium text-slate-400">
+<span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span>
+<span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-6 lg:col-span-1">
+<!-- Churn Rate Mini Chart -->
+<div class="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800 flex-1">
+<div>
+<h3 class="text-base font-bold text-slate-900 dark:text-white">Churn Rate by Month</h3>
+<div class="mt-1 flex items-baseline gap-2">
+<span class="text-2xl font-bold text-slate-900 dark:text-white">2.1%</span>
+<span class="text-sm font-medium text-green-500">-0.5%</span>
+</div>
+</div>
+<div class="mt-auto flex h-32 items-end justify-between gap-2">
+<div class="group relative flex h-full w-full flex-col justify-end gap-1">
+<div class="w-full rounded-t bg-slate-200 dark:bg-slate-700" style="height: 60%"></div>
+<span class="text-center text-[10px] text-slate-400">Jan</span>
+</div>
+<div class="group relative flex h-full w-full flex-col justify-end gap-1">
+<div class="w-full rounded-t bg-slate-200 dark:bg-slate-700" style="height: 45%"></div>
+<span class="text-center text-[10px] text-slate-400">Feb</span>
+</div>
+<div class="group relative flex h-full w-full flex-col justify-end gap-1">
+<div class="w-full rounded-t bg-primary/40 dark:bg-primary/30" style="height: 75%"></div>
+<span class="text-center text-[10px] text-slate-400">Mar</span>
+</div>
+<div class="group relative flex h-full w-full flex-col justify-end gap-1">
+<div class="w-full rounded-t bg-slate-200 dark:bg-slate-700" style="height: 30%"></div>
+<span class="text-center text-[10px] text-slate-400">Apr</span>
+</div>
+<div class="group relative flex h-full w-full flex-col justify-end gap-1">
+<div class="w-full rounded-t bg-slate-200 dark:bg-slate-700" style="height: 50%"></div>
+<span class="text-center text-[10px] text-slate-400">May</span>
+</div>
+<div class="group relative flex h-full w-full flex-col justify-end gap-1">
+<div class="w-full rounded-t bg-primary dark:bg-primary" style="height: 25%"></div>
+<span class="text-center text-[10px] text-slate-400">Jun</span>
+</div>
+</div>
+</div>
+<!-- Tier Breakdown -->
+<div class="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-800 flex-1">
+<h3 class="text-base font-bold text-slate-900 dark:text-white">Subscribers by Tier</h3>
+<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-sm">
+<span class="text-slate-600 dark:text-slate-300">Professional</span>
+<span class="font-bold text-slate-900 dark:text-white">65%</span>
+</div>
+<div class="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
+<div class="h-full bg-primary" style="width: 65%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-sm">
+<span class="text-slate-600 dark:text-slate-300">Student</span>
+<span class="font-bold text-slate-900 dark:text-white">25%</span>
+</div>
+<div class="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
+<div class="h-full bg-purple-500" style="width: 25%"></div>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<div class="flex justify-between text-sm">
+<span class="text-slate-600 dark:text-slate-300">Institution</span>
+<span class="font-bold text-slate-900 dark:text-white">10%</span>
+</div>
+<div class="h-2 w-full overflow-hidden rounded-full bg-slate-100 dark:bg-slate-700">
+<div class="h-full bg-orange-500" style="width: 10%"></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Transactions Table -->
+<div class="rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-800">
+<div class="flex items-center justify-between border-b border-slate-200 px-6 py-4 dark:border-slate-700">
+<h3 class="text-lg font-bold text-slate-900 dark:text-white">Recent Transactions</h3>
+<a class="text-sm font-medium text-primary hover:text-primary/80" href="#">View All</a>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left text-sm text-slate-500 dark:text-slate-400">
+<thead class="bg-slate-50 text-xs uppercase text-slate-700 dark:bg-slate-700/50 dark:text-slate-300">
+<tr>
+<th class="px-6 py-3 font-semibold" scope="col">User</th>
+<th class="px-6 py-3 font-semibold" scope="col">Plan</th>
+<th class="px-6 py-3 font-semibold" scope="col">Date</th>
+<th class="px-6 py-3 font-semibold" scope="col">Amount</th>
+<th class="px-6 py-3 font-semibold" scope="col">Status</th>
+<th class="px-6 py-3 font-semibold text-right" scope="col">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-200 dark:divide-slate-700">
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-700/30">
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-9 w-9 overflow-hidden rounded-full bg-slate-200" data-alt="Portrait of Alex Morgan" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCeVs5b2_qoPiGe8ernibwr-BeeupTucEUnr4ITlGIMkLPKHDQowkS65ehElL9T_ZwZgdr7IrYvi3UY0GliwAhcQox5eY6wFP2UZn7l6b8YjJbZVV5AEx9lBu_-vPDPHvTNJhu8kBa1FQQ5nCn2oP-nQ-jrbeNdJQrxiLsICdVgP4ZOX_gz6AbH6L1Zvxdubu6DtaBmptxwpoe0deaOMbQ2IHa2aIYiGvs-5oohDwcKcSXNDZ8_FswFG6KOpGy_hemUbFXaEQp4_gE'); background-size: cover;"></div>
+<div class="font-medium text-slate-900 dark:text-white">Alex Morgan</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<span class="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10 dark:bg-purple-400/10 dark:text-purple-400 dark:ring-purple-400/20">Professional</span>
+</td>
+<td class="whitespace-nowrap px-6 py-4">Oct 24, 2023</td>
+<td class="whitespace-nowrap px-6 py-4 font-medium text-slate-900 dark:text-white">$49.00</td>
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center gap-2 text-green-600 dark:text-green-400">
+<span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+<span>Success</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+<span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-700/30">
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-9 w-9 overflow-hidden rounded-full bg-slate-200" data-alt="Portrait of Sarah Jenkins" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD7KG9wGBQwkx6JdNbe-D2CnX7GraOSp3nG_CFpDucDXSXFeOx_iZZ4jCrFYdEgP_JR_drAuTRvooA0BkXH4zeR9dnRouW_BwX8Qz4LPnAFhkZMRs8m5FZXQxMw4-q9Y5S89NwjriEuTVZqLbNuCJArTDdhUH1arkbwZQdCZFExKPUbYSH8LaaqR8UDUJDaFx32_qtYf7gRMt8o2KZrYphX8uAtVBZBmANlIAcGOQqk_zqX6pm8fLUK73HVrJfVAT5kffHieaoVsnc'); background-size: cover;"></div>
+<div class="font-medium text-slate-900 dark:text-white">Sarah Jenkins</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-700/10 dark:bg-blue-400/10 dark:text-blue-400 dark:ring-blue-400/20">Student</span>
+</td>
+<td class="whitespace-nowrap px-6 py-4">Oct 24, 2023</td>
+<td class="whitespace-nowrap px-6 py-4 font-medium text-slate-900 dark:text-white">$12.00</td>
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center gap-2 text-yellow-600 dark:text-yellow-400">
+<span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+<span>Pending</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+<span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-700/30">
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-9 w-9 overflow-hidden rounded-full bg-slate-200" data-alt="Portrait of Michael Ross" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDWMgahGU0y65zm4FisVvQ_zUxvy6CAyyOrK0Daa5ELHuijLChNGP1qa-b4J_NSpjLbL8dsqJCDIZTUe0vjjkm2t38UQJgKEGT0p40LnPxAjfV5EgQj-R8Ads1JIEFEPSM5pqWfxWm8Lrc1Xmx15L4GRA1GyM4-umESwpW05J6_f_QgVmdMLSzKYbMaO8exk8FNN3TEQqhf4nikxusiKdGHzZksBGIufQ741oZz7CCbG9nU8nYiD72Eo9nC4bxbZRHkAMLIYeIZ6xg'); background-size: cover;"></div>
+<div class="font-medium text-slate-900 dark:text-white">Michael Ross</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<span class="inline-flex items-center rounded-md bg-orange-50 px-2 py-1 text-xs font-medium text-orange-700 ring-1 ring-inset ring-orange-700/10 dark:bg-orange-400/10 dark:text-orange-400 dark:ring-orange-400/20">Institution</span>
+</td>
+<td class="whitespace-nowrap px-6 py-4">Oct 23, 2023</td>
+<td class="whitespace-nowrap px-6 py-4 font-medium text-slate-900 dark:text-white">$299.00</td>
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center gap-2 text-red-600 dark:text-red-400">
+<span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+<span>Failed</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+<span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
+</button>
+</td>
+</tr>
+<tr class="group hover:bg-slate-50 dark:hover:bg-slate-700/30">
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="h-9 w-9 overflow-hidden rounded-full bg-slate-200" data-alt="Portrait of Emily Chen" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDao-jp8QQPZXbkr5mWZINEynkZAeVfDUn0SiuuScafCnDoNM93qYWlI_JRneF6CrVTdn2dQKyy7wQrvDb9hPvn0GgZ4otGkNXxjxI7CuPiX06nK0ZKovDJA83F7nsE9l9GkGzl5swurIFz8VMh9fJpoIlP_1SBiYtKFHt6Cnm40pYCrXzUOZexxIqrthHOTMfBcHtafa6zD4ZRyoT87Juc1IdLlGXnGfMWvlbMVBpCpUZPf9p2rLNX5Pr2eJX5Yhbz9iuYgyOnt1g'); background-size: cover;"></div>
+<div class="font-medium text-slate-900 dark:text-white">Emily Chen</div>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4">
+<span class="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-700/10 dark:bg-purple-400/10 dark:text-purple-400 dark:ring-purple-400/20">Professional</span>
+</td>
+<td class="whitespace-nowrap px-6 py-4">Oct 23, 2023</td>
+<td class="whitespace-nowrap px-6 py-4 font-medium text-slate-900 dark:text-white">$49.00</td>
+<td class="whitespace-nowrap px-6 py-4">
+<div class="flex items-center gap-2 text-green-600 dark:text-green-400">
+<span class="h-1.5 w-1.5 rounded-full bg-current"></span>
+<span>Success</span>
+</div>
+</td>
+<td class="whitespace-nowrap px-6 py-4 text-right">
+<button class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+<span class="material-symbols-outlined" style="font-size: 20px;">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

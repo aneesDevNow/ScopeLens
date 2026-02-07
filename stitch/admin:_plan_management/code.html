@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin: Plan Management</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Navigation -->
+<div class="w-full border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky top-0 z-50">
+<div class="px-4 md:px-10 py-3 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<div class="size-8 text-primary">
+<svg class="w-full h-full" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M44 11.2727C44 14.0109 39.8386 16.3957 33.69 17.6364C39.8386 18.877 44 21.2618 44 24C44 26.7382 39.8386 29.123 33.69 30.3636C39.8386 31.6043 44 33.9891 44 36.7273C44 40.7439 35.0457 44 24 44C12.9543 44 4 40.7439 4 36.7273C4 33.9891 8.16144 31.6043 14.31 30.3636C8.16144 29.123 4 26.7382 4 24C4 21.2618 8.16144 18.877 14.31 17.6364C8.16144 16.3957 4 14.0109 4 11.2727C4 7.25611 12.9543 4 24 4C35.0457 4 44 7.25611 44 11.2727Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Scope Lens Admin</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-8">
+<nav class="flex items-center gap-6 lg:gap-9">
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Dashboard</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Users</a>
+<a class="text-primary text-sm font-medium leading-normal" href="#">Plans</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Settings</a>
+<a class="text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Logs</a>
+</nav>
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-10 ring-2 ring-slate-100 dark:ring-slate-800" data-alt="Administrator profile picture placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCWIOvOck9vP3sgRYwDfg6BOFYr6RbTJLr8yaI5uniYNh_NEKxywkWIQxU1wED4k6rtOibeMWtgV0PkcazekUQFlkLHOUcen2trxCLefy6sIYRyI-VRAe22j6XUKsxG_TJ5LGJjhdziCmkgUdHw8b_cbOOMAaNI8kLDV1oWvB1Rvggh8eiJxcM0viA_g9ewq3OLwnMFkOd2urha0flWHeAGUVABA-jfJnbtBvyrErppPal415LhlZX_18MtaVbhjXxfXFm29YADd58");'></div>
+</div>
+<div class="md:hidden">
+<span class="material-symbols-outlined text-slate-900 dark:text-white cursor-pointer">menu</span>
+</div>
+</div>
+</div>
+<!-- Main Content Layout -->
+<main class="flex-1 w-full max-w-[1200px] mx-auto px-4 md:px-10 py-8 flex flex-col gap-8">
+<!-- Page Heading -->
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="flex flex-col gap-2">
+<h1 class="text-slate-900 dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Plan Management</h1>
+<p class="text-slate-500 dark:text-slate-400 text-base font-normal max-w-2xl">Configure subscription tiers, pricing models, and feature limits for Scope Lens AI detection services.</p>
+</div>
+<button class="group flex items-center justify-center gap-2 rounded-lg h-10 px-5 bg-primary hover:bg-blue-700 text-white text-sm font-bold leading-normal transition-all shadow-md hover:shadow-lg">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>Create New Plan</span>
+</button>
+</div>
+<!-- Active Plans Grid -->
+<section class="flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h2 class="text-xl font-bold text-slate-800 dark:text-slate-200">Active Subscription Tiers</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Basic Plan -->
+<div class="flex flex-col h-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex flex-col gap-4 flex-1">
+<div class="flex items-center justify-between">
+<h3 class="text-slate-900 dark:text-white text-lg font-bold">Basic</h3>
+<span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold uppercase tracking-wider px-2 py-1 rounded">Active</span>
+</div>
+<div class="flex items-baseline gap-1 text-slate-900 dark:text-white">
+<span class="text-4xl font-black tracking-tighter">$29</span>
+<span class="text-slate-500 dark:text-slate-400 font-medium">/month</span>
+</div>
+<div class="flex flex-col gap-3 mt-2 flex-1">
+<div class="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+<span>500 Scans/mo</span>
+</div>
+<div class="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+<span>5MB Max File Size</span>
+</div>
+<div class="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+<span>Basic Email Support</span>
+</div>
+<div class="flex items-start gap-3 text-sm text-slate-400 dark:text-slate-600 line-through">
+<span class="material-symbols-outlined text-[20px] shrink-0">cancel</span>
+<span>API Access</span>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-3">
+<button class="flex items-center justify-center gap-2 rounded-lg h-9 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm font-semibold transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                                Edit
+                            </button>
+<button class="flex items-center justify-center gap-2 rounded-lg h-9 px-4 border border-slate-200 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-semibold transition-colors">
+<span class="material-symbols-outlined text-[18px]">pause</span>
+                                Deactivate
+                            </button>
+</div>
+</div>
+<!-- Pro Plan -->
+<div class="flex flex-col h-full rounded-xl border border-primary/30 bg-white dark:bg-slate-900 p-6 shadow-lg shadow-primary/5 ring-1 ring-primary/10 relative">
+<!-- Recommended Badge -->
+<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-white text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full shadow-sm">
+                            Most Popular
+                        </div>
+<div class="flex flex-col gap-4 flex-1">
+<div class="flex items-center justify-between">
+<h3 class="text-slate-900 dark:text-white text-lg font-bold">Pro</h3>
+<span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold uppercase tracking-wider px-2 py-1 rounded">Active</span>
+</div>
+<div class="flex items-baseline gap-1 text-slate-900 dark:text-white">
+<span class="text-4xl font-black tracking-tighter">$99</span>
+<span class="text-slate-500 dark:text-slate-400 font-medium">/month</span>
+</div>
+<div class="flex flex-col gap-3 mt-2 flex-1">
+<div class="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+<span>5,000 Scans/mo</span>
+</div>
+<div class="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+<span>25MB Max File Size</span>
+</div>
+<div class="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+<span>Priority Support</span>
+</div>
+<div class="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+<span>Standard API Access</span>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-3">
+<button class="flex items-center justify-center gap-2 rounded-lg h-9 px-4 bg-primary text-white hover:bg-blue-700 text-sm font-semibold transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                                Edit
+                            </button>
+<button class="flex items-center justify-center gap-2 rounded-lg h-9 px-4 border border-slate-200 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-semibold transition-colors">
+<span class="material-symbols-outlined text-[18px]">pause</span>
+                                Deactivate
+                            </button>
+</div>
+</div>
+<!-- Enterprise Plan -->
+<div class="flex flex-col h-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm hover:shadow-md transition-shadow">
+<div class="flex flex-col gap-4 flex-1">
+<div class="flex items-center justify-between">
+<h3 class="text-slate-900 dark:text-white text-lg font-bold">Enterprise</h3>
+<span class="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 text-xs font-bold uppercase tracking-wider px-2 py-1 rounded">Active</span>
+</div>
+<div class="flex items-baseline gap-1 text-slate-900 dark:text-white">
+<span class="text-4xl font-black tracking-tighter">$299</span>
+<span class="text-slate-500 dark:text-slate-400 font-medium">/month</span>
+</div>
+<div class="flex flex-col gap-3 mt-2 flex-1">
+<div class="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+<span>Unlimited Scans</span>
+</div>
+<div class="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+<span>100MB Max File Size</span>
+</div>
+<div class="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+<span>Dedicated Account Manager</span>
+</div>
+<div class="flex items-start gap-3 text-sm text-slate-700 dark:text-slate-300">
+<span class="material-symbols-outlined text-primary text-[20px] shrink-0">check_circle</span>
+<span>Custom API Integration</span>
+</div>
+</div>
+</div>
+<div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 grid grid-cols-2 gap-3">
+<button class="flex items-center justify-center gap-2 rounded-lg h-9 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm font-semibold transition-colors">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                                Edit
+                            </button>
+<button class="flex items-center justify-center gap-2 rounded-lg h-9 px-4 border border-slate-200 dark:border-slate-700 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 text-sm font-semibold transition-colors">
+<span class="material-symbols-outlined text-[18px]">pause</span>
+                                Deactivate
+                            </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Archived / Legacy Plans -->
+<section class="flex flex-col gap-4 mt-4">
+<div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+<h2 class="text-xl font-bold text-slate-800 dark:text-slate-200">Archived &amp; Legacy Plans</h2>
+</div>
+<div class="flex flex-col gap-4">
+<!-- Legacy Card 1 -->
+<div class="flex flex-col md:flex-row items-stretch gap-0 md:gap-6 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+<div class="w-full md:w-64 h-40 md:h-auto bg-cover bg-center shrink-0" data-alt="Abstract blue technology pattern symbolizing old version data" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCq5MAup980kh74jcceyIFteiehDKuKyJ1j0mr9GNe24OaWLMBk5bAWBmivj_d_TDHwFXEY-7lhaeVKsRWmVjNwLKeEpDacpbEdCdako2KGWdR8FCOrYaE16opcYegE6I_Ht7t3HzW-A0mZ311zZIcZ5y4DWJRdGQbkoksZ3Ck3uOYJQY2MMd5QiP17h4Uwjq5KQMuUQoPZNyDaNWJLcrUi2plrnPPEGt2Ei6Vt2c7lZQK17EUgqAvbTg0WloNQZBFwQO413RdboTQ");'>
+<div class="w-full h-full bg-slate-900/30 flex items-center justify-center">
+<span class="bg-slate-900/80 text-white text-xs font-bold px-3 py-1 rounded backdrop-blur-sm">Archived 2023</span>
+</div>
+</div>
+<div class="flex flex-1 flex-col justify-center p-6 gap-4">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-3">
+<h4 class="text-slate-900 dark:text-white text-lg font-bold">Legacy - Starter Plan</h4>
+<span class="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded">Inactive</span>
+</div>
+<p class="text-slate-500 dark:text-slate-400 text-sm">$19/month - This plan is no longer available for new signups. 142 users remaining.</p>
+</div>
+<div class="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-slate-400">
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">history</span> Grandfathered</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">group</span> 142 Users</span>
+<span class="flex items-center gap-1"><span class="material-symbols-outlined text-[16px]">attach_money</span> $2,698 MRR</span>
+</div>
+</div>
+<div class="p-6 flex items-center md:border-l md:border-slate-100 dark:md:border-slate-800">
+<button class="w-full md:w-auto flex items-center justify-center gap-2 rounded-lg h-9 px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-900 dark:text-white text-sm font-medium transition-colors whitespace-nowrap">
+<span>Manage Legacy Plan</span>
+<span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

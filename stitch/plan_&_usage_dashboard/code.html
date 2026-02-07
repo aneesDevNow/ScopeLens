@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Plan &amp; Usage Dashboard - CheckMate AI</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#135bec",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+</head>
+<body class="font-display bg-background-light dark:bg-background-dark text-[#0d121b] dark:text-white">
+<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-[#e7ebf3] dark:border-[#2a3447] px-10 py-3 bg-white dark:bg-[#1a2233]">
+<div class="flex items-center gap-4 text-[#0d121b] dark:text-white">
+<div class="size-6 text-primary">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M42.4379 44C42.4379 44 36.0744 33.9038 41.1692 24C46.8624 12.9336 42.2078 4 42.2078 4L7.01134 4C7.01134 4 11.6577 12.932 5.96912 23.9969C0.876273 33.9029 7.27094 44 7.27094 44L42.4379 44Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">CheckMate AI</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8">
+<div class="flex items-center gap-9 hidden md:flex">
+<a class="text-[#0d121b] dark:text-[#9ca3af] hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Dashboard</a>
+<a class="text-[#0d121b] dark:text-[#9ca3af] hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">History</a>
+<a class="text-[#0d121b] dark:text-[#9ca3af] hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Account</a>
+<a class="text-[#0d121b] dark:text-[#9ca3af] hover:text-primary dark:hover:text-primary transition-colors text-sm font-medium leading-normal" href="#">Help</a>
+</div>
+<div class="flex items-center gap-4">
+<button class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-9 px-4 bg-primary text-[#f8f9fc] text-sm font-bold leading-normal tracking-[0.015em] hover:bg-blue-700 transition-colors">
+<span class="truncate">Upgrade</span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 border border-[#e7ebf3] dark:border-[#2a3447]" data-alt="User profile avatar placeholder" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAPWLWFWJ4Y4kYyo1vehkYWNwq_LcQVh8rPN3pSS4IfbHzgWec384W236pGHK9hY8rMJQKgJygdwmAfdV2-Ctg6nq9u5HziFTgJvNp9hq_afStSiruANlL5OrkeS1TIR6gNbUTf01kg6bG_tMCHN0Eizd7KWxcVuFLst8dTHGtC4IViwIGagNuhEQv4CqDOGKY8Q70Uc6F7Ak4U4un4boiArOaaAIl_eHV70tIMEw_XMcaeKjD04-LsrSFsbmNmxdXK_SsitaYXXeg");'></div>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="layout-container flex h-full grow flex-col">
+<div class="px-4 md:px-10 lg:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+<!-- Page Heading -->
+<div class="flex flex-wrap justify-between gap-3 p-4">
+<div class="flex min-w-72 flex-col gap-2">
+<h1 class="text-[#0d121b] dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">Plan &amp; Usage</h1>
+<p class="text-[#4c669a] dark:text-[#94a3b8] text-base font-normal leading-normal">Manage your subscription and track your scan usage for the current billing cycle.</p>
+</div>
+</div>
+<!-- Usage Stats Section -->
+<div class="p-4">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Scans Remaining Card -->
+<div class="flex flex-col gap-2 rounded-xl p-6 border border-[#cfd7e7] dark:border-[#2a3447] bg-white dark:bg-[#1a2233] shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-[#0d121b] dark:text-white text-base font-medium leading-normal">Scans Remaining</p>
+<span class="material-symbols-outlined text-primary text-2xl">radar</span>
+</div>
+<p class="text-[#0d121b] dark:text-white tracking-light text-3xl font-bold leading-tight mt-2">12 <span class="text-[#94a3b8] text-xl font-medium">/ 50</span></p>
+<!-- Embedded Progress Bar -->
+<div class="mt-4 flex flex-col gap-2">
+<div class="flex justify-between items-center text-xs">
+<span class="text-[#4c669a] dark:text-[#94a3b8]">Usage</span>
+<span class="text-[#0d121b] dark:text-white font-medium">76%</span>
+</div>
+<div class="rounded-full bg-[#cfd7e7] dark:bg-[#2a3447] h-2 w-full overflow-hidden">
+<div class="h-full rounded-full bg-primary" style="width: 76%;"></div>
+</div>
+</div>
+</div>
+<!-- Words Analyzed Card -->
+<div class="flex flex-col gap-2 rounded-xl p-6 border border-[#cfd7e7] dark:border-[#2a3447] bg-white dark:bg-[#1a2233] shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-[#0d121b] dark:text-white text-base font-medium leading-normal">Words Analyzed</p>
+<span class="material-symbols-outlined text-primary text-2xl">article</span>
+</div>
+<p class="text-[#0d121b] dark:text-white tracking-light text-3xl font-bold leading-tight mt-2">24,500</p>
+<p class="text-[#4c669a] dark:text-[#94a3b8] text-sm mt-4">Total lifetime words scanned</p>
+</div>
+<!-- Plan Renewal Card -->
+<div class="flex flex-col gap-2 rounded-xl p-6 border border-[#cfd7e7] dark:border-[#2a3447] bg-white dark:bg-[#1a2233] shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-[#0d121b] dark:text-white text-base font-medium leading-normal">Plan Renewal</p>
+<span class="material-symbols-outlined text-primary text-2xl">calendar_month</span>
+</div>
+<p class="text-[#0d121b] dark:text-white tracking-light text-3xl font-bold leading-tight mt-2">Oct 15</p>
+<p class="text-[#4c669a] dark:text-[#94a3b8] text-sm mt-4">Next billing date</p>
+</div>
+</div>
+</div>
+<!-- Upgrade / Pricing Section Header -->
+<div class="flex flex-col gap-2 p-4 mt-8">
+<h2 class="text-[#0d121b] dark:text-white text-2xl font-bold leading-tight">Upgrade your plan</h2>
+<p class="text-[#4c669a] dark:text-[#94a3b8]">Unlock deeper analysis and higher scan limits.</p>
+</div>
+<!-- Pricing Cards Grid -->
+<div class="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 px-4 pb-12">
+<!-- Student Plan (Current) -->
+<div class="flex flex-col gap-4 rounded-xl border border-solid border-primary bg-[#f0f5ff] dark:bg-[#151c2e] dark:border-primary/50 p-6 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-3">
+<span class="bg-primary/10 text-primary dark:text-blue-400 text-xs font-bold px-2 py-1 rounded-full border border-primary/20">CURRENT PLAN</span>
+</div>
+<div class="flex flex-col gap-1">
+<h3 class="text-[#0d121b] dark:text-white text-lg font-bold leading-tight">Student</h3>
+<p class="flex items-baseline gap-1 text-[#0d121b] dark:text-white">
+<span class="text-4xl font-black leading-tight tracking-[-0.033em]">$0</span>
+<span class="text-base font-bold text-[#4c669a] dark:text-[#94a3b8]">/mo</span>
+</p>
+</div>
+<button class="flex w-full cursor-not-allowed items-center justify-center rounded-lg h-10 px-4 bg-[#cfd7e7] dark:bg-[#2a3447] text-[#4c669a] dark:text-[#94a3b8] text-sm font-bold leading-normal tracking-[0.015em] opacity-70" disabled="">
+                                Active
+                            </button>
+<div class="flex flex-col gap-3 mt-2">
+<div class="text-sm font-medium leading-normal flex gap-3 text-[#0d121b] dark:text-[#e2e8f0]">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                    50 Scans/mo
+                                </div>
+<div class="text-sm font-medium leading-normal flex gap-3 text-[#0d121b] dark:text-[#e2e8f0]">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                    Basic Analysis
+                                </div>
+<div class="text-sm font-medium leading-normal flex gap-3 text-[#0d121b] dark:text-[#e2e8f0]">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                    Email Support
+                                </div>
+</div>
+</div>
+<!-- Professional Plan -->
+<div class="flex flex-col gap-4 rounded-xl border border-solid border-[#cfd7e7] dark:border-[#2a3447] bg-white dark:bg-[#1a2233] p-6 shadow-md hover:border-primary transition-colors group">
+<div class="flex flex-col gap-1">
+<div class="flex items-center justify-between">
+<h3 class="text-[#0d121b] dark:text-white text-lg font-bold leading-tight">Professional</h3>
+<span class="text-white text-xs font-bold uppercase tracking-wider rounded-full bg-primary px-3 py-1">Popular</span>
+</div>
+<p class="flex items-baseline gap-1 text-[#0d121b] dark:text-white">
+<span class="text-4xl font-black leading-tight tracking-[-0.033em]">$12</span>
+<span class="text-base font-bold text-[#4c669a] dark:text-[#94a3b8]">/mo</span>
+</p>
+</div>
+<button class="flex w-full cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-primary text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-blue-700 transition-colors shadow-lg shadow-primary/20">
+                                Upgrade Now
+                            </button>
+<div class="flex flex-col gap-3 mt-2">
+<div class="text-sm font-medium leading-normal flex gap-3 text-[#0d121b] dark:text-[#e2e8f0]">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                    Unlimited Scans
+                                </div>
+<div class="text-sm font-medium leading-normal flex gap-3 text-[#0d121b] dark:text-[#e2e8f0]">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                    Deep Analysis AI
+                                </div>
+<div class="text-sm font-medium leading-normal flex gap-3 text-[#0d121b] dark:text-[#e2e8f0]">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                    Priority Support
+                                </div>
+<div class="text-sm font-medium leading-normal flex gap-3 text-[#0d121b] dark:text-[#e2e8f0]">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                    Plagiarism Check
+                                </div>
+</div>
+</div>
+<!-- Institution Plan -->
+<div class="flex flex-col gap-4 rounded-xl border border-solid border-[#cfd7e7] dark:border-[#2a3447] bg-white dark:bg-[#1a2233] p-6">
+<div class="flex flex-col gap-1">
+<h3 class="text-[#0d121b] dark:text-white text-lg font-bold leading-tight">Institution</h3>
+<p class="flex items-baseline gap-1 text-[#0d121b] dark:text-white">
+<span class="text-4xl font-black leading-tight tracking-[-0.033em]">$299</span>
+<span class="text-base font-bold text-[#4c669a] dark:text-[#94a3b8]">/mo</span>
+</p>
+</div>
+<button class="flex w-full cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-white dark:bg-[#2a3447] border border-[#cfd7e7] dark:border-[#4b5563] text-[#0d121b] dark:text-white text-sm font-bold leading-normal tracking-[0.015em] hover:bg-[#f8f9fc] dark:hover:bg-[#323d4d] transition-colors">
+                                Contact Sales
+                            </button>
+<div class="flex flex-col gap-3 mt-2">
+<div class="text-sm font-medium leading-normal flex gap-3 text-[#0d121b] dark:text-[#e2e8f0]">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                    API Access
+                                </div>
+<div class="text-sm font-medium leading-normal flex gap-3 text-[#0d121b] dark:text-[#e2e8f0]">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                    SSO Integration
+                                </div>
+<div class="text-sm font-medium leading-normal flex gap-3 text-[#0d121b] dark:text-[#e2e8f0]">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                    Dedicated Account Manager
+                                </div>
+<div class="text-sm font-medium leading-normal flex gap-3 text-[#0d121b] dark:text-[#e2e8f0]">
+<span class="material-symbols-outlined text-primary text-[20px]">check</span>
+                                    Team Management
+                                </div>
+</div>
+</div>
+</div>
+<!-- End Pricing Cards Grid -->
+</div>
+</div>
+</main>
+</div>
+</body></html>

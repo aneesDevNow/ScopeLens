@@ -1,0 +1,345 @@
+<html class="light" lang="en"><head>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/></head><body class="bg-background-light dark:bg-background-dark text-[#0d121b] dark:text-white">```html
+
+
+
+
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Scope Lens Admin - Support &amp; Feedback</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#135bec",
+                "background-light": "#f6f6f8",
+                "background-dark": "#101622",
+              },
+              fontFamily: {
+                "display": ["Inter", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+            },
+          },
+        }
+      </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- TopNavBar -->
+<div class="w-full bg-white dark:bg-[#1a2234] border-b border-solid border-[#e7ebf3] dark:border-[#2a3447]">
+<div class="px-6 md:px-10 py-3 flex items-center justify-between whitespace-nowrap">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-4 text-[#0d121b] dark:text-white">
+<div class="size-8 text-primary">
+<svg class="w-full h-full" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M44 11.2727C44 14.0109 39.8386 16.3957 33.69 17.6364C39.8386 18.877 44 21.2618 44 24C44 26.7382 39.8386 29.123 33.69 30.3636C39.8386 31.6043 44 33.9891 44 36.7273C44 40.7439 35.0457 44 24 44C12.9543 44 4 40.7439 4 36.7273C4 33.9891 8.16144 31.6043 14.31 30.3636C8.16144 29.123 4 26.7382 4 24C4 21.2618 8.16144 18.877 14.31 17.6364C8.16144 16.3957 4 14.0109 4 11.2727C4 7.25611 12.9543 4 24 4C35.0457 4 44 7.25611 44 11.2727Z" fill="currentColor"></path>
+</svg>
+</div>
+<h2 class="text-lg font-bold leading-tight tracking-[-0.015em]">Scope Lens Admin</h2>
+</div>
+<div class="hidden lg:flex items-center gap-9">
+<a class="text-[#4c669a] dark:text-[#94a3b8] hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Dashboard</a>
+<a class="text-[#4c669a] dark:text-[#94a3b8] hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Users</a>
+<a class="text-[#4c669a] dark:text-[#94a3b8] hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Scan Logs</a>
+<a class="text-primary text-sm font-medium leading-normal" href="#">Support &amp; Feedback</a>
+<a class="text-[#4c669a] dark:text-[#94a3b8] hover:text-primary dark:hover:text-primary text-sm font-medium leading-normal transition-colors" href="#">Settings</a>
+</div>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<label class="hidden md:flex flex-col min-w-40 !h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-lg h-full">
+<div class="text-[#4c669a] dark:text-[#94a3b8] flex border-none bg-[#f6f6f8] dark:bg-[#2a3447] items-center justify-center pl-4 rounded-l-lg border-r-0">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#0d121b] dark:text-white focus:outline-0 focus:ring-0 border-none bg-[#f6f6f8] dark:bg-[#2a3447] focus:border-none h-full placeholder:text-[#4c669a] px-4 rounded-l-none border-l-0 pl-2 text-sm font-normal leading-normal" placeholder="Search tickets..." value=""/>
+</div>
+</label>
+<button class="relative bg-transparent border-none p-2 text-[#4c669a] dark:text-[#94a3b8] hover:text-primary">
+<span class="material-symbols-outlined">notifications</span>
+<span class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white dark:border-[#1a2234]"></span>
+</button>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-9 ring-2 ring-transparent hover:ring-primary transition-all cursor-pointer" data-alt="Admin user profile picture" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD_BNYhKD366CoikWsuVsrpGRyFrjDbMUSq75JmiJ5qsU8CubnSnitXemroaDz2PsG1KyPYMgIRg4g0QJXDppYR_0qW9LF1Nnia-qtEjVhbylnF9ug5uExb9D0LUyf8QXKX5LJYmIaoT5pG33ZafR5Rq6kr1PxJaya3Ne29uL30VdlrI7ca_-10weQ983YFGc6SfVNHjV9U1Mb3gFtbQg5Qh3vZYwN_54d4kENuG8SI6jcS-wxvoh7UB7fkKNMQyvK283JORw6c4Ck");'></div>
+</div>
+</div>
+</div>
+<!-- Main Content Area -->
+<div class="flex flex-1 justify-center py-8 px-4 md:px-10">
+<div class="layout-content-container flex flex-col w-full max-w-[1200px] flex-1">
+<!-- Page Heading -->
+<div class="flex flex-wrap justify-between items-end gap-4 pb-6">
+<div class="flex min-w-72 flex-col gap-2">
+<h1 class="text-[#0d121b] dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Support &amp; Feedback</h1>
+<p class="text-[#4c669a] dark:text-[#94a3b8] text-base font-normal leading-normal">Manage user inquiries and platform feedback efficiently.</p>
+</div>
+<button class="flex items-center gap-2 bg-primary hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg text-sm font-medium transition-colors">
+<span class="material-symbols-outlined text-[20px]">add</span>
+<span>Create Ticket</span>
+</button>
+</div>
+<!-- Stats -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-white dark:bg-[#1a2234] border border-[#e7ebf3] dark:border-[#2a3447] shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-[#4c669a] dark:text-[#94a3b8] text-sm font-medium leading-normal">Open Tickets</p>
+<span class="material-symbols-outlined text-[#4c669a] dark:text-[#94a3b8] text-[20px]">inbox</span>
+</div>
+<div class="flex items-end gap-2">
+<p class="text-[#0d121b] dark:text-white tracking-light text-2xl font-bold leading-tight">24</p>
+<span class="flex items-center text-[#07883b] text-xs font-medium bg-[#07883b]/10 px-1.5 py-0.5 rounded">
+<span class="material-symbols-outlined text-[14px] mr-0.5">trending_up</span>
+                                    +2%
+                                </span>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-white dark:bg-[#1a2234] border border-[#e7ebf3] dark:border-[#2a3447] shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-[#4c669a] dark:text-[#94a3b8] text-sm font-medium leading-normal">In Progress</p>
+<span class="material-symbols-outlined text-[#4c669a] dark:text-[#94a3b8] text-[20px]">pending</span>
+</div>
+<div class="flex items-end gap-2">
+<p class="text-[#0d121b] dark:text-white tracking-light text-2xl font-bold leading-tight">12</p>
+<span class="flex items-center text-[#4c669a] text-xs font-medium bg-[#4c669a]/10 px-1.5 py-0.5 rounded">
+                                    0%
+                                </span>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-white dark:bg-[#1a2234] border border-[#e7ebf3] dark:border-[#2a3447] shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-[#4c669a] dark:text-[#94a3b8] text-sm font-medium leading-normal">Resolved Today</p>
+<span class="material-symbols-outlined text-[#4c669a] dark:text-[#94a3b8] text-[20px]">check_circle</span>
+</div>
+<div class="flex items-end gap-2">
+<p class="text-[#0d121b] dark:text-white tracking-light text-2xl font-bold leading-tight">45</p>
+<span class="flex items-center text-[#07883b] text-xs font-medium bg-[#07883b]/10 px-1.5 py-0.5 rounded">
+<span class="material-symbols-outlined text-[14px] mr-0.5">trending_up</span>
+                                    +15%
+                                </span>
+</div>
+</div>
+<div class="flex flex-col gap-2 rounded-xl p-5 bg-white dark:bg-[#1a2234] border border-[#e7ebf3] dark:border-[#2a3447] shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-[#4c669a] dark:text-[#94a3b8] text-sm font-medium leading-normal">Avg Response Time</p>
+<span class="material-symbols-outlined text-[#4c669a] dark:text-[#94a3b8] text-[20px]">timer</span>
+</div>
+<div class="flex items-end gap-2">
+<p class="text-[#0d121b] dark:text-white tracking-light text-2xl font-bold leading-tight">1h 32m</p>
+<span class="flex items-center text-[#e73908] text-xs font-medium bg-[#e73908]/10 px-1.5 py-0.5 rounded">
+<span class="material-symbols-outlined text-[14px] mr-0.5">trending_down</span>
+                                    -5%
+                                </span>
+</div>
+</div>
+</div>
+<!-- Quick Reply & Recent Tickets Grid -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8 mb-8">
+<!-- Recent Tickets Table Section -->
+<div class="xl:col-span-2 flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<h3 class="text-[#0d121b] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Recent Tickets</h3>
+<div class="flex gap-2">
+<button class="flex items-center justify-center size-8 rounded-lg border border-[#e7ebf3] dark:border-[#2a3447] bg-white dark:bg-[#1a2234] text-[#4c669a] dark:text-[#94a3b8] hover:bg-[#f6f6f8] dark:hover:bg-[#2a3447]">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+</button>
+<button class="flex items-center justify-center size-8 rounded-lg border border-[#e7ebf3] dark:border-[#2a3447] bg-white dark:bg-[#1a2234] text-[#4c669a] dark:text-[#94a3b8] hover:bg-[#f6f6f8] dark:hover:bg-[#2a3447]">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+</div>
+<div class="overflow-hidden rounded-xl border border-[#e7ebf3] dark:border-[#2a3447] bg-white dark:bg-[#1a2234] shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#f8f9fc] dark:bg-[#1e2736] border-b border-[#e7ebf3] dark:border-[#2a3447]">
+<th class="px-6 py-4 text-[#4c669a] dark:text-[#94a3b8] text-xs font-semibold uppercase tracking-wider">Ticket ID</th>
+<th class="px-6 py-4 text-[#4c669a] dark:text-[#94a3b8] text-xs font-semibold uppercase tracking-wider">User</th>
+<th class="px-6 py-4 text-[#4c669a] dark:text-[#94a3b8] text-xs font-semibold uppercase tracking-wider">Subject</th>
+<th class="px-6 py-4 text-[#4c669a] dark:text-[#94a3b8] text-xs font-semibold uppercase tracking-wider">Urgency</th>
+<th class="px-6 py-4 text-[#4c669a] dark:text-[#94a3b8] text-xs font-semibold uppercase tracking-wider">Status</th>
+<th class="px-6 py-4 text-[#4c669a] dark:text-[#94a3b8] text-xs font-semibold uppercase tracking-wider text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#e7ebf3] dark:divide-[#2a3447]">
+<!-- Row 1 -->
+<tr class="hover:bg-[#f8f9fc] dark:hover:bg-[#1e2736] transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#0d121b] dark:text-white font-medium">#T-1024</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-[#e0e7ff] text-primary flex items-center justify-center text-xs font-bold">AM</div>
+<div class="text-sm text-[#0d121b] dark:text-white">Alice Moore</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#4c669a] dark:text-[#94a3b8]">Scan failed error</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/30 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:text-red-300">
+                                                        High
+                                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:text-blue-300">
+                                                        Open
+                                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<button class="text-primary hover:text-blue-700 text-sm font-medium">Review</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-[#f8f9fc] dark:hover:bg-[#1e2736] transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#0d121b] dark:text-white font-medium">#T-1023</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-8" data-alt="User Avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAduKREcssr12vwbWo0hbMqNb3yaW5RxeBje6twilb3V2RDtesgeivZ7zeOeVmuIvJRQwMlOarzdnBZ9Qwreu-BhSe9lKiM8ps4L_bGkuZkQeGoX_00zjKJMp98DlKBO23itH_izEzgm-U69WAg79aTzW0jxquswBR-8scmq1JCMO4ipW-Knd-hTl4VkUhpMmzUstpHsp6ehrgrkMpldwsg8AKVzmnBCr7TJWW8Dkz_d4IIZGWWNoJpNTJxoQd1zdosDjq975UVpHE");'></div>
+<div class="text-sm text-[#0d121b] dark:text-white">Bob Smith</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#4c669a] dark:text-[#94a3b8]">Billing inquiry</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:text-yellow-300">
+                                                        Medium
+                                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-2.5 py-0.5 text-xs font-medium text-purple-800 dark:text-purple-300">
+                                                        In Progress
+                                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<button class="text-primary hover:text-blue-700 text-sm font-medium">Review</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-[#f8f9fc] dark:hover:bg-[#1e2736] transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#0d121b] dark:text-white font-medium">#T-1022</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-[#dcfce7] text-green-600 flex items-center justify-center text-xs font-bold">CD</div>
+<div class="text-sm text-[#0d121b] dark:text-white">Charlie Day</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#4c669a] dark:text-[#94a3b8]">Feature request</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-gray-100 dark:bg-gray-800 px-2.5 py-0.5 text-xs font-medium text-gray-800 dark:text-gray-300">
+                                                        Low
+                                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-2.5 py-0.5 text-xs font-medium text-blue-800 dark:text-blue-300">
+                                                        Open
+                                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<button class="text-primary hover:text-blue-700 text-sm font-medium">Review</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-[#f8f9fc] dark:hover:bg-[#1e2736] transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#0d121b] dark:text-white font-medium">#T-1021</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="bg-center bg-no-repeat bg-cover rounded-full size-8" data-alt="User Avatar" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBQzJufph8e9vrOWxyjI4jCpM4Qzp5CsgJWqA-SRIHU8v9pTMXyqc3UqZtN9TU4Lc7KLCPC8FTK2Wmr3h_3ZLSoizFdBORULutBeijVwHszMxyfcA1ZlTXs0VYD81aFAZfD-kDZGUPg4PRZme1OLlM1kda2TdwvFTrEQggPla5Rh0KJlNcj2YVLhycqCz4GIfn26QkNYhXs594XkeJm7VFqf2xbfPOCm6CzEigO5CZ8pFg6zCHhZay-5Q4QJ1zRWkui12yWiLb0t1M");'></div>
+<div class="text-sm text-[#0d121b] dark:text-white">Diana Prince</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#4c669a] dark:text-[#94a3b8]">Login issue</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/30 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:text-red-300">
+                                                        High
+                                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:text-green-300">
+                                                        Resolved
+                                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<button class="text-primary hover:text-blue-700 text-sm font-medium">Review</button>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="hover:bg-[#f8f9fc] dark:hover:bg-[#1e2736] transition-colors">
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#0d121b] dark:text-white font-medium">#T-1020</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<div class="size-8 rounded-full bg-[#fce7f3] text-pink-600 flex items-center justify-center text-xs font-bold">EW</div>
+<div class="text-sm text-[#0d121b] dark:text-white">Evan Wright</div>
+</div>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-sm text-[#4c669a] dark:text-[#94a3b8]">API Limit increase</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-0.5 text-xs font-medium text-yellow-800 dark:text-yellow-300">
+                                                        Medium
+                                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap">
+<span class="inline-flex items-center rounded-full bg-purple-100 dark:bg-purple-900/30 px-2.5 py-0.5 text-xs font-medium text-purple-800 dark:text-purple-300">
+                                                        In Progress
+                                                    </span>
+</td>
+<td class="px-6 py-4 whitespace-nowrap text-right">
+<button class="text-primary hover:text-blue-700 text-sm font-medium">Review</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-6 py-4 border-t border-[#e7ebf3] dark:border-[#2a3447] flex items-center justify-between">
+<p class="text-sm text-[#4c669a] dark:text-[#94a3b8]">Showing 5 of 24 tickets</p>
+<div class="flex gap-2">
+<button class="px-3 py-1 text-sm border border-[#e7ebf3] dark:border-[#2a3447] rounded-lg text-[#4c669a] dark:text-[#94a3b8] hover:bg-[#f6f6f8] dark:hover:bg-[#2a3447] disabled:opacity-50" disabled="">Previous</button>
+<button class="px-3 py-1 text-sm border border-[#e7ebf3] dark:border-[#2a3447] rounded-lg text-[#0d121b] dark:text-white hover:bg-[#f6f6f8] dark:hover:bg-[#2a3447]">Next</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Quick Reply Interface -->
+<div class="flex flex-col gap-4">
+<h3 class="text-[#0d121b] dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Quick Reply</h3>
+<div class="flex flex-col bg-white dark:bg-[#1a2234] border border-[#e7ebf3] dark:border-[#2a3447] rounded-xl p-5 shadow-sm h-full">
+<p class="text-sm text-[#4c669a] dark:text-[#94a3b8] mb-4">Respond to the most recent high-priority ticket: <span class="text-[#0d121b] dark:text-white font-medium">#T-1024</span></p>
+<div class="flex flex-col gap-3 flex-1">
+<div class="space-y-1">
+<label class="text-xs font-medium text-[#0d121b] dark:text-white">Template</label>
+<select class="w-full rounded-lg border-[#cfd7e7] dark:border-[#2a3447] bg-[#f8f9fc] dark:bg-[#1e2736] text-sm text-[#0d121b] dark:text-white focus:ring-primary focus:border-primary">
+<option>Scan Error Apology</option>
+<option>Billing Clarification</option>
+<option>Feature Request Ack</option>
+<option>Custom Message</option>
+</select>
+</div>
+<div class="space-y-1 flex-1 flex flex-col">
+<label class="text-xs font-medium text-[#0d121b] dark:text-white">Message</label>
+<textarea class="w-full flex-1 min-h-[140px] rounded-lg border-[#cfd7e7] dark:border-[#2a3447] bg-[#f8f9fc] dark:bg-[#1e2736] text-sm text-[#0d121b] dark:text-white focus:ring-primary focus:border-primary p-3 resize-none" placeholder="Type your response here...">Hi Alice,
+
+We've investigated the scan failure and identified a temporary timeout with our processing engine. We have reset the scan for you, and it should complete shortly.
+
+Apologies for the inconvenience.</textarea>
+</div>
+<div class="flex items-center justify-between pt-2">
+<label class="flex items-center gap-2 cursor-pointer">
+<input checked="" class="rounded border-gray-300 text-primary focus:ring-primary" type="checkbox"/>
+<span class="text-xs text-[#4c669a] dark:text-[#94a3b8]">Mark as Resolved</span>
+</label>
+<button class="bg-primary hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">send</span>
+                                            Send Reply
+                                        </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body></html>

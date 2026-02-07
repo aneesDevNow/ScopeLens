@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Scope Lens: Reseller Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#1313ec",
+              "background-light": "#f6f6f8",
+              "background-dark": "#101022",
+              "surface-light": "#ffffff",
+              "surface-dark": "#1a1a2e",
+              "text-light": "#111118",
+              "text-dark": "#e0e0e0",
+              "text-secondary-light": "#616189",
+              "text-secondary-dark": "#9ca3af",
+              "border-light": "#dbdbe6",
+              "border-dark": "#2e2e42",
+            },
+            fontFamily: {
+              "display": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .filled-icon { font-variation-settings: 'FILL' 1; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark font-display h-screen flex overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 flex-shrink-0 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex flex-col h-full transition-colors duration-200">
+<div class="flex flex-col h-full justify-between p-4">
+<div class="flex flex-col gap-6">
+<!-- Branding -->
+<div class="flex flex-col px-2 mt-2">
+<h1 class="text-text-light dark:text-white text-lg font-bold leading-normal flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">deployed_code</span>
+                        Reseller Portal
+                    </h1>
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-xs font-normal leading-normal mt-1">Scope Lens Admin</p>
+</div>
+<!-- Navigation -->
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10 text-primary group transition-colors" href="#">
+<span class="material-symbols-outlined filled-icon">dashboard</span>
+<p class="text-sm font-semibold leading-normal">Dashboard</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-background-light dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">group</span>
+<p class="text-sm font-medium leading-normal">My Customers</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-background-light dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">history</span>
+<p class="text-sm font-medium leading-normal">Credit History</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-background-light dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">vpn_key</span>
+<p class="text-sm font-medium leading-normal">Key Management</p>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-background-light dark:hover:bg-white/5 text-text-secondary-light dark:text-text-secondary-dark hover:text-text-light dark:hover:text-white transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<p class="text-sm font-medium leading-normal">Settings</p>
+</a>
+</nav>
+</div>
+<!-- Footer / Logout -->
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-3 px-3 py-3 rounded-xl bg-background-light dark:bg-white/5 border border-border-light dark:border-border-dark">
+<div class="h-10 w-10 rounded-full bg-gradient-to-tr from-primary to-indigo-400 flex items-center justify-center text-white font-bold" data-alt="User avatar gradient">
+                        JS
+                    </div>
+<div class="flex flex-col overflow-hidden">
+<p class="text-text-light dark:text-white text-sm font-semibold truncate">Jane Smith</p>
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-xs truncate">jane@scopelens.com</p>
+</div>
+</div>
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-background-light dark:bg-white/5 hover:bg-border-light dark:hover:bg-white/10 text-text-light dark:text-white text-sm font-bold leading-normal border border-border-light dark:border-border-dark transition-colors">
+<span class="truncate">Logout</span>
+</button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark">
+<div class="layout-container flex flex-col h-full max-w-[1200px] mx-auto p-6 md:p-10 w-full">
+<!-- Page Header + Primary Action -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+<div class="flex flex-col gap-1">
+<h1 class="text-text-light dark:text-white text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">Reseller Overview</h1>
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-base font-normal">Manage your credits and sub-accounts efficiently.</p>
+</div>
+<button class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 bg-primary hover:bg-primary/90 text-white gap-2 shadow-lg shadow-primary/20 transition-all">
+<span class="material-symbols-outlined">credit_card</span>
+<span class="truncate font-bold tracking-[0.015em]">Purchase Credits</span>
+</button>
+</div>
+<!-- Stats Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+<!-- Stat Card 1 -->
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium leading-normal">Bulk Credit Balance</p>
+<span class="material-symbols-outlined text-primary bg-primary/10 p-1.5 rounded-md">account_balance_wallet</span>
+</div>
+<p class="text-text-light dark:text-white tracking-tight text-3xl font-bold leading-tight">25,000</p>
+<p class="text-xs text-green-600 dark:text-green-400 flex items-center gap-1 font-medium mt-1">
+<span class="material-symbols-outlined text-[16px]">trending_up</span> +500 this week
+                    </p>
+</div>
+<!-- Stat Card 2 -->
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium leading-normal">Sub-accounts Managed</p>
+<span class="material-symbols-outlined text-teal-600 bg-teal-500/10 p-1.5 rounded-md dark:text-teal-400">group</span>
+</div>
+<p class="text-text-light dark:text-white tracking-tight text-3xl font-bold leading-tight">48</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1 font-medium mt-1">
+                        Active accounts
+                    </p>
+</div>
+<!-- Stat Card 3 -->
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium leading-normal">Keys Generated</p>
+<span class="material-symbols-outlined text-indigo-600 bg-indigo-500/10 p-1.5 rounded-md dark:text-indigo-400">key</span>
+</div>
+<p class="text-text-light dark:text-white tracking-tight text-3xl font-bold leading-tight">152</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark flex items-center gap-1 font-medium mt-1">
+                        Lifetime total
+                    </p>
+</div>
+<!-- Stat Card 4 -->
+<div class="flex flex-col gap-2 rounded-xl p-6 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
+<div class="flex justify-between items-start">
+<p class="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium leading-normal">Support Tickets</p>
+<span class="material-symbols-outlined text-orange-600 bg-orange-500/10 p-1.5 rounded-md dark:text-orange-400">support_agent</span>
+</div>
+<p class="text-text-light dark:text-white tracking-tight text-3xl font-bold leading-tight">2</p>
+<p class="text-xs text-orange-600 dark:text-orange-400 flex items-center gap-1 font-medium mt-1">
+                        Open requests
+                    </p>
+</div>
+</div>
+<!-- Content Grid: Tool & Table -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+<!-- Left Column: Generate Keys Tool -->
+<div class="lg:col-span-1 flex flex-col gap-6">
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm overflow-hidden flex flex-col">
+<div class="p-5 border-b border-border-light dark:border-border-dark">
+<h2 class="text-text-light dark:text-white text-lg font-bold leading-tight flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">encrypted</span>
+                                Generate Customer Keys
+                            </h2>
+</div>
+<div class="p-5 flex flex-col gap-4">
+<div class="flex flex-col gap-2">
+<label class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">Customer Email</label>
+<input class="bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-lg px-3 py-2.5 text-sm text-text-light dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all" placeholder="client@company.com" type="email"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">Plan Type</label>
+<div class="relative">
+<select class="w-full appearance-none bg-background-light dark:bg-background-dark border border-border-light dark:border-border-dark rounded-lg px-3 py-2.5 text-sm text-text-light dark:text-white focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all cursor-pointer">
+<option>Standard (50 Credits)</option>
+<option>Pro (200 Credits)</option>
+<option>Enterprise (Unlimited)</option>
+</select>
+<div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-text-secondary-light dark:text-text-secondary-dark">
+<span class="material-symbols-outlined">expand_more</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-sm font-medium text-text-secondary-light dark:text-text-secondary-dark">Key Expiration</label>
+<div class="flex gap-2">
+<button class="flex-1 py-2 text-xs font-medium rounded-lg border border-border-light dark:border-border-dark text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5">30 Days</button>
+<button class="flex-1 py-2 text-xs font-medium rounded-lg bg-primary/10 text-primary border border-primary/20">90 Days</button>
+<button class="flex-1 py-2 text-xs font-medium rounded-lg border border-border-light dark:border-border-dark text-text-secondary-light dark:text-text-secondary-dark hover:bg-background-light dark:hover:bg-white/5">1 Year</button>
+</div>
+</div>
+<div class="h-px bg-border-light dark:bg-border-dark my-1"></div>
+<button class="flex w-full cursor-pointer items-center justify-center rounded-lg h-10 px-4 bg-primary hover:bg-primary/90 text-white text-sm font-bold shadow-md shadow-primary/20 transition-all">
+                                Generate Key
+                            </button>
+</div>
+</div>
+<!-- Promo / Info Card -->
+<div class="bg-gradient-to-br from-indigo-900 to-primary rounded-xl p-5 text-white shadow-lg relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+<span class="material-symbols-outlined text-[100px]">rocket_launch</span>
+</div>
+<h3 class="font-bold text-lg relative z-10">New Feature Alert</h3>
+<p class="text-indigo-100 text-sm mt-2 relative z-10">Bulk key generation is now available via CSV upload in the Settings tab.</p>
+<button class="mt-4 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-lg text-xs font-bold transition-colors relative z-10">Check Settings</button>
+</div>
+</div>
+<!-- Right Column: Customer Table -->
+<div class="lg:col-span-2 flex flex-col h-full">
+<div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm flex-1 flex flex-col">
+<div class="p-5 border-b border-border-light dark:border-border-dark flex justify-between items-center">
+<h2 class="text-text-light dark:text-white text-lg font-bold leading-tight">My Customers</h2>
+<button class="text-primary hover:text-primary/80 text-sm font-medium flex items-center gap-1">
+                                View All <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</div>
+<div class="overflow-x-auto flex-1">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-background-light dark:bg-background-dark/50 border-b border-border-light dark:border-border-dark">
+<th class="p-4 text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">Customer</th>
+<th class="p-4 text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">Plan</th>
+<th class="p-4 text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">Usage</th>
+<th class="p-4 text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">Status</th>
+<th class="p-4 text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-light dark:divide-border-dark">
+<!-- Row 1 -->
+<tr class="hover:bg-background-light dark:hover:bg-white/5 transition-colors group">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 flex items-center justify-center text-xs font-bold">JD</div>
+<div>
+<p class="text-sm font-medium text-text-light dark:text-white">John Doe</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">john@example.com</p>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-medium">Pro Plan</span>
+</td>
+<td class="p-4">
+<div class="flex flex-col gap-1 w-full max-w-[120px]">
+<div class="flex justify-between text-xs text-text-secondary-light dark:text-text-secondary-dark">
+<span>145/200</span>
+<span>72%</span>
+</div>
+<div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[72%] rounded-full"></div>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1.5 text-xs font-medium text-green-600 dark:text-green-400">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Active
+                                            </span>
+</td>
+<td class="p-4 text-right">
+<button class="p-1.5 rounded-lg hover:bg-border-light dark:hover:bg-white/10 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-background-light dark:hover:bg-white/5 transition-colors group">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400 flex items-center justify-center text-xs font-bold">AS</div>
+<div>
+<p class="text-sm font-medium text-text-light dark:text-white">Alice Smith</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">alice.tech@corp.com</p>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-medium">Enterprise</span>
+</td>
+<td class="p-4">
+<div class="flex flex-col gap-1 w-full max-w-[120px]">
+<div class="flex justify-between text-xs text-text-secondary-light dark:text-text-secondary-dark">
+<span>8.2k/∞</span>
+<span>--</span>
+</div>
+<div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+<div class="h-full bg-teal-500 w-[25%] rounded-full"></div>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1.5 text-xs font-medium text-green-600 dark:text-green-400">
+<span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Active
+                                            </span>
+</td>
+<td class="p-4 text-right">
+<button class="p-1.5 rounded-lg hover:bg-border-light dark:hover:bg-white/10 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-background-light dark:hover:bg-white/5 transition-colors group">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 flex items-center justify-center text-xs font-bold">RJ</div>
+<div>
+<p class="text-sm font-medium text-text-light dark:text-white">Robert Johnson</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">bob@agency.net</p>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium">Standard</span>
+</td>
+<td class="p-4">
+<div class="flex flex-col gap-1 w-full max-w-[120px]">
+<div class="flex justify-between text-xs text-text-secondary-light dark:text-text-secondary-dark">
+<span class="text-red-500 font-medium">48/50</span>
+<span class="text-red-500 font-medium">96%</span>
+</div>
+<div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+<div class="h-full bg-red-500 w-[96%] rounded-full"></div>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1.5 text-xs font-medium text-yellow-600 dark:text-yellow-400">
+<span class="w-1.5 h-1.5 rounded-full bg-yellow-500"></span> Renew Soon
+                                            </span>
+</td>
+<td class="p-4 text-right">
+<button class="p-1.5 rounded-lg hover:bg-border-light dark:hover:bg-white/10 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-background-light dark:hover:bg-white/5 transition-colors group">
+<td class="p-4">
+<div class="flex items-center gap-3">
+<div class="h-8 w-8 rounded-full bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-400 flex items-center justify-center text-xs font-bold">MK</div>
+<div>
+<p class="text-sm font-medium text-text-light dark:text-white">Maria Kline</p>
+<p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">mkline@startup.io</p>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center px-2 py-1 rounded-md bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs font-medium">Pro Plan</span>
+</td>
+<td class="p-4">
+<div class="flex flex-col gap-1 w-full max-w-[120px]">
+<div class="flex justify-between text-xs text-text-secondary-light dark:text-text-secondary-dark">
+<span>12/200</span>
+<span>6%</span>
+</div>
+<div class="w-full h-1.5 bg-border-light dark:bg-border-dark rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[6%] rounded-full"></div>
+</div>
+</div>
+</td>
+<td class="p-4">
+<span class="inline-flex items-center gap-1.5 text-xs font-medium text-red-600 dark:text-red-400">
+<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Inactive
+                                            </span>
+</td>
+<td class="p-4 text-right">
+<button class="p-1.5 rounded-lg hover:bg-border-light dark:hover:bg-white/10 text-text-secondary-light dark:text-text-secondary-dark hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-4 border-t border-border-light dark:border-border-dark flex justify-center">
+<button class="text-sm text-text-secondary-light dark:text-text-secondary-dark hover:text-primary dark:hover:text-primary font-medium transition-colors">Load more customers...</button>
+</div>
+</div>
+</div>
+</div>
+<footer class="mt-12 mb-6 text-center text-xs text-text-secondary-light dark:text-text-secondary-dark">
+                © 2024 Scope Lens Inc. All rights reserved.
+            </footer>
+</div>
+</main>
+<!-- Theme Toggle (Floating) -->
+<button class="fixed bottom-6 right-6 h-12 w-12 rounded-full bg-primary text-white shadow-lg shadow-primary/40 flex items-center justify-center hover:scale-110 transition-transform z-50" onclick="document.documentElement.classList.toggle('dark')">
+<span class="material-symbols-outlined block dark:hidden">dark_mode</span>
+<span class="material-symbols-outlined hidden dark:block">light_mode</span>
+</button>
+</body></html>
