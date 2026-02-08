@@ -1,0 +1,11 @@
+services:
+  reseller:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scopelens-reseller
+    ports:
+      - "3003:3003"
+    env_file:
+      - .env.local
+    restart: unless-stopped

@@ -1,0 +1,11 @@
+services:
+  admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scopelens-admin
+    ports:
+      - "3002:3002"
+    env_file:
+      - .env.local
+    restart: unless-stopped

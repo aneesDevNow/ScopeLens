@@ -1,15 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-// Same packages as the frontend — keep in sync
-const creditPackages = [
-    { id: "pkg_25", amount: 25, bonus: 0, label: "Starter" },
-    { id: "pkg_50", amount: 50, bonus: 5, label: "Basic" },
-    { id: "pkg_100", amount: 100, bonus: 15, label: "Standard" },
-    { id: "pkg_250", amount: 250, bonus: 50, label: "Pro" },
-    { id: "pkg_500", amount: 500, bonus: 125, label: "Enterprise" },
-];
-
 export async function POST(request: Request) {
     try {
         const supabase = await createClient();
@@ -21,18 +12,34 @@ export async function POST(request: Request) {
         }
 
         // 2. Parse body
-        const { packageId } = await request.json();
+        let body;
+        try {
+            body = await request.json();
+        } catch {
+            return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+        }
+
+        const { packageId } = body;
         if (!packageId) {
             return NextResponse.json({ error: "Missing packageId" }, { status: 400 });
         }
 
-        // 3. Validate package
-        const pkg = creditPackages.find(p => p.id === packageId);
-        if (!pkg) {
-            return NextResponse.json({ error: "Invalid package" }, { status: 400 });
+        // 3. Validate package from DB
+        const { data: pkg, error: pkgError } = await supabase
+            .from("credit_packages")
+            .select("*")
+            .eq("id", packageId)
+            .single();
+
+        if (pkgError || !pkg) {
+            return NextResponse.json({ error: "Invalid package or package not found" }, { status: 404 });
         }
 
-        const totalCredits = pkg.amount + pkg.bonus;
+        if (!pkg.is_active) {
+            return NextResponse.json({ error: "This package is no longer active" }, { status: 400 });
+        }
+
+        const totalCredits = pkg.credits + (pkg.bonus_credits || 0);
 
         // 4. Get reseller record
         const { data: reseller, error: resellerErr } = await supabase
@@ -55,7 +62,7 @@ export async function POST(request: Request) {
                 type: "credit_purchase",
                 amount: totalCredits,
                 balance_after: newBalance,
-                description: `Purchased ${pkg.label} package: ${pkg.amount} credits${pkg.bonus > 0 ? ` + ${pkg.bonus} bonus` : ""}`,
+                description: `Purchased ${pkg.name} package: ${pkg.credits} credits${pkg.bonus_credits > 0 ? ` + ${pkg.bonus_credits} bonus` : ""}`,
                 created_by: user.id,
             });
 
@@ -78,7 +85,7 @@ export async function POST(request: Request) {
         return NextResponse.json({
             success: true,
             credit_balance: newBalance,
-            package: pkg.label,
+            package: pkg.name,
             credits_added: totalCredits,
         });
     } catch (error) {

@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface ResellerData {
     credit_balance: number;
@@ -10,77 +12,60 @@ interface ResellerData {
 
 interface CreditPackage {
     id: string;
-    amount: number;
-    bonus: number;
-    label: string;
-    popular?: boolean;
+    name: string;
+    credits: number;
+    bonus_credits: number;
+    price: number;
+    is_popular: boolean;
+    sort_order: number;
 }
 
-const creditPackages: CreditPackage[] = [
-    { id: "pkg_25", amount: 25, bonus: 0, label: "Starter" },
-    { id: "pkg_50", amount: 50, bonus: 5, label: "Basic" },
-    { id: "pkg_100", amount: 100, bonus: 15, label: "Standard", popular: true },
-    { id: "pkg_250", amount: 250, bonus: 50, label: "Pro" },
-    { id: "pkg_500", amount: 500, bonus: 125, label: "Enterprise" },
-];
-
-export default function BillingPage() {
+function BillingContent() {
     const { formatPrice } = useCurrency();
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [loading, setLoading] = useState(true);
     const [reseller, setReseller] = useState<ResellerData | null>(null);
+    const [packages, setPackages] = useState<CreditPackage[]>([]);
     const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
-    const [purchasing, setPurchasing] = useState(false);
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     useEffect(() => {
+        const success = searchParams.get("success");
+        if (success) {
+            setSuccessMsg("Purchase successful! Your credits have been added.");
+            // Clean up URL
+            window.history.replaceState(null, "", "/billing");
+        }
+    }, [searchParams]);
+
+    useEffect(() => {
         async function fetchData() {
             try {
-                const res = await fetch("/api/profile");
-                if (res.ok) {
-                    const data = await res.json();
+                const [profileRes, packagesRes] = await Promise.all([
+                    fetch("/api/profile"),
+                    fetch("/api/credit-packages")
+                ]);
+
+                if (profileRes.ok) {
+                    const data = await profileRes.json();
                     setReseller(data.reseller);
+                }
+
+                if (packagesRes.ok) {
+                    const data = await packagesRes.json();
+                    setPackages(data.packages);
                 }
             } catch (err) {
                 console.error("Error fetching data:", err);
+                setErrorMsg("Failed to load data. Please refresh.");
             } finally {
                 setLoading(false);
             }
         }
         fetchData();
     }, []);
-
-    async function handlePurchase() {
-        if (!selectedPackage || purchasing) return;
-        setPurchasing(true);
-        setSuccessMsg(null);
-        setErrorMsg(null);
-
-        try {
-            const res = await fetch("/api/billing/purchase", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ packageId: selectedPackage }),
-            });
-
-            const data = await res.json();
-
-            if (!res.ok) {
-                setErrorMsg(data.error || "Purchase failed");
-                return;
-            }
-
-            // Update local balance immediately
-            setReseller(prev => prev ? { ...prev, credit_balance: data.credit_balance } : prev);
-            setSuccessMsg(`Successfully purchased ${data.package} package! +${formatPrice(data.credits_added)} credits added.`);
-            setSelectedPackage(null);
-        } catch (err) {
-            console.error("Purchase error:", err);
-            setErrorMsg("Network error — please try again");
-        } finally {
-            setPurchasing(false);
-        }
-    }
 
     if (loading) {
         return (
@@ -144,7 +129,7 @@ export default function BillingPage() {
             <div className="mb-8">
                 <h2 className="text-text-light text-xl font-bold mb-4">Select a Credit Package</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {creditPackages.map((pkg) => (
+                    {packages.map((pkg) => (
                         <button
                             key={pkg.id}
                             onClick={() => setSelectedPackage(pkg.id)}
@@ -153,21 +138,21 @@ export default function BillingPage() {
                                 : "border-border-light hover:border-text-secondary-light"
                                 }`}
                         >
-                            {pkg.popular && (
+                            {pkg.is_popular && (
                                 <span className="absolute -top-2.5 right-4 px-3 py-1 bg-primary text-white text-xs font-semibold rounded-full">
                                     Popular
                                 </span>
                             )}
-                            <p className="text-sm font-medium text-text-secondary-light mb-1">{pkg.label}</p>
-                            <p className="text-3xl font-bold text-text-light">{formatPrice(pkg.amount)}</p>
-                            {pkg.bonus > 0 && (
+                            <p className="text-sm font-medium text-text-secondary-light mb-1">{pkg.name}</p>
+                            <p className="text-3xl font-bold text-text-light">{formatPrice(pkg.price)}</p>
+                            {pkg.bonus_credits > 0 && (
                                 <div className="mt-2 flex items-center gap-1 text-green-600">
                                     <span className="material-symbols-outlined text-sm">add_circle</span>
-                                    <span className="text-sm font-medium">+{formatPrice(pkg.bonus)} bonus credits</span>
+                                    <span className="text-sm font-medium">+{pkg.bonus_credits} bonus credits</span>
                                 </div>
                             )}
                             <p className="text-xs text-text-secondary-light mt-2">
-                                Total: {formatPrice(pkg.amount + pkg.bonus)} credits
+                                Total: {pkg.credits + pkg.bonus_credits} credits
                             </p>
                         </button>
                     ))}
@@ -178,56 +163,60 @@ export default function BillingPage() {
             {selectedPackage && (
                 <div className="bg-surface-light rounded-xl border border-border-light shadow-sm p-6 max-w-md">
                     {(() => {
-                        const pkg = creditPackages.find(p => p.id === selectedPackage);
+                        const pkg = packages.find(p => p.id === selectedPackage);
                         if (!pkg) return null;
+                        const totalCredits = pkg.credits + pkg.bonus_credits;
                         return (
                             <>
                                 <div className="space-y-3 mb-6">
                                     <div className="flex justify-between text-sm">
                                         <span className="text-text-secondary-light">Package</span>
-                                        <span className="font-medium text-text-light">{pkg.label}</span>
+                                        <span className="font-medium text-text-light">{pkg.name}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
                                         <span className="text-text-secondary-light">Credits</span>
-                                        <span className="font-medium text-text-light">{formatPrice(pkg.amount)}</span>
+                                        <span className="font-medium text-text-light">{pkg.credits}</span>
                                     </div>
-                                    {pkg.bonus > 0 && (
+                                    {pkg.bonus_credits > 0 && (
                                         <div className="flex justify-between text-sm text-green-600">
                                             <span>Bonus</span>
-                                            <span className="font-medium">+{formatPrice(pkg.bonus)}</span>
+                                            <span className="font-medium">+{pkg.bonus_credits}</span>
                                         </div>
                                     )}
                                     <div className="h-px bg-border-light"></div>
                                     <div className="flex justify-between">
                                         <span className="font-semibold text-text-light">Total Credits</span>
-                                        <span className="font-bold text-primary">{formatPrice(pkg.amount + pkg.bonus)}</span>
+                                        <span className="font-bold text-primary">{totalCredits}</span>
+                                    </div>
+                                    <div className="flex justify-between text-lg pt-2 mt-2 border-t border-border-light">
+                                        <span className="font-bold text-text-light">Price</span>
+                                        <span className="font-bold text-text-light">{formatPrice(pkg.price)}</span>
                                     </div>
                                 </div>
-                                <button
-                                    onClick={handlePurchase}
-                                    disabled={purchasing}
-                                    className="w-full h-10 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-bold rounded-lg shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2"
+                                <Link
+                                    href={`/billing/checkout?package=${pkg.id}`}
+                                    className="w-full h-10 bg-primary hover:bg-primary/90 text-white text-sm font-bold rounded-lg shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2"
                                 >
-                                    {purchasing ? (
-                                        <>
-                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                            Processing...
-                                        </>
-                                    ) : (
-                                        <>
-                                            <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
-                                            Purchase {formatPrice(pkg.amount)}
-                                        </>
-                                    )}
-                                </button>
-                                <p className="text-xs text-text-secondary-light text-center mt-3">
-                                    Auto-confirmed for development
-                                </p>
+                                    <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
+                                    Proceed to Checkout
+                                </Link>
                             </>
                         );
                     })()}
                 </div>
             )}
         </>
+    );
+}
+
+export default function BillingPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-[60vh] flex items-center justify-center">
+                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+        }>
+            <BillingContent />
+        </Suspense>
     );
 }

@@ -326,24 +326,18 @@ ScopeLens/
 
 ## Docker Deployment
 
-Each portal has its own `Dockerfile` (multi-stage, Node 20 Alpine, standalone output). Orchestrate with:
+Each portal has its own `Dockerfile` and `docker-compose.yml`. You can build and run them independently.
 
-```bash
-# Build & run all portals
-docker compose up -d --build
+**To run a specific portal:**
 
-# Build a single portal
-docker build -t scopelens-landing ./scopelens-landing
+1. Navigate to the portal directory (e.g., `cd scopelens-dashboard`)
+2. Run `docker compose up -d --build`
 
-# Run a single portal
-docker run -p 3000:3000 --env-file ./scopelens-landing/.env.local scopelens-landing
-```
-
-| Service | Container | Port | Dockerfile |
+| Service | Directory | Port | Compose File |
 |---|---|---|---|
-| Landing | `scopelens-landing` | 3000 | `scopelens-landing/Dockerfile` |
-| Dashboard | `scopelens-dashboard` | 3001 | `scopelens-dashboard/Dockerfile` |
-| Admin | `scopelens-admin` | 3002 | `scopelens-admin/Dockerfile` |
-| Reseller | `scopelens-reseller` | 3003 | `scopelens-reseller/Dockerfile` |
+| Landing | `scopelens-landing/` | 3000 | `docker-compose.yml` |
+| Dashboard | `scopelens-dashboard/` | 3001 | `docker-compose.yml` |
+| Admin | `scopelens-admin/` | 3002 | `docker-compose.yml` |
+| Reseller | `scopelens-reseller/` | 3003 | `docker-compose.yml` |
 
-Each service reads its own `.env.local` via `env_file` in `docker-compose.yml`.
+Each service reads its own `.env.local` automatically.
