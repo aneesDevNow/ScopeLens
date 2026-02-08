@@ -211,7 +211,7 @@ export default function ResellerPage() {
                             <img src="/icon.svg" alt="Scope Lens" className="w-8 h-8 opacity-80" />
                             <span className="text-lg font-bold text-gray-900">Scope Lens</span>
                         </div>
-                        <p className="text-sm text-gray-500">© 2024 Scope Lens Inc. All rights reserved.</p>
+                        <p className="text-sm text-gray-500">© 2026 Scope Lens Inc. All rights reserved.</p>
                     </div>
                 </div>
             </footer>

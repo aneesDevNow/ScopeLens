@@ -80,13 +80,16 @@ export async function updateSession(request: NextRequest) {
 
     // Role isolation: only reseller users can access the reseller portal
     if (user && !isApiRoute && !isLoginPage && !isAuthCallback && !isSignupPage && !isRootPage) {
-        const { data: profile } = await supabase
+        console.log(`[MW] Checking role for user ${user.id}`)
+        const { data: profile, error: profileError } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', user.id)
             .single()
 
-        if (profile?.role !== 'reseller') {
+        console.log(`[MW] Profile result:`, profile, `Error:`, profileError)
+
+        if (profile?.role !== 'reseller' && profile?.role !== 'admin') {
             // Non-reseller users cannot access the reseller portal — redirect to login with error
             const loginUrl = request.nextUrl.clone()
             loginUrl.pathname = '/login'

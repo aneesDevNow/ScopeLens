@@ -301,7 +301,7 @@ export default async function LandingPage() {
               <Link href="#" className="text-gray-400 hover:text-white transition-colors">Contact</Link>
               <Link href="/reseller" className="text-gray-400 hover:text-white transition-colors">Resellers</Link>
             </div>
-            <p className="text-sm text-gray-500">© 2024 Scope Lens. All rights reserved.</p>
+            <p className="text-sm text-gray-500">© 2026 Scope Lens. All rights reserved.</p>
           </div>
         </div>
       </footer >

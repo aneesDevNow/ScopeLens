@@ -149,7 +149,7 @@ export default function LoginPage() {
 
                 {/* Footer */}
                 <p className="text-center text-gray-400 text-sm mt-8">
-                    © 2024 Scope Lens. All rights reserved.
+                    © 2026 Scope Lens. All rights reserved.
                 </p>
             </div>
         </div>

@@ -340,7 +340,12 @@ Each portal has its own `Dockerfile` and `docker-compose.yml`. You can build and
 | Admin | `scopelens-admin/` | 3002 | `docker-compose.yml` |
 | Reseller | `scopelens-reseller/` | 3003 | `docker-compose.yml` |
 
-Each service reads its own `.env.local` automatically.
+| Reseller | `scopelens-reseller/` | 3003 | `docker-compose.yml` |
+
+**Environment Variables:**
+The `docker-compose.yml` files use system environment variables (e.g., `${NEXT_PUBLIC_SUPABASE_URL}`). You must provide these variables in your deployment platform (Dokploy) or via a `.env` file in the root. The explicit `env_file: .env.local` directive has been **removed**.
+
+Ensure you set both Build Args (for public vars) and Environment Variables in Dokploy.
 
 ---
 
