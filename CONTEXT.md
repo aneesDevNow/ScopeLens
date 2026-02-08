@@ -161,9 +161,9 @@ cd scopelens-reseller && npm run dev
 - **Port:** 3003
 - **Design:** Stitch design system — custom sidebar, Inter font, primary #1313ec, Material Symbols icons
 - **Layout:** Custom ResellerSidebar component (not shadcn SidebarProvider), fixed sidebar + scrollable main
-- **Auth:** Role-based — middleware enforces `profiles.role = 'reseller'`. Login calls `signInWithPassword` and redirects; middleware handles role check server-side.
+- **Auth:** Role-based — middleware enforces `profiles.role = 'reseller'` OR `'admin'`. Login calls `signInWithPassword` and redirects; middleware handles role check server-side.
 - **Login:** `signInWithPassword` only (no client-side getUser/profile check) — centered card, Scope Lens logo, gradient blue button, "Reseller Portal" badge
-- **Signup:** Server-side `/api/signup` uses admin API to auto-confirm email, set `profiles.role = 'reseller'`, and create `resellers` table row
+- **Signup:** Server-side `/api/signup` uses admin API to auto-confirm email, set `profiles.role = 'reseller'`, and create `resellers` table row (with referral_code)
 - **Middleware Optimization:** Public pages (login, signup, root, auth callback) skip `getUser()` to prevent Supabase rate limit drain. Static assets excluded from matcher.
 - **Pages:**
   - `/` — Reseller landing (become a reseller)
