@@ -38,16 +38,24 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Failed to create user" }, { status: 500 });
         }
 
-        // Update the profile role to 'reseller' (trigger defaults to 'user')
+        // Update or insert the profile to ensure role is set
+        // (Using upsert to handle race condition where trigger hasn't created profile yet)
         const { error: profileError } = await supabaseAdmin
             .from("profiles")
-            .update({ role: "reseller" })
-            .eq("id", userData.user.id);
+            .upsert({
+                id: userData.user.id,
+                email,
+                first_name: companyName,
+                role: "reseller",
+            }, { onConflict: "id" });
 
         if (profileError) {
             console.error("Failed to update profile role:", profileError);
             // Don't fail the signup — the user was created, role can be fixed later
         }
+
+        // Generate a random referral code
+        const referralCode = Math.random().toString(36).substring(2, 10).toUpperCase();
 
         // Also create a row in the resellers table if it exists
         const { error: resellerError } = await supabaseAdmin
@@ -55,6 +63,7 @@ export async function POST(request: Request) {
             .insert({
                 user_id: userData.user.id,
                 company_name: companyName,
+                referral_code: referralCode,
                 credit_balance: 0,
             });
 

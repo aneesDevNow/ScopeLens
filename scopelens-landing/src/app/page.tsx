@@ -64,7 +64,7 @@ export default async function LandingPage() {
           <div className="hidden md:flex items-center gap-8">
             <Link href="#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Features</Link>
             <Link href="#pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Pricing</Link>
-            <Link href="/partner" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">For Partners</Link>
+            <Link href="/reseller" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Resellers</Link>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/login">
@@ -299,7 +299,7 @@ export default async function LandingPage() {
               <Link href="#" className="text-gray-400 hover:text-white transition-colors">Privacy</Link>
               <Link href="#" className="text-gray-400 hover:text-white transition-colors">Terms</Link>
               <Link href="#" className="text-gray-400 hover:text-white transition-colors">Contact</Link>
-              <Link href="/partner" className="text-gray-400 hover:text-white transition-colors">Partners</Link>
+              <Link href="/reseller" className="text-gray-400 hover:text-white transition-colors">Resellers</Link>
             </div>
             <p className="text-sm text-gray-500">© 2024 Scope Lens. All rights reserved.</p>
           </div>
