@@ -343,9 +343,10 @@ Each portal has its own `Dockerfile` and `docker-compose.yml`. You can build and
 | Reseller | `scopelens-reseller/` | 3003 | `docker-compose.yml` |
 
 **Environment Variables:**
-The `docker-compose.yml` files use system environment variables (e.g., `${NEXT_PUBLIC_SUPABASE_URL}`). You must provide these variables in your deployment platform (Dokploy) or via a `.env` file in the root. The explicit `env_file: .env.local` directive has been **removed**.
+The `docker-compose.yml` files use system environment variables (e.g., `${NEXT_PUBLIC_SUPABASE_URL}`). You must provide these variables in your deployment platform (Dokploy) or via a `.env` file in the root.
 
-Ensure you set both Build Args (for public vars) and Environment Variables in Dokploy.
+**Build Configuration:**
+Public variables (`NEXT_PUBLIC_...`) have default values in the Dockerfile pointing to the production Supabase instance. You do **not** need to set Build Args in Dokploy unless you are overriding them for a different environment. Just set the **Environment Variables** for runtime.
 
 ---
 
