@@ -54,16 +54,21 @@ export async function updateSession(request: NextRequest) {
         }
     )
 
-    // Refresh session if expired - IMPORTANT: do not remove this
-    const { data: { user } } = await supabase.auth.getUser()
-
-    // If no user and not on an excluded path, redirect to login
+    // Check if this is a public page BEFORE calling getUser() to avoid burning rate limits
     const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/callback')
     const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
     const isLoginPage = request.nextUrl.pathname === '/login'
     const isSignupPage = request.nextUrl.pathname === '/signup'
 
-    if (!user && !isAuthCallback && !isApiRoute && !isLoginPage && !isSignupPage) {
+    // Skip auth check entirely for public pages
+    if (isLoginPage || isSignupPage || isAuthCallback) {
+        return supabaseResponse
+    }
+
+    // Refresh session if expired - IMPORTANT: do not remove this
+    const { data: { user } } = await supabase.auth.getUser()
+
+    if (!user && !isApiRoute) {
         const loginUrl = request.nextUrl.clone()
         loginUrl.pathname = '/login'
         return NextResponse.redirect(loginUrl)
