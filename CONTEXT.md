@@ -341,3 +341,21 @@ Each portal has its own `Dockerfile` and `docker-compose.yml`. You can build and
 | Reseller | `scopelens-reseller/` | 3003 | `docker-compose.yml` |
 
 Each service reads its own `.env.local` automatically.
+
+---
+
+## Deployment & CI/CD
+
+### Dokploy
+
+The project uses [Dokploy](https://dokploy.com/) for deployment.
+
+- **Server:** `https://dokploy.membercore.dev`
+- **CLI:** Installed globally (`npm i -g @dokploy/cli`)
+- **Auth:** Configured via `dokploy authenticate` (API key saved locally)
+
+**Useful Commands:**
+```bash
+dokploy app list
+dokploy env push -u
+```
