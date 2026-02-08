@@ -3,8 +3,12 @@ import { createBrowserClient } from '@supabase/ssr'
 // Extract project ref from Supabase URL
 function getProjectRef(): string {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ""
-    const match = url.match(/https?:\/\/([a-z0-9]+)\.supabase/)
-    return match?.[1] || ""
+    // Cloud Supabase: https://xxx.supabase.co
+    const cloudMatch = url.match(/https?:\/\/([a-z0-9]+)\.supabase/)
+    if (cloudMatch) return cloudMatch[1]
+    // Self-hosted: use full hostname as project ref
+    const selfHostedMatch = url.match(/https?:\/\/([^/]+)/)
+    return selfHostedMatch?.[1]?.replace(/[.:]/g, '_') || ""
 }
 
 // Cookie name mapping (browser-safe, no encryption — encryption is handled server-side)

@@ -95,10 +95,15 @@ export function toSupabaseCookieName(customName: string, projectRef: string): st
 
 /**
  * Extract project ref from Supabase URL
- * https://xxx.supabase.co → xxx
+ * Cloud:       https://xxx.supabase.co → xxx
+ * Self-hosted: https://scopelens-supabase.membercore.dev → scopelens-supabase
  */
 export function getProjectRef(): string {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
-    const match = url.match(/https?:\/\/([a-z0-9]+)\.supabase/);
-    return match?.[1] || "";
+    // Cloud Supabase: https://xxx.supabase.co
+    const cloudMatch = url.match(/https?:\/\/([a-z0-9]+)\.supabase/);
+    if (cloudMatch) return cloudMatch[1];
+    // Self-hosted: use full hostname as project ref
+    const selfHostedMatch = url.match(/https?:\/\/([^/]+)/);
+    return selfHostedMatch?.[1]?.replace(/[.:]/g, '_') || "";
 }

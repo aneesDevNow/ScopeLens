@@ -183,6 +183,7 @@ cd scopelens-reseller && npm run dev
   - `GET /api/keys/usage` — API usage logs & stats
   - `GET /api/plans` — Plans with reseller pricing
   - `GET /api/transactions` — Transaction history
+  - `POST /api/billing/purchase` — Auto-confirm credit purchase (validates package, records transaction, updates balance)
 
 ### Admin Panel (`scopelens-admin/`)
 - **Port:** 3002
@@ -218,7 +219,7 @@ cd scopelens-reseller && npm run dev
 All tables have RLS enabled. Key patterns:
 
 - **Users** can only SELECT their own data (profiles, subscriptions, scans, reports)
-- **Resellers** can manage their own clients, keys, and view their transactions
+- **Resellers** can manage their own data: `resellers` (SELECT/UPDATE own row via `auth.uid() = user_id`), `reseller_transactions` (SELECT/INSERT own via reseller_id lookup)
 - **Admins** have ALL access on most tables via role check (`profiles.role = 'admin'`)
 - **Service role** bypasses RLS (used for background processing, subscription writes)
 - **Special:** `license_keys` has separate policies for:
@@ -311,7 +312,11 @@ ScopeLens/
 
 ## Supabase Connection
 
-- **Project:** `sonwwaslaqzbtmpxxrhr`
-- **Region:** Supabase cloud
-- **Direct DB:** `postgresql://postgres:***@db.sonwwaslaqzbtmpxxrhr.supabase.co:5432/postgres`
+- **Instance:** Self-hosted at `https://scopelens-supabase.membercore.dev`
+- **Auth API:** `https://scopelens-supabase.membercore.dev/auth/v1`
+- **REST API:** `https://scopelens-supabase.membercore.dev/rest/v1`
+- **PG Meta:** `https://scopelens-supabase.membercore.dev/pg/query`
 - **Storage Buckets:** `uploads` (user files), `reports` (PDF reports)
+- **Test Users:**
+  - Admin: `technicalanees@gmail.com` / `Admin1234!` (role: admin)
+  - Reseller: `resellertest@scope.lens` / `Reseller1234!` (role: reseller)

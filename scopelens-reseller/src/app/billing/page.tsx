@@ -29,6 +29,9 @@ export default function BillingPage() {
     const [loading, setLoading] = useState(true);
     const [reseller, setReseller] = useState<ResellerData | null>(null);
     const [selectedPackage, setSelectedPackage] = useState<string | null>(null);
+    const [purchasing, setPurchasing] = useState(false);
+    const [successMsg, setSuccessMsg] = useState<string | null>(null);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -46,6 +49,38 @@ export default function BillingPage() {
         }
         fetchData();
     }, []);
+
+    async function handlePurchase() {
+        if (!selectedPackage || purchasing) return;
+        setPurchasing(true);
+        setSuccessMsg(null);
+        setErrorMsg(null);
+
+        try {
+            const res = await fetch("/api/billing/purchase", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ packageId: selectedPackage }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setErrorMsg(data.error || "Purchase failed");
+                return;
+            }
+
+            // Update local balance immediately
+            setReseller(prev => prev ? { ...prev, credit_balance: data.credit_balance } : prev);
+            setSuccessMsg(`Successfully purchased ${data.package} package! +${formatPrice(data.credits_added)} credits added.`);
+            setSelectedPackage(null);
+        } catch (err) {
+            console.error("Purchase error:", err);
+            setErrorMsg("Network error — please try again");
+        } finally {
+            setPurchasing(false);
+        }
+    }
 
     if (loading) {
         return (
@@ -69,6 +104,26 @@ export default function BillingPage() {
                     Purchase credits to generate license keys for your clients
                 </p>
             </div>
+
+            {/* Success / Error Messages */}
+            {successMsg && (
+                <div className="mb-6 p-4 rounded-xl bg-green-50 border border-green-200 flex items-center gap-3">
+                    <span className="material-symbols-outlined text-green-600">check_circle</span>
+                    <p className="text-green-800 text-sm font-medium">{successMsg}</p>
+                    <button onClick={() => setSuccessMsg(null)} className="ml-auto text-green-400 hover:text-green-600">
+                        <span className="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>
+            )}
+            {errorMsg && (
+                <div className="mb-6 p-4 rounded-xl bg-red-50 border border-red-200 flex items-center gap-3">
+                    <span className="material-symbols-outlined text-red-600">error</span>
+                    <p className="text-red-800 text-sm font-medium">{errorMsg}</p>
+                    <button onClick={() => setErrorMsg(null)} className="ml-auto text-red-400 hover:text-red-600">
+                        <span className="material-symbols-outlined text-[18px]">close</span>
+                    </button>
+                </div>
+            )}
 
             {/* Current Balance */}
             <div className="bg-gradient-to-br from-indigo-900 to-primary rounded-xl p-8 text-white mb-8 relative overflow-hidden group">
@@ -94,8 +149,8 @@ export default function BillingPage() {
                             key={pkg.id}
                             onClick={() => setSelectedPackage(pkg.id)}
                             className={`p-6 rounded-xl border-2 transition-all text-left relative bg-surface-light ${selectedPackage === pkg.id
-                                    ? "border-primary bg-primary/5"
-                                    : "border-border-light hover:border-text-secondary-light"
+                                ? "border-primary bg-primary/5"
+                                : "border-border-light hover:border-text-secondary-light"
                                 }`}
                         >
                             {pkg.popular && (
@@ -148,12 +203,25 @@ export default function BillingPage() {
                                         <span className="font-bold text-primary">{formatPrice(pkg.amount + pkg.bonus)}</span>
                                     </div>
                                 </div>
-                                <button className="w-full h-10 bg-primary hover:bg-primary/90 text-white text-sm font-bold rounded-lg shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2">
-                                    <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
-                                    Purchase {formatPrice(pkg.amount)}
+                                <button
+                                    onClick={handlePurchase}
+                                    disabled={purchasing}
+                                    className="w-full h-10 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white text-sm font-bold rounded-lg shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2"
+                                >
+                                    {purchasing ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                            Processing...
+                                        </>
+                                    ) : (
+                                        <>
+                                            <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
+                                            Purchase {formatPrice(pkg.amount)}
+                                        </>
+                                    )}
                                 </button>
                                 <p className="text-xs text-text-secondary-light text-center mt-3">
-                                    Payment processing will be set up in production
+                                    Auto-confirmed for development
                                 </p>
                             </>
                         );

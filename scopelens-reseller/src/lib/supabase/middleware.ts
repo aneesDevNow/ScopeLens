@@ -61,12 +61,15 @@ export async function updateSession(request: NextRequest) {
     const isSignupPage = request.nextUrl.pathname === '/signup'
     const isRootPage = request.nextUrl.pathname === '/'
 
+    console.log(`[MW] ${request.method} ${request.nextUrl.pathname} | public=${isLoginPage || isSignupPage || isRootPage || isAuthCallback}`)
+
     // Skip auth check entirely for public pages — no need to hit Supabase Auth API
     if (isLoginPage || isSignupPage || isRootPage || isAuthCallback) {
         return supabaseResponse
     }
 
     // Refresh session if expired - IMPORTANT: do not remove this
+    console.log(`[MW] >>> getUser() called for ${request.nextUrl.pathname}`)
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user && !isApiRoute) {
