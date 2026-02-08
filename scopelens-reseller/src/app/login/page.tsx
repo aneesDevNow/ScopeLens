@@ -29,31 +29,7 @@ export default function LoginPage() {
                 return;
             }
 
-            // Verify reseller role from profiles table (same pattern as admin portal)
-            const { data: { user: authUser } } = await supabase.auth.getUser();
-            if (!authUser) {
-                setError("Authentication failed.");
-                return;
-            }
-
-            const { data: profile, error: profileError } = await supabase
-                .from("profiles")
-                .select("role")
-                .eq("id", authUser.id)
-                .single();
-
-            if (profileError || !profile) {
-                await supabase.auth.signOut();
-                setError("Profile not found. Please contact support.");
-                return;
-            }
-
-            if (profile.role !== "reseller") {
-                await supabase.auth.signOut();
-                setError("Access denied. This portal is for reseller accounts only.");
-                return;
-            }
-
+            // Redirect to dashboard — middleware enforces role=reseller
             router.push("/dashboard");
             router.refresh();
         } catch {
