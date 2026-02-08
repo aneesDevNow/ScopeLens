@@ -48,7 +48,7 @@ export default function ResellerPage() {
                                 Partner with the leading AI detection platform. Unlock new revenue streams with competitive margins, bulk discounts, and exclusive tools designed for your success.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                                <Link href="http://localhost:3003/signup">
+                                <Link href={`${process.env.RESELLER_DASHBOARD}/signup`}>
                                     <button className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/30 text-lg w-full sm:w-auto">
                                         Join the Reseller Program
                                     </button>
