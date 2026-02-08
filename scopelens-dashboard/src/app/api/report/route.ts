@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { uploadToS3, downloadFromS3, getDocumentsBucket, getReportsBucket } from "@/lib/s3";
 import { jsPDF } from "jspdf";
 import JSZip from "jszip";
 
@@ -218,16 +219,16 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Scan not found" }, { status: 404 });
         }
 
-        // Check if report already exists (cached)
+        // Check if report already exists (cached in S3)
         if (scan.report_path) {
-            const { data: fileData, error: downloadError } = await supabase.storage
-                .from("reports")
-                .download(scan.report_path);
+            const { data: cachedReport, error: downloadError } = await downloadFromS3(
+                getReportsBucket(),
+                scan.report_path
+            );
 
-            if (!downloadError && fileData) {
-                const buffer = await fileData.arrayBuffer();
+            if (!downloadError && cachedReport) {
                 const fileName = `${scan.file_name?.replace(/\.[^/.]+$/, "") || "report"}_ai_report.pdf`;
-                return new NextResponse(buffer, {
+                return new NextResponse(new Uint8Array(cachedReport), {
                     status: 200,
                     headers: {
                         "Content-Type": "application/pdf",
@@ -312,12 +313,13 @@ export async function POST(request: NextRequest) {
         let docParagraphs: DocParagraph[] = [];
         try {
             if (scan.file_path) {
-                const { data: origFile, error: origError } = await supabase.storage
-                    .from("documents")
-                    .download(scan.file_path);
+                const { data: origFile, error: origError } = await downloadFromS3(
+                    getDocumentsBucket(),
+                    scan.file_path
+                );
 
                 if (!origError && origFile) {
-                    const origBuffer = await origFile.arrayBuffer();
+                    const origBuffer = new Uint8Array(origFile).buffer as ArrayBuffer;
                     const fileType = scan.file_type || "";
 
                     if (fileType.includes("wordprocessingml") || scan.file_name?.endsWith(".docx")) {
@@ -885,23 +887,22 @@ export async function POST(request: NextRequest) {
         // ─── Convert to buffer and return ───
         const pdfBuffer = doc.output("arraybuffer");
 
-        // Upload to Supabase Storage (best-effort caching)
+        // Upload to S3 (best-effort caching)
         const reportPath = `${user.id}/${scan.id}_report.pdf`;
-        supabase.storage
-            .from("reports")
-            .upload(reportPath, pdfBuffer, {
-                contentType: "application/pdf",
-                upsert: true,
-            })
-            .then(({ error: uploadError }) => {
-                if (uploadError) {
-                    console.error("Report cache error (non-blocking):", uploadError);
-                    return;
-                }
+        uploadToS3(
+            getReportsBucket(),
+            reportPath,
+            pdfBuffer,
+            "application/pdf"
+        )
+            .then(() => {
                 supabase
                     .from("scans")
                     .update({ report_path: reportPath })
                     .eq("id", scanId);
+            })
+            .catch((uploadError) => {
+                console.error("Report cache error (non-blocking):", uploadError);
             });
 
         // Return PDF directly as download

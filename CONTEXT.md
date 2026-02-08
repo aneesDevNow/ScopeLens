@@ -24,7 +24,8 @@ All four portals are **independent Next.js 16.1.6** apps with their own `node_mo
 | Styling | Tailwind CSS + shadcn/ui |
 | Auth | Supabase Auth (email/password) |
 | Database | Supabase PostgreSQL |
-| Storage | Supabase Storage (file uploads, reports) |
+| Storage (Dashboard) | External S3 (documents & reports via `@aws-sdk/client-s3`) |
+| Storage (Admin/Reseller) | Supabase Storage (logos, other assets) |
 | AI Detection | ZeroGPT API (via `zerogpt_accounts` rotation) |
 
 ---
@@ -39,6 +40,12 @@ All portals require `.env.local`:
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | ✅ | ✅ | ✅ | Public anon key (RLS-bound) |
 | `SUPABASE_SERVICE_ROLE_KEY` | — | ✅ | ✅ | ✅ | Bypass RLS for privileged ops |
 | `COOKIE_ENCRYPTION_KEY` | — | ✅ | ✅ | ✅ | Cross-portal auth handoff |
+| `S3_ENDPOINT` | — | ✅ | — | — | S3-compatible storage endpoint |
+| `S3_REGION` | — | ✅ | — | — | S3 region (default: us-east-1) |
+| `S3_ACCESS_KEY` | — | ✅ | — | — | S3 access key |
+| `S3_SECRET_KEY` | — | ✅ | — | — | S3 secret key |
+| `S3_BUCKET_DOCUMENTS` | — | ✅ | — | — | Bucket for uploaded files |
+| `S3_BUCKET_REPORTS` | — | ✅ | — | — | Bucket for generated PDF reports |
 
 ---
 

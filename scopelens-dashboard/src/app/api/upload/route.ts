@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { uploadToS3, deleteFromS3, getDocumentsBucket } from "@/lib/s3";
 import JSZip from "jszip";
 
 // Extract text from DOCX file buffer
@@ -186,15 +187,16 @@ export async function POST(request: NextRequest) {
         const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, "_");
         const filePath = `${user.id}/${timestamp}_${sanitizedName}`;
 
-        // Upload to Supabase Storage
-        const { data: uploadData, error: uploadError } = await supabase.storage
-            .from("documents")
-            .upload(filePath, arrayBuffer, {
-                contentType: file.type,
-                upsert: false
-            });
-
-        if (uploadError) {
+        // Upload to S3
+        let uploadResult: { path: string };
+        try {
+            uploadResult = await uploadToS3(
+                getDocumentsBucket(),
+                filePath,
+                arrayBuffer,
+                file.type
+            );
+        } catch (uploadError) {
             console.error("Upload error:", uploadError);
             return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
         }
@@ -207,7 +209,7 @@ export async function POST(request: NextRequest) {
                 file_name: file.name,
                 file_size: file.size,
                 file_type: file.type,
-                file_path: uploadData.path,
+                file_path: uploadResult.path,
                 status: "pending",
                 ai_score: null
             })
@@ -216,8 +218,8 @@ export async function POST(request: NextRequest) {
 
         if (scanError) {
             console.error("Scan record error:", scanError);
-            // Try to delete the uploaded file if DB insert fails
-            await supabase.storage.from("documents").remove([filePath]);
+            // Try to delete the uploaded file from S3 if DB insert fails
+            try { await deleteFromS3(getDocumentsBucket(), filePath); } catch { }
             return NextResponse.json({ error: "Failed to create scan record", details: scanError.message }, { status: 500 });
         }
 
