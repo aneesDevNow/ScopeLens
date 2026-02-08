@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { uploadToS3, downloadFromS3, getDocumentsBucket, getReportsBucket } from "@/lib/s3";
+import { uploadToS3, downloadFromS3, getDocumentsFolder, getReportsFolder } from "@/lib/s3";
 import { jsPDF } from "jspdf";
 import JSZip from "jszip";
 
@@ -222,7 +222,7 @@ export async function POST(request: NextRequest) {
         // Check if report already exists (cached in S3)
         if (scan.report_path) {
             const { data: cachedReport, error: downloadError } = await downloadFromS3(
-                getReportsBucket(),
+                getReportsFolder(),
                 scan.report_path
             );
 
@@ -314,7 +314,7 @@ export async function POST(request: NextRequest) {
         try {
             if (scan.file_path) {
                 const { data: origFile, error: origError } = await downloadFromS3(
-                    getDocumentsBucket(),
+                    getDocumentsFolder(),
                     scan.file_path
                 );
 
@@ -890,7 +890,7 @@ export async function POST(request: NextRequest) {
         // Upload to S3 (best-effort caching)
         const reportPath = `${user.id}/${scan.id}_report.pdf`;
         uploadToS3(
-            getReportsBucket(),
+            getReportsFolder(),
             reportPath,
             pdfBuffer,
             "application/pdf"

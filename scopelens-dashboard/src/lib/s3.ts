@@ -11,7 +11,6 @@ let _client: S3Client | null = null;
 function getClient(): S3Client {
     if (!_client) {
         const endpoint = process.env.S3_ENDPOINT;
-        const region = process.env.S3_REGION || "us-east-1";
         const accessKeyId = process.env.S3_ACCESS_KEY;
         const secretAccessKey = process.env.S3_SECRET_KEY;
 
@@ -21,39 +20,58 @@ function getClient(): S3Client {
             );
         }
 
+        // Extract region from endpoint URL (e.g. s3.eu-central-2.wasabisys.com → eu-central-2)
+        let region = "us-east-1";
+        try {
+            const host = new URL(endpoint).hostname;
+            const parts = host.split(".");
+            if (parts.length >= 3 && parts[0] === "s3") {
+                region = parts[1];
+            }
+        } catch { /* fallback to us-east-1 */ }
+
         _client = new S3Client({
             endpoint,
             region,
             credentials: { accessKeyId, secretAccessKey },
-            forcePathStyle: true, // Required for MinIO / R2 / non-AWS S3
+            forcePathStyle: true,
         });
     }
     return _client;
 }
 
-// ─── Bucket names from env (with defaults) ───
-export function getDocumentsBucket(): string {
-    return process.env.S3_BUCKET_DOCUMENTS || "documents";
+// ─── Single bucket + folder prefixes ───
+function getBucket(): string {
+    return process.env.S3_BUCKET_NAME || "scopelens";
 }
 
-export function getReportsBucket(): string {
-    return process.env.S3_BUCKET_REPORTS || "reports";
+export function getDocumentsFolder(): string {
+    return process.env.S3_BUCKET_FOLDER_DOCUMENTS || "documents";
+}
+
+export function getReportsFolder(): string {
+    return process.env.S3_BUCKET_FOLDER_REPORTS || "reports";
+}
+
+/** Build the full S3 key: folder/key */
+function buildKey(folder: string, key: string): string {
+    return `${folder}/${key}`;
 }
 
 // ─── Upload ───
 export async function uploadToS3(
-    bucket: string,
+    folder: string,
     key: string,
     body: ArrayBuffer | Buffer | Uint8Array,
-    contentType: string,
-    upsert = false
+    contentType: string
 ): Promise<{ path: string }> {
     const client = getClient();
+    const fullKey = buildKey(folder, key);
 
     await client.send(
         new PutObjectCommand({
-            Bucket: bucket,
-            Key: key,
+            Bucket: getBucket(),
+            Key: fullKey,
             Body: body instanceof ArrayBuffer ? Buffer.from(body) : body,
             ContentType: contentType,
         })
@@ -64,15 +82,17 @@ export async function uploadToS3(
 
 // ─── Download ───
 export async function downloadFromS3(
-    bucket: string,
+    folder: string,
     key: string
 ): Promise<{ data: Buffer | null; error: Error | null }> {
     try {
         const client = getClient();
+        const fullKey = buildKey(folder, key);
+
         const response = await client.send(
             new GetObjectCommand({
-                Bucket: bucket,
-                Key: key,
+                Bucket: getBucket(),
+                Key: fullKey,
             })
         );
 
@@ -94,14 +114,16 @@ export async function downloadFromS3(
 
 // ─── Delete ───
 export async function deleteFromS3(
-    bucket: string,
+    folder: string,
     key: string
 ): Promise<void> {
     const client = getClient();
+    const fullKey = buildKey(folder, key);
+
     await client.send(
         new DeleteObjectCommand({
-            Bucket: bucket,
-            Key: key,
+            Bucket: getBucket(),
+            Key: fullKey,
         })
     );
 }
