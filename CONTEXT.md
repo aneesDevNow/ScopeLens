@@ -27,6 +27,7 @@ All four portals are **independent Next.js 16.1.6** apps with their own `node_mo
 | Storage (Dashboard) | External S3 (documents & reports via `@aws-sdk/client-s3`) |
 | Storage (Admin/Reseller) | Supabase Storage (logos, other assets) |
 | AI Detection | ZeroGPT API (via `zerogpt_accounts` rotation) |
+| Containerization | Docker (multi-stage, standalone output) |
 
 ---
 
@@ -320,3 +321,29 @@ ScopeLens/
 - **Test Users:**
   - Admin: `technicalanees@gmail.com` / `Admin1234!` (role: admin)
   - Reseller: `resellertest@scope.lens` / `Reseller1234!` (role: reseller)
+
+---
+
+## Docker Deployment
+
+Each portal has its own `Dockerfile` (multi-stage, Node 20 Alpine, standalone output). Orchestrate with:
+
+```bash
+# Build & run all portals
+docker compose up -d --build
+
+# Build a single portal
+docker build -t scopelens-landing ./scopelens-landing
+
+# Run a single portal
+docker run -p 3000:3000 --env-file ./scopelens-landing/.env.local scopelens-landing
+```
+
+| Service | Container | Port | Dockerfile |
+|---|---|---|---|
+| Landing | `scopelens-landing` | 3000 | `scopelens-landing/Dockerfile` |
+| Dashboard | `scopelens-dashboard` | 3001 | `scopelens-dashboard/Dockerfile` |
+| Admin | `scopelens-admin` | 3002 | `scopelens-admin/Dockerfile` |
+| Reseller | `scopelens-reseller` | 3003 | `scopelens-reseller/Dockerfile` |
+
+Each service reads its own `.env.local` via `env_file` in `docker-compose.yml`.
