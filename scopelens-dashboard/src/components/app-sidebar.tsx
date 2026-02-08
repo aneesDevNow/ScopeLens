@@ -32,13 +32,8 @@ interface Subscription {
 const navItems = [
     { title: "Upload Hub", url: "/", icon: "cloud_upload" },
     { title: "File History", url: "/files", icon: "folder_open" },
-    { title: "Reports", url: "/reports", icon: "assessment" },
     { title: "Plans & Usage", url: "/plans", icon: "credit_card" },
     { title: "Settings", url: "/settings", icon: "settings" },
-];
-
-const resellerItems = [
-    { title: "Reseller Dashboard", url: "/reseller", icon: "handshake" },
 ];
 
 export function AppSidebar() {
@@ -93,23 +88,6 @@ export function AppSidebar() {
                     <SidebarGroupContent>
                         <SidebarMenu>
                             {navItems.map((item) => (
-                                <SidebarMenuItem key={item.title}>
-                                    <SidebarMenuButton asChild isActive={pathname === item.url}>
-                                        <Link href={item.url}>
-                                            <span className="material-symbols-outlined">{item.icon}</span>
-                                            <span>{item.title}</span>
-                                        </Link>
-                                    </SidebarMenuButton>
-                                </SidebarMenuItem>
-                            ))}
-                        </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-                <SidebarGroup>
-                    <SidebarGroupLabel>Partner</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <SidebarMenu>
-                            {resellerItems.map((item) => (
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild isActive={pathname === item.url}>
                                         <Link href={item.url}>

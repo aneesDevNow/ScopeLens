@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function GET() {
     try {
-        const supabase = await createClient();
+        const supabase = createAdminClient();
 
         const { data: plans, error } = await supabase
             .from("plans")
@@ -23,7 +23,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
     try {
-        const supabase = await createClient();
+        const supabase = createAdminClient();
         const body = await request.json();
 
         const { data, error } = await supabase

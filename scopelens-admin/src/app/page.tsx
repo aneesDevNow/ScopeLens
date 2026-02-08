@@ -40,19 +40,10 @@ Generated: ${new Date().toLocaleString()}
 
 Platform Metrics
 ----------------
-Total Users: 12,450
-Monthly Revenue: $45,230
-Scans This Month: 847,000
-Active Resellers: 156
-
-User Growth: +12% this month
-Revenue Growth: +8% vs last month
-
-Recent Activity
----------------
-- 3 new signups in the last hour
-- 156 active resellers
-- 847K scans processed
+Total Users: 0
+Monthly Revenue: $0
+Scans This Month: 0
+Active Resellers: 0
 
 This report was auto-generated from the ScopeLens Admin Dashboard.
 `;
@@ -80,10 +71,10 @@ This report was auto-generated from the ScopeLens Admin Dashboard.
               <span className="material-symbols-outlined text-primary">group</span>
               Total Users
             </CardDescription>
-            <CardTitle className="text-3xl">12,450</CardTitle>
+            <CardTitle className="text-3xl">0</CardTitle>
           </CardHeader>
           <CardContent>
-            <span className="text-xs text-green-500">+12% this month</span>
+            <span className="text-xs text-muted-foreground">No data yet</span>
           </CardContent>
         </Card>
         <Card>
@@ -92,10 +83,10 @@ This report was auto-generated from the ScopeLens Admin Dashboard.
               <span className="material-symbols-outlined text-primary">payments</span>
               Monthly Revenue
             </CardDescription>
-            <CardTitle className="text-3xl">$45,230</CardTitle>
+            <CardTitle className="text-3xl">$0</CardTitle>
           </CardHeader>
           <CardContent>
-            <span className="text-xs text-green-500">+8% vs last month</span>
+            <span className="text-xs text-muted-foreground">No data yet</span>
           </CardContent>
         </Card>
         <Card>
@@ -104,10 +95,10 @@ This report was auto-generated from the ScopeLens Admin Dashboard.
               <span className="material-symbols-outlined text-primary">analytics</span>
               Scans This Month
             </CardDescription>
-            <CardTitle className="text-3xl">847K</CardTitle>
+            <CardTitle className="text-3xl">0</CardTitle>
           </CardHeader>
           <CardContent>
-            <span className="text-xs text-muted-foreground">Avg 28.2K/day</span>
+            <span className="text-xs text-muted-foreground">No data yet</span>
           </CardContent>
         </Card>
         <Card>
@@ -116,10 +107,10 @@ This report was auto-generated from the ScopeLens Admin Dashboard.
               <span className="material-symbols-outlined text-primary">handshake</span>
               Active Resellers
             </CardDescription>
-            <CardTitle className="text-3xl">156</CardTitle>
+            <CardTitle className="text-3xl">0</CardTitle>
           </CardHeader>
           <CardContent>
-            <span className="text-xs text-green-500">+5 this week</span>
+            <span className="text-xs text-muted-foreground">No data yet</span>
           </CardContent>
         </Card>
       </div>
@@ -132,25 +123,9 @@ This report was auto-generated from the ScopeLens Admin Dashboard.
             <CardDescription>Latest user registrations</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {[
-                { name: "Emily Chen", email: "emily@university.edu", time: "5 min ago" },
-                { name: "Marcus Johnson", email: "mjohnson@college.edu", time: "12 min ago" },
-                { name: "Sarah Williams", email: "swilliams@school.edu", time: "1 hour ago" },
-              ].map((user, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <span className="text-primary text-sm font-semibold">{user.name[0]}</span>
-                    </div>
-                    <div>
-                      <div className="font-medium text-sm">{user.name}</div>
-                      <div className="text-xs text-muted-foreground">{user.email}</div>
-                    </div>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{user.time}</span>
-                </div>
-              ))}
+            <div className="text-center py-8 text-muted-foreground">
+              <span className="material-symbols-outlined text-3xl mb-2 block">person_off</span>
+              <p className="text-sm">No recent signups</p>
             </div>
           </CardContent>
         </Card>

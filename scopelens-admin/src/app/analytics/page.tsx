@@ -21,37 +21,37 @@ export default function AnalyticsPage() {
                 <Card>
                     <CardHeader className="pb-2">
                         <CardDescription>Total Revenue</CardDescription>
-                        <CardTitle className="text-3xl">$452,320</CardTitle>
+                        <CardTitle className="text-3xl">$0</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <span className="text-xs text-green-500">+23% YoY</span>
+                        <span className="text-xs text-muted-foreground">No data yet</span>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
                         <CardDescription>MRR</CardDescription>
-                        <CardTitle className="text-3xl">$45,230</CardTitle>
+                        <CardTitle className="text-3xl">$0</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <span className="text-xs text-green-500">+8% vs last month</span>
+                        <span className="text-xs text-muted-foreground">No data yet</span>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
                         <CardDescription>Churn Rate</CardDescription>
-                        <CardTitle className="text-3xl">2.4%</CardTitle>
+                        <CardTitle className="text-3xl">0%</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <span className="text-xs text-green-500">-0.3% improvement</span>
+                        <span className="text-xs text-muted-foreground">No data yet</span>
                     </CardContent>
                 </Card>
                 <Card>
                     <CardHeader className="pb-2">
                         <CardDescription>Avg. LTV</CardDescription>
-                        <CardTitle className="text-3xl">$342</CardTitle>
+                        <CardTitle className="text-3xl">$0</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <span className="text-xs text-green-500">+15% vs last quarter</span>
+                        <span className="text-xs text-muted-foreground">No data yet</span>
                     </CardContent>
                 </Card>
             </div>
@@ -91,10 +91,10 @@ export default function AnalyticsPage() {
                 <CardContent>
                     <div className="space-y-4">
                         {[
-                            { stage: "Visitors", count: 45000, pct: 100 },
-                            { stage: "Signups", count: 12450, pct: 28 },
-                            { stage: "Active Users", count: 8420, pct: 19 },
-                            { stage: "Paid Subscribers", count: 4030, pct: 9 },
+                            { stage: "Visitors", count: 0, pct: 0 },
+                            { stage: "Signups", count: 0, pct: 0 },
+                            { stage: "Active Users", count: 0, pct: 0 },
+                            { stage: "Paid Subscribers", count: 0, pct: 0 },
                         ].map((item) => (
                             <div key={item.stage}>
                                 <div className="flex justify-between text-sm mb-1">

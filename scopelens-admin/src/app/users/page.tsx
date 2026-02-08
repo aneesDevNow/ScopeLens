@@ -24,13 +24,8 @@ interface User {
     joined: string;
 }
 
-const initialUsers: User[] = [
-    { id: 1, name: "Emily Chen", email: "emily@university.edu", role: "User", status: "Active", plan: "Pro", joined: "Jan 15, 2024" },
-    { id: 2, name: "Marcus Johnson", email: "mjohnson@college.edu", role: "User", status: "Active", plan: "Enterprise", joined: "Jan 10, 2024" },
-    { id: 3, name: "Sarah Williams", email: "swilliams@school.edu", role: "User", status: "Suspended", plan: "Free", joined: "Dec 28, 2023" },
-    { id: 4, name: "David Lee", email: "dlee@institute.edu", role: "Admin", status: "Active", plan: "Pro", joined: "Nov 15, 2023" },
-    { id: 5, name: "Jennifer Adams", email: "jadams@academy.edu", role: "Reseller", status: "Active", plan: "Enterprise", joined: "Oct 5, 2023" },
-];
+// TODO: Fetch real users from Supabase
+const initialUsers: User[] = [];
 
 export default function UsersPage() {
     const [users, setUsers] = useState<User[]>(initialUsers);

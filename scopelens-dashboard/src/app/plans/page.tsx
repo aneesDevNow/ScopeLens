@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 interface Plan {
@@ -12,6 +11,7 @@ interface Plan {
     price_yearly: number;
     scans_per_month: number;
     features: string[];
+    is_popular?: boolean;
 }
 
 interface Subscription {
@@ -29,26 +29,80 @@ interface SubscriptionData {
     };
 }
 
+interface ScanStats {
+    total_words_analyzed: number;
+    total_scans: number;
+    completed_scans: number;
+    avg_ai_score: number;
+}
+
 export default function PlansPage() {
     const [data, setData] = useState<SubscriptionData | null>(null);
+    const [plans, setPlans] = useState<Plan[]>([]);
+    const [stats, setStats] = useState<ScanStats | null>(null);
     const [loading, setLoading] = useState(true);
+    const [claimKey, setClaimKey] = useState("");
+    const [claiming, setClaiming] = useState(false);
+    const [claimMessage, setClaimMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+    const handleClaimKey = async () => {
+        if (!claimKey.trim()) return;
+        setClaiming(true);
+        setClaimMessage(null);
+        try {
+            const res = await fetch("/api/claim-key", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ key_code: claimKey.trim() }),
+            });
+            const result = await res.json();
+            if (res.ok) {
+                setClaimMessage({ type: "success", text: result.message });
+                setClaimKey("");
+                // Refresh subscription data
+                const subRes = await fetch("/api/subscription");
+                if (subRes.ok) setData(await subRes.json());
+            } else {
+                setClaimMessage({ type: "error", text: result.error || "Failed to claim key" });
+            }
+        } catch {
+            setClaimMessage({ type: "error", text: "Network error. Please try again." });
+        } finally {
+            setClaiming(false);
+        }
+    };
 
     useEffect(() => {
-        async function fetchSubscription() {
+        async function fetchData() {
             try {
-                const res = await fetch("/api/subscription");
-                if (res.ok) {
-                    const subData = await res.json();
+                const [subRes, plansRes, statsRes] = await Promise.all([
+                    fetch("/api/subscription"),
+                    fetch("/api/plans"),
+                    fetch("/api/scans/stats"),
+                ]);
+
+                if (subRes.ok) {
+                    const subData = await subRes.json();
                     setData(subData);
                 }
+
+                if (plansRes.ok) {
+                    const plansData = await plansRes.json();
+                    setPlans(plansData.plans || []);
+                }
+
+                if (statsRes.ok) {
+                    const statsData = await statsRes.json();
+                    setStats(statsData);
+                }
             } catch (err) {
-                console.error("Error fetching subscription:", err);
+                console.error("Error fetching data:", err);
             } finally {
                 setLoading(false);
             }
         }
 
-        fetchSubscription();
+        fetchData();
     }, []);
 
     const currentPlan = data?.plan?.slug || "free";
@@ -61,27 +115,33 @@ export default function PlansPage() {
         ? new Date(data.subscription.current_period_end).toLocaleDateString("en-US", { month: "short", day: "numeric" })
         : "N/A";
 
-    const plans = [
-        {
-            slug: "student",
-            name: "Student",
-            price: 0,
-            features: ["50 Scans/mo", "Basic Analysis", "Email Support"],
-        },
-        {
-            slug: "professional",
-            name: "Professional",
-            price: 12,
-            features: ["Unlimited Scans", "Deep Analysis AI", "Priority Support", "Plagiarism Check"],
-            popular: true,
-        },
-        {
-            slug: "institution",
-            name: "Institution",
-            price: 299,
-            features: ["API Access", "SSO Integration", "Dedicated Account Manager", "Team Management"],
-        },
-    ];
+    const totalWords = stats?.total_words_analyzed || 0;
+    const formatWordCount = (count: number) => {
+        if (count >= 1000000) return `${(count / 1000000).toFixed(1)}M`;
+        if (count >= 1000) return `${(count / 1000).toFixed(1)}K`;
+        return count.toString();
+    };
+
+    const parseFeatures = (features: unknown): string[] => {
+        if (!features) return [];
+        if (Array.isArray(features)) return features;
+        if (typeof features === "object") {
+            // DB stores as {"Feature Name": true, ...}
+            return Object.keys(features as Record<string, boolean>);
+        }
+        if (typeof features === "string") {
+            try {
+                const parsed = JSON.parse(features);
+                if (Array.isArray(parsed)) return parsed;
+                if (typeof parsed === "object" && parsed !== null) {
+                    return Object.keys(parsed);
+                }
+            } catch {
+                return features.split(",").map(f => f.trim()).filter(Boolean);
+            }
+        }
+        return [];
+    };
 
     return (
         <div className="min-h-screen bg-gray-50 p-8">
@@ -130,7 +190,7 @@ export default function PlansPage() {
                                 </svg>
                             </div>
                         </div>
-                        <div className="text-4xl font-bold text-gray-900 mb-2">24,500</div>
+                        <div className="text-4xl font-bold text-gray-900 mb-2">{loading ? "..." : formatWordCount(totalWords)}</div>
                         <p className="text-gray-400 text-sm">Total lifetime words scanned</p>
                     </div>
 
@@ -149,6 +209,51 @@ export default function PlansPage() {
                     </div>
                 </div>
 
+                {/* Claim Key Section */}
+                <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 shadow-lg border border-blue-100 mb-12">
+                    <div className="flex items-start gap-4">
+                        <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                            </svg>
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-1">Have a License Key?</h3>
+                            <p className="text-gray-500 text-sm mb-4">Enter your license key to activate a subscription plan.</p>
+                            <div className="flex gap-3">
+                                <input
+                                    type="text"
+                                    placeholder="SL-XXXXX-XXXXX-XXXXX-XXXXX"
+                                    className="flex-1 px-4 py-3 bg-white rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm tracking-wider uppercase shadow-sm"
+                                    value={claimKey}
+                                    onChange={(e) => { setClaimKey(e.target.value); setClaimMessage(null); }}
+                                    onKeyDown={(e) => e.key === "Enter" && handleClaimKey()}
+                                    maxLength={26}
+                                />
+                                <button
+                                    onClick={handleClaimKey}
+                                    disabled={claiming || !claimKey.trim()}
+                                    className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                >
+                                    {claiming ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                            Claiming...
+                                        </>
+                                    ) : (
+                                        "Activate Key"
+                                    )}
+                                </button>
+                            </div>
+                            {claimMessage && (
+                                <div className={`mt-3 p-3 rounded-xl text-sm font-medium ${claimMessage.type === "success" ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
+                                    {claimMessage.text}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+
                 {/* Upgrade Section */}
                 <div className="mb-8">
                     <h2 className="text-2xl font-bold text-gray-900 mb-2">Upgrade your plan</h2>
@@ -156,68 +261,74 @@ export default function PlansPage() {
                 </div>
 
                 {/* Plan Cards */}
-                <div className="grid md:grid-cols-3 gap-6">
-                    {plans.map((plan) => {
-                        const isCurrentPlan = plan.slug === currentPlan || (currentPlan === "free" && plan.slug === "student");
+                {loading ? (
+                    <div className="text-center py-12 text-gray-400">Loading plans...</div>
+                ) : plans.length === 0 ? (
+                    <div className="text-center py-12 text-gray-400">No plans available.</div>
+                ) : (
+                    <div className="grid md:grid-cols-3 gap-6">
+                        {plans.map((plan) => {
+                            const isCurrentPlan = plan.slug === currentPlan || (currentPlan === "free" && plan.slug === "free");
 
-                        return (
-                            <div
-                                key={plan.slug}
-                                className={`bg-white rounded-2xl p-6 shadow-lg shadow-gray-200/50 border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${isCurrentPlan ? "border-blue-500" : "border-gray-100"
-                                    }`}
-                            >
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-xl font-semibold text-gray-900">{plan.name}</h3>
-                                    {isCurrentPlan && (
-                                        <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full uppercase">
-                                            Current Plan
-                                        </span>
-                                    )}
-                                    {plan.popular && !isCurrentPlan && (
-                                        <span className="px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full uppercase">
-                                            Popular
-                                        </span>
-                                    )}
-                                </div>
+                            return (
+                                <div
+                                    key={plan.slug}
+                                    className={`bg-white rounded-2xl p-6 shadow-lg shadow-gray-200/50 border-2 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${isCurrentPlan ? "border-blue-500" : "border-gray-100"
+                                        }`}
+                                >
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h3 className="text-xl font-semibold text-gray-900">{plan.name}</h3>
+                                        {isCurrentPlan && (
+                                            <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full uppercase">
+                                                Current Plan
+                                            </span>
+                                        )}
+                                        {plan.is_popular && !isCurrentPlan && (
+                                            <span className="px-3 py-1 bg-blue-600 text-white text-xs font-semibold rounded-full uppercase">
+                                                Popular
+                                            </span>
+                                        )}
+                                    </div>
 
-                                <div className="flex items-baseline gap-1 mb-6">
-                                    <span className="text-4xl font-bold text-gray-900">${plan.price}</span>
-                                    <span className="text-gray-400">/mo</span>
-                                </div>
+                                    <div className="flex items-baseline gap-1 mb-6">
+                                        <span className="text-4xl font-bold text-gray-900">${plan.price_monthly}</span>
+                                        <span className="text-gray-400">/mo</span>
+                                    </div>
 
-                                {isCurrentPlan ? (
-                                    <button
-                                        disabled
-                                        className="w-full py-3 px-4 rounded-xl border-2 border-gray-200 text-gray-400 font-medium mb-6 cursor-not-allowed"
-                                    >
-                                        Active
-                                    </button>
-                                ) : plan.slug === "institution" ? (
-                                    <button className="w-full py-3 px-4 rounded-xl border-2 border-gray-300 text-gray-700 font-medium mb-6 hover:bg-gray-50 transition-colors">
-                                        Contact Sales
-                                    </button>
-                                ) : (
-                                    <Link href={`/checkout?plan=${plan.slug}`} className="block mb-6">
-                                        <button className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25">
-                                            Upgrade Now
+                                    {isCurrentPlan ? (
+                                        <button
+                                            disabled
+                                            className="w-full py-3 px-4 rounded-xl border-2 border-gray-200 text-gray-400 font-medium mb-6 cursor-not-allowed"
+                                        >
+                                            Active
                                         </button>
-                                    </Link>
-                                )}
+                                    ) : plan.slug === "institution" ? (
+                                        <button className="w-full py-3 px-4 rounded-xl border-2 border-gray-300 text-gray-700 font-medium mb-6 hover:bg-gray-50 transition-colors">
+                                            Contact Sales
+                                        </button>
+                                    ) : (
+                                        <Link href={`/checkout?plan=${plan.slug}`} className="block mb-6">
+                                            <button className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25">
+                                                Upgrade Now
+                                            </button>
+                                        </Link>
+                                    )}
 
-                                <ul className="space-y-3">
-                                    {plan.features.map((feature, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-gray-600">
-                                            <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                                            </svg>
-                                            {feature}
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-                        );
-                    })}
-                </div>
+                                    <ul className="space-y-3">
+                                        {parseFeatures(plan.features).map((feature, i) => (
+                                            <li key={i} className="flex items-center gap-3 text-gray-600">
+                                                <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                </svg>
+                                                {feature}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </div>
     );

@@ -75,6 +75,26 @@ export default function UploadHubPage() {
   }, []);
 
   const handleUpload = async (file: File) => {
+    // Client-side validation
+    const ext = file.name.toLowerCase().split('.').pop();
+    if (!ext || !['docx', 'txt'].includes(ext)) {
+      setUploadProgress("Invalid file type. Only DOCX and TXT files are allowed.");
+      setTimeout(() => setUploadProgress(""), 3000);
+      return;
+    }
+    const maxSize = 20 * 1024 * 1024; // 20MB
+    if (file.size > maxSize) {
+      setUploadProgress("File too large. Maximum size is 20MB.");
+      setTimeout(() => setUploadProgress(""), 3000);
+      return;
+    }
+    // Check remaining credits client-side
+    if (creditsRemaining <= 0) {
+      setUploadProgress("File limit reached. Upgrade your plan to scan more.");
+      setTimeout(() => setUploadProgress(""), 3000);
+      return;
+    }
+
     setUploading(true);
     setUploadProgress("Uploading...");
 
@@ -159,7 +179,7 @@ export default function UploadHubPage() {
           <input
             ref={fileInputRef}
             type="file"
-            accept=".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
+            accept=".docx,.txt,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
             onChange={handleFileSelect}
             className="hidden"
           />
@@ -189,7 +209,7 @@ export default function UploadHubPage() {
                   {isDragging ? "Drop your file here" : "Drop your files here"}
                 </h3>
                 <p className="text-gray-500 mb-4">or click to browse from your computer</p>
-                <p className="text-sm text-gray-400">Supports PDF, DOCX, TXT up to 10MB</p>
+                <p className="text-sm text-gray-400">Supports DOCX, TXT up to 20MB • {creditsRemaining} scan{creditsRemaining !== 1 ? 's' : ''} remaining</p>
               </div>
             )}
           </div>
@@ -286,8 +306,8 @@ export default function UploadHubPage() {
                     </div>
                     {scan.status === "completed" ? (
                       <div className={`px-3 py-1.5 rounded-full text-sm font-semibold ${(scan.ai_score || 0) > 50
-                          ? 'bg-red-100 text-red-700'
-                          : 'bg-green-100 text-green-700'
+                        ? 'bg-red-100 text-red-700'
+                        : 'bg-green-100 text-green-700'
                         }`}>
                         {scan.ai_score}% AI
                       </div>

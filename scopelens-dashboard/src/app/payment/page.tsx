@@ -41,27 +41,11 @@ export default function PaymentPage() {
     }, []);
 
     const fetchPaymentData = async () => {
-        // Simulate loading payment methods and invoices
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // TODO: Fetch real payment methods and invoices from payment API
+        await new Promise((resolve) => setTimeout(resolve, 500));
 
-        // Mock data
-        setPaymentMethods([
-            {
-                id: "pm_1",
-                type: "card",
-                brand: "Visa",
-                last4: "4242",
-                expMonth: 12,
-                expYear: 2027,
-                isDefault: true,
-            },
-        ]);
-
-        setInvoices([
-            { id: "inv_001", date: "2026-02-01", amount: 19.90, status: "paid", description: "Pro Plan - February 2026" },
-            { id: "inv_002", date: "2026-01-01", amount: 19.90, status: "paid", description: "Pro Plan - January 2026" },
-            { id: "inv_003", date: "2025-12-01", amount: 19.90, status: "paid", description: "Pro Plan - December 2025" },
-        ]);
+        setPaymentMethods([]);
+        setInvoices([]);
 
         setLoading(false);
     };
@@ -304,21 +288,21 @@ export default function PaymentPage() {
                         <h2 className="text-lg font-semibold text-gray-900 mb-6">Billing Summary</h2>
 
                         {/* Current Plan */}
-                        <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 mb-6">
-                            <p className="text-sm text-blue-600 mb-1">Current Plan</p>
-                            <p className="text-xl font-bold text-gray-900">Pro Plan</p>
-                            <p className="text-sm text-gray-600">{formatPrice(19)}/month</p>
+                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 mb-6">
+                            <p className="text-sm text-gray-500 mb-1">Current Plan</p>
+                            <p className="text-xl font-bold text-gray-900">No Active Plan</p>
+                            <p className="text-sm text-gray-500">Subscribe to get started</p>
                         </div>
 
                         {/* Next Payment */}
                         <div className="space-y-3 mb-6">
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">Next Payment</span>
-                                <span className="text-gray-900 font-medium">March 1, 2026</span>
+                                <span className="text-gray-900 font-medium">—</span>
                             </div>
                             <div className="flex justify-between text-sm">
                                 <span className="text-gray-500">Amount Due</span>
-                                <span className="text-gray-900 font-medium">{formatPrice(19)}</span>
+                                <span className="text-gray-900 font-medium">—</span>
                             </div>
                         </div>
 

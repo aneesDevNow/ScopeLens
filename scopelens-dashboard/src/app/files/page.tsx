@@ -59,9 +59,20 @@ export default function FilesPage() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ scanId: scan.id })
             });
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || "Failed to generate report");
-            if (data.reportUrl) window.open(data.reportUrl, "_blank");
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || "Failed to generate report");
+            }
+            // Download the PDF blob
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${scan.file_name?.replace(/\.[^/.]+$/, "") || "report"}_ai_report.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         } catch (error) {
             console.error("Download error:", error);
             alert(error instanceof Error ? error.message : "Failed to download report");

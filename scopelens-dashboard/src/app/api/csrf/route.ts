@@ -3,7 +3,7 @@ import { generateCSRFToken } from '@/lib/csrf';
 
 /**
  * GET /api/csrf - Get a new CSRF token
- * Call this endpoint to get a token for forms
+ * Call this endpoint to get a token for forms test
  */
 export async function GET() {
     try {
@@ -20,3 +20,5 @@ export async function GET() {
         );
     }
 }
+
+

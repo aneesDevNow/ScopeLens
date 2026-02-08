@@ -20,11 +20,13 @@ const navItems = [
     { title: "Overview", url: "/", icon: "dashboard" },
     { title: "Users", url: "/users", icon: "group" },
     { title: "Plans", url: "/plans", icon: "credit_card" },
+    { title: "AI Detection", url: "/ai-detection", icon: "smart_toy" },
     { title: "Analytics", url: "/analytics", icon: "analytics" },
     { title: "Resellers", url: "/resellers", icon: "handshake" },
     { title: "Licenses", url: "/licenses", icon: "key" },
     { title: "Support", url: "/support", icon: "support_agent" },
     { title: "System", url: "/system", icon: "monitoring" },
+    { title: "Settings", url: "/settings", icon: "settings" },
 ];
 
 export function AdminSidebar() {
@@ -65,7 +67,7 @@ export function AdminSidebar() {
                     </Avatar>
                     <div className="flex flex-col">
                         <span className="text-sm font-medium">Admin User</span>
-                        <span className="text-xs text-muted-foreground">admin@scopelens.com</span>
+                        <span className="text-xs text-muted-foreground">Administrator</span>
                     </div>
                 </div>
             </SidebarFooter>

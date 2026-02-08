@@ -52,14 +52,21 @@ export async function PUT(request: Request) {
 
         const updates = await request.json()
 
+        // Build update object dynamically — only include fields that are provided
+        const updateData: Record<string, unknown> = {
+            updated_at: new Date().toISOString(),
+        }
+
+        if (updates.firstName !== undefined) updateData.first_name = updates.firstName
+        if (updates.lastName !== undefined) updateData.last_name = updates.lastName
+        if (updates.institution !== undefined) updateData.institution = updates.institution
+        if (updates.two_factor_enabled !== undefined) updateData.two_factor_enabled = updates.two_factor_enabled
+        if (updates.email_notifications !== undefined) updateData.email_notifications = updates.email_notifications
+        if (updates.weekly_report !== undefined) updateData.weekly_report = updates.weekly_report
+
         const { data: profile, error } = await supabase
             .from('profiles')
-            .update({
-                first_name: updates.firstName,
-                last_name: updates.lastName,
-                institution: updates.institution,
-                updated_at: new Date().toISOString(),
-            })
+            .update(updateData)
             .eq('id', user.id)
             .select()
             .single()

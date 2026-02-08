@@ -19,14 +19,17 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
 
-  // Don't show the main sidebar on reseller pages (they have their own)
-  const isResellerRoute = pathname?.startsWith("/reseller");
+  // Don't show the main sidebar on login or auth pages
+  const isAuthRoute = pathname === "/login" || pathname === "/signup" || pathname?.startsWith("/auth/");
+  const isStandalonePage = isAuthRoute;
 
   return (
     <html lang="en">
       <head>
         <title>Scope Lens Dashboard</title>
         <meta name="description" content="AI Content Detection Dashboard" />
+        <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
           rel="stylesheet"
@@ -34,8 +37,8 @@ export default function RootLayout({
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <CurrencyProvider>
-          {isResellerRoute ? (
-            // Reseller pages have their own layout, no main sidebar
+          {isStandalonePage ? (
+            // Standalone pages (reseller, login, auth) — no main sidebar
             <main className="flex-1 bg-background">
               {children}
             </main>

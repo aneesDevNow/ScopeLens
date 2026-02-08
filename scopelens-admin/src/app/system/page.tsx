@@ -118,25 +118,9 @@ export default function SystemPage() {
                     <CardDescription>Real-time system events</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="space-y-2 font-mono text-xs">
-                        {[
-                            { time: "10:45:32", level: "INFO", message: "User login successful: emily@university.edu" },
-                            { time: "10:45:28", level: "INFO", message: "Scan completed: document_id=abc123, score=12%" },
-                            { time: "10:45:15", level: "WARN", message: "Rate limit approaching for API key: sk-***789" },
-                            { time: "10:44:58", level: "INFO", message: "New subscription: user_id=usr_456, plan=Pro" },
-                            { time: "10:44:42", level: "ERROR", message: "PDF parsing failed: unsupported encoding" },
-                        ].map((log, i) => (
-                            <div key={i} className="flex gap-4 p-2 rounded bg-muted/50">
-                                <span className="text-muted-foreground">{log.time}</span>
-                                <Badge variant={
-                                    log.level === "ERROR" ? "destructive" :
-                                        log.level === "WARN" ? "secondary" : "outline"
-                                } className="text-xs">
-                                    {log.level}
-                                </Badge>
-                                <span className="flex-1">{log.message}</span>
-                            </div>
-                        ))}
+                    <div className="text-center py-8 text-muted-foreground">
+                        <span className="material-symbols-outlined text-3xl mb-2 block">description</span>
+                        <p className="text-sm">No logs yet</p>
                     </div>
                 </CardContent>
             </Card>

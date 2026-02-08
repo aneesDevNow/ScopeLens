@@ -7,18 +7,37 @@ interface Profile {
     email: string;
     first_name: string | null;
     last_name: string | null;
-    institution: string | null;
+
     two_factor_enabled: boolean;
+    email_notifications?: boolean;
+    weekly_report?: boolean;
 }
 
 export default function SettingsPage() {
     const [profile, setProfile] = useState<Profile | null>(null);
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
-    const [institution, setInstitution] = useState("");
+
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [saveMessage, setSaveMessage] = useState("");
+
+    // Change Password modal state
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [currentPassword, setCurrentPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmNewPassword, setConfirmNewPassword] = useState("");
+    const [passwordLoading, setPasswordLoading] = useState(false);
+    const [passwordMessage, setPasswordMessage] = useState("");
+    const [passwordError, setPasswordError] = useState(false);
+
+    // 2FA state
+    const [twoFactorEnabled, setTwoFactorEnabled] = useState(false);
+    const [twoFactorLoading, setTwoFactorLoading] = useState(false);
+
+    // Notification states
+    const [emailNotifications, setEmailNotifications] = useState(true);
+    const [weeklyReport, setWeeklyReport] = useState(false);
 
     useEffect(() => {
         async function fetchProfile() {
@@ -29,7 +48,22 @@ export default function SettingsPage() {
                     setProfile(data.profile);
                     setFirstName(data.profile.first_name || "");
                     setLastName(data.profile.last_name || "");
-                    setInstitution(data.profile.institution || "");
+
+                    setTwoFactorEnabled(data.profile.two_factor_enabled || false);
+
+                    // Load notification preferences from profile or localStorage fallback
+                    if (data.profile.email_notifications !== undefined) {
+                        setEmailNotifications(data.profile.email_notifications);
+                    } else {
+                        const stored = localStorage.getItem("scopelens_email_notifications");
+                        setEmailNotifications(stored !== null ? stored === "true" : true);
+                    }
+                    if (data.profile.weekly_report !== undefined) {
+                        setWeeklyReport(data.profile.weekly_report);
+                    } else {
+                        const stored = localStorage.getItem("scopelens_weekly_report");
+                        setWeeklyReport(stored !== null ? stored === "true" : false);
+                    }
                 }
             } catch (err) {
                 console.error("Error fetching profile:", err);
@@ -40,6 +74,7 @@ export default function SettingsPage() {
         fetchProfile();
     }, []);
 
+
     const handleSave = async () => {
         setSaving(true);
         setSaveMessage("");
@@ -47,13 +82,106 @@ export default function SettingsPage() {
             const res = await fetch("/api/profile", {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ firstName, lastName, institution }),
+                body: JSON.stringify({ firstName, lastName }),
             });
             setSaveMessage(res.ok ? "Profile updated successfully!" : "Failed to update profile");
         } catch {
             setSaveMessage("An error occurred");
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleChangePassword = async () => {
+        setPasswordMessage("");
+        setPasswordError(false);
+
+        if (newPassword !== confirmNewPassword) {
+            setPasswordMessage("New passwords do not match");
+            setPasswordError(true);
+            return;
+        }
+        if (newPassword.length < 6) {
+            setPasswordMessage("Password must be at least 6 characters");
+            setPasswordError(true);
+            return;
+        }
+
+        setPasswordLoading(true);
+        try {
+            const res = await fetch("/api/profile/change-password", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ currentPassword, newPassword }),
+            });
+            const data = await res.json();
+            if (res.ok) {
+                setPasswordMessage("Password changed successfully!");
+                setPasswordError(false);
+                setCurrentPassword("");
+                setNewPassword("");
+                setConfirmNewPassword("");
+                setTimeout(() => setShowPasswordModal(false), 2000);
+            } else {
+                setPasswordMessage(data.error || "Failed to change password");
+                setPasswordError(true);
+            }
+        } catch {
+            setPasswordMessage("An error occurred");
+            setPasswordError(true);
+        } finally {
+            setPasswordLoading(false);
+        }
+    };
+
+    const handleToggle2FA = async () => {
+        setTwoFactorLoading(true);
+        const newValue = !twoFactorEnabled;
+        try {
+            const res = await fetch("/api/profile", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ two_factor_enabled: newValue }),
+            });
+            if (res.ok) {
+                setTwoFactorEnabled(newValue);
+            }
+        } catch (err) {
+            console.error("Error toggling 2FA:", err);
+        } finally {
+            setTwoFactorLoading(false);
+        }
+    };
+
+    const handleToggleEmailNotifications = async () => {
+        const newValue = !emailNotifications;
+        setEmailNotifications(newValue);
+        localStorage.setItem("scopelens_email_notifications", String(newValue));
+        // Try to persist to DB (may fail if column doesn't exist yet)
+        try {
+            await fetch("/api/profile", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email_notifications: newValue }),
+            });
+        } catch {
+            // Silently ignore — localStorage is the fallback
+        }
+    };
+
+    const handleToggleWeeklyReport = async () => {
+        const newValue = !weeklyReport;
+        setWeeklyReport(newValue);
+        localStorage.setItem("scopelens_weekly_report", String(newValue));
+        // Try to persist to DB
+        try {
+            await fetch("/api/profile", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ weekly_report: newValue }),
+            });
+        } catch {
+            // Silently ignore — localStorage is the fallback
         }
     };
 
@@ -116,15 +244,7 @@ export default function SettingsPage() {
                                             className="w-full px-4 py-3 bg-gray-100 rounded-xl border border-gray-200 text-gray-500 cursor-not-allowed"
                                         />
                                     </div>
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Institution</label>
-                                        <input
-                                            type="text"
-                                            value={institution}
-                                            onChange={(e) => setInstitution(e.target.value)}
-                                            className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                        />
-                                    </div>
+
                                     <div className="flex items-center gap-4 pt-2">
                                         <button
                                             onClick={handleSave}
@@ -160,22 +280,44 @@ export default function SettingsPage() {
                             </div>
                         </div>
                         <div className="p-6 space-y-4">
+                            {/* Password */}
                             <div className="flex items-center justify-between p-5 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
                                 <div>
                                     <div className="font-medium text-gray-900">Password</div>
-                                    <div className="text-sm text-gray-500">Last changed 30 days ago</div>
+                                    <div className="text-sm text-gray-500">Change your account password</div>
                                 </div>
-                                <button className="px-5 py-2 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-white transition-colors">
+                                <button
+                                    onClick={() => {
+                                        setShowPasswordModal(true);
+                                        setPasswordMessage("");
+                                        setCurrentPassword("");
+                                        setNewPassword("");
+                                        setConfirmNewPassword("");
+                                    }}
+                                    className="px-5 py-2 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-white hover:border-gray-300 transition-colors"
+                                >
                                     Change Password
                                 </button>
                             </div>
+
+                            {/* 2FA */}
                             <div className="flex items-center justify-between p-5 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
                                 <div>
                                     <div className="font-medium text-gray-900">Two-Factor Authentication</div>
-                                    <div className="text-sm text-gray-500">Add an extra layer of security</div>
+                                    <div className="text-sm text-gray-500">
+                                        {twoFactorEnabled ? "2FA is currently enabled" : "Add an extra layer of security"}
+                                    </div>
                                 </div>
-                                <button className="px-5 py-2 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-white transition-colors">
-                                    {profile?.two_factor_enabled ? "Disable 2FA" : "Enable 2FA"}
+                                <button
+                                    onClick={handleToggle2FA}
+                                    disabled={twoFactorLoading}
+                                    className={`w-14 h-8 rounded-full relative cursor-pointer transition-colors duration-300 ${twoFactorEnabled ? "bg-green-500" : "bg-gray-300"
+                                        } ${twoFactorLoading ? "opacity-50" : ""}`}
+                                >
+                                    <div
+                                        className={`w-6 h-6 bg-white rounded-full absolute top-1 shadow-md transition-transform duration-300 ${twoFactorEnabled ? "translate-x-7" : "translate-x-1"
+                                            }`}
+                                    />
                                 </button>
                             </div>
                         </div>
@@ -197,28 +339,118 @@ export default function SettingsPage() {
                             </div>
                         </div>
                         <div className="p-6 space-y-4">
+                            {/* Email Notifications */}
                             <div className="flex items-center justify-between p-5 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
                                 <div>
                                     <div className="font-medium text-gray-900">Email Notifications</div>
                                     <div className="text-sm text-gray-500">Receive scan results via email</div>
                                 </div>
-                                <button className="w-14 h-8 bg-blue-600 rounded-full relative cursor-pointer transition-colors">
-                                    <div className="w-6 h-6 bg-white rounded-full absolute right-1 top-1 shadow transition-transform"></div>
+                                <button
+                                    onClick={handleToggleEmailNotifications}
+                                    className={`w-14 h-8 rounded-full relative cursor-pointer transition-colors duration-300 ${emailNotifications ? "bg-blue-600" : "bg-gray-300"
+                                        }`}
+                                >
+                                    <div
+                                        className={`w-6 h-6 bg-white rounded-full absolute top-1 shadow-md transition-transform duration-300 ${emailNotifications ? "translate-x-7" : "translate-x-1"
+                                            }`}
+                                    />
                                 </button>
                             </div>
+
+                            {/* Weekly Report */}
                             <div className="flex items-center justify-between p-5 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
                                 <div>
                                     <div className="font-medium text-gray-900">Weekly Report</div>
                                     <div className="text-sm text-gray-500">Get a weekly summary of your activity</div>
                                 </div>
-                                <button className="w-14 h-8 bg-gray-300 rounded-full relative cursor-pointer transition-colors">
-                                    <div className="w-6 h-6 bg-white rounded-full absolute left-1 top-1 shadow transition-transform"></div>
+                                <button
+                                    onClick={handleToggleWeeklyReport}
+                                    className={`w-14 h-8 rounded-full relative cursor-pointer transition-colors duration-300 ${weeklyReport ? "bg-blue-600" : "bg-gray-300"
+                                        }`}
+                                >
+                                    <div
+                                        className={`w-6 h-6 bg-white rounded-full absolute top-1 shadow-md transition-transform duration-300 ${weeklyReport ? "translate-x-7" : "translate-x-1"
+                                            }`}
+                                    />
                                 </button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Change Password Modal */}
+            {showPasswordModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+                        <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                            <h3 className="text-lg font-semibold text-gray-900">Change Password</h3>
+                            <button
+                                onClick={() => setShowPasswordModal(false)}
+                                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+                            >
+                                ✕
+                            </button>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Current Password</label>
+                                <input
+                                    type="password"
+                                    value={currentPassword}
+                                    onChange={(e) => setCurrentPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">New Password</label>
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700">Confirm New Password</label>
+                                <input
+                                    type="password"
+                                    value={confirmNewPassword}
+                                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                />
+                            </div>
+
+                            {passwordMessage && (
+                                <div className={`p-3 rounded-xl text-sm font-medium ${passwordError
+                                    ? "bg-red-50 text-red-600 border border-red-100"
+                                    : "bg-green-50 text-green-600 border border-green-100"
+                                    }`}>
+                                    {passwordMessage}
+                                </div>
+                            )}
+                        </div>
+                        <div className="p-6 border-t border-gray-100 flex gap-3 justify-end">
+                            <button
+                                onClick={() => setShowPasswordModal(false)}
+                                className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleChangePassword}
+                                disabled={passwordLoading}
+                                className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25 disabled:opacity-50"
+                            >
+                                {passwordLoading ? "Changing..." : "Change Password"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

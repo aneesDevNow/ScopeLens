@@ -17,33 +17,8 @@ interface Ticket {
     responses: { from: string; message: string; time: string }[];
 }
 
-const initialTickets: Ticket[] = [
-    {
-        id: 1, subject: "API rate limit issue", user: "emily@university.edu", priority: "High", status: "Open", created: "2 hours ago",
-        description: "We're getting 429 errors when trying to scan documents in bulk. Our subscription should allow 500 scans/month but we're hitting limits after just 50.",
-        responses: []
-    },
-    {
-        id: 2, subject: "Bug in PDF parsing", user: "mjohnson@college.edu", priority: "Medium", status: "In Progress", created: "1 day ago",
-        description: "Some PDFs with embedded images are not being parsed correctly. The AI detection score shows 0% even for clearly AI-generated content.",
-        responses: [
-            { from: "Support", message: "We've identified the issue with image-heavy PDFs. Our team is working on a fix.", time: "12 hours ago" }
-        ]
-    },
-    {
-        id: 3, subject: "Feature request: Bulk upload", user: "swilliams@school.edu", priority: "Low", status: "Open", created: "2 days ago",
-        description: "It would be great to upload multiple files at once instead of one at a time. We have hundreds of essays to scan.",
-        responses: []
-    },
-    {
-        id: 4, subject: "Billing inquiry", user: "dlee@institute.edu", priority: "Medium", status: "Resolved", created: "3 days ago",
-        description: "I was charged twice for my Pro subscription this month.",
-        responses: [
-            { from: "Support", message: "Found the duplicate charge. Refund has been initiated.", time: "2 days ago" },
-            { from: "User", message: "Received the refund. Thank you!", time: "1 day ago" }
-        ]
-    },
-];
+// TODO: Fetch real tickets from Supabase
+const initialTickets: Ticket[] = [];
 
 export default function SupportPage() {
     const [tickets, setTickets] = useState<Ticket[]>(initialTickets);

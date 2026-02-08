@@ -161,50 +161,66 @@ export default function PlansPage() {
                 </Button>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {plans.map((plan) => (
-                    <Card key={plan.id} className={!plan.is_active ? "opacity-60" : ""}>
-                        <CardHeader>
+                    <Card key={plan.id} className={`flex flex-col ${!plan.is_active ? "opacity-60" : ""}`}>
+                        <CardHeader className="pb-3">
                             <div className="flex items-center justify-between">
-                                <CardTitle>{plan.name}</CardTitle>
+                                <CardTitle className="text-lg">{plan.name}</CardTitle>
                                 {!plan.is_active && <Badge variant="secondary">Inactive</Badge>}
                             </div>
-                            <div className="text-2xl font-bold">
-                                ${plan.price_monthly}<span className="text-sm font-normal text-muted-foreground">/mo</span>
+                            <div className="mt-1">
+                                <span className="text-3xl font-bold">${plan.price_monthly}</span>
+                                <span className="text-sm text-muted-foreground">/mo</span>
                             </div>
-                            <CardDescription>{plan.scans_per_month === -1 ? "Unlimited" : plan.scans_per_month} scans/month</CardDescription>
+                            <p className="text-sm text-muted-foreground">
+                                {plan.scans_per_month === -1 ? "Unlimited" : plan.scans_per_month} scans/month
+                            </p>
+                            {plan.price_yearly > 0 && (
+                                <p className="text-xs text-muted-foreground">
+                                    ${plan.price_yearly}/yr (save ${(plan.price_monthly * 12 - plan.price_yearly).toFixed(0)})
+                                </p>
+                            )}
                         </CardHeader>
-                        <CardContent className="space-y-4">
-                            {/* Reseller Pricing Section */}
-                            <div className="p-3 rounded-lg bg-green-50 border border-green-200">
-                                <div className="text-xs text-green-700 font-medium mb-1">Reseller Pricing</div>
-                                <div className="flex items-center justify-between">
-                                    <span className="text-sm">Cost to reseller:</span>
-                                    <span className="font-bold text-green-700">${plan.reseller_price_monthly}/mo</span>
+
+                        <CardContent className="flex-1 space-y-4">
+                            {/* Reseller Pricing */}
+                            <div className="p-3 rounded-lg bg-emerald-950/50 border border-emerald-800/50">
+                                <div className="flex items-center gap-1.5 mb-2">
+                                    <span className="material-symbols-outlined text-emerald-400 text-base">storefront</span>
+                                    <span className="text-xs font-semibold text-emerald-400 uppercase tracking-wide">Reseller</span>
                                 </div>
-                                <div className="text-xs text-muted-foreground mt-1">
-                                    {plan.reseller_discount_percent}% discount ({Math.round(plan.price_monthly - plan.reseller_price_monthly)} margin)
+                                <div className="flex items-baseline justify-between">
+                                    <span className="text-sm text-muted-foreground">Cost</span>
+                                    <span className="text-lg font-bold text-emerald-400">${plan.reseller_price_monthly}<span className="text-xs font-normal">/mo</span></span>
+                                </div>
+                                <div className="flex items-center justify-between mt-1">
+                                    <span className="text-xs text-muted-foreground">Discount</span>
+                                    <span className="text-xs text-emerald-500">{plan.reseller_discount_percent}% off · ${(plan.price_monthly - plan.reseller_price_monthly).toFixed(0)} margin</span>
                                 </div>
                             </div>
 
                             {/* Features */}
-                            <ul className="space-y-1 text-sm">
-                                {Object.keys(plan.features || {}).filter(k => plan.features[k]).slice(0, 4).map((feature, i) => (
-                                    <li key={i} className="flex items-center gap-2">
-                                        <span className="material-symbols-outlined text-primary text-sm">check</span>
-                                        {feature}
-                                    </li>
-                                ))}
-                            </ul>
+                            {Object.keys(plan.features || {}).filter(k => plan.features[k]).length > 0 && (
+                                <ul className="space-y-1.5">
+                                    {Object.keys(plan.features || {}).filter(k => plan.features[k]).map((feature, i) => (
+                                        <li key={i} className="flex items-start gap-2 text-sm">
+                                            <span className="material-symbols-outlined text-primary text-sm mt-0.5">check_circle</span>
+                                            <span>{feature}</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            )}
                         </CardContent>
-                        <CardFooter className="flex gap-2">
+
+                        <CardFooter className="flex gap-2 pt-4 border-t">
                             <Button variant="outline" className="flex-1" onClick={() => openEditModal(plan)}>
-                                <span className="material-symbols-outlined mr-2">edit</span>
+                                <span className="material-symbols-outlined mr-2 text-base">edit</span>
                                 Edit
                             </Button>
                             {plan.name !== "Free" && (
-                                <Button variant="ghost" size="icon" onClick={() => handleDelete(plan.id)}>
-                                    <span className="material-symbols-outlined text-destructive">delete</span>
+                                <Button variant="ghost" size="icon" onClick={() => handleDelete(plan.id)} className="text-destructive hover:text-destructive">
+                                    <span className="material-symbols-outlined">delete</span>
                                 </Button>
                             )}
                         </CardFooter>
@@ -214,26 +230,33 @@ export default function PlansPage() {
 
             {/* Modal */}
             {showModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
                     <Card className="w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                        <CardHeader>
+                        <CardHeader className="relative">
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="absolute right-4 top-4 text-muted-foreground hover:text-foreground transition-colors"
+                            >
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
                             <CardTitle>{editingPlan ? "Edit Plan" : "Create New Plan"}</CardTitle>
                             <CardDescription>
                                 {editingPlan ? "Update the plan details and reseller pricing" : "Add a new subscription plan with reseller pricing"}
                             </CardDescription>
                         </CardHeader>
-                        <CardContent className="space-y-4">
+                        <CardContent className="space-y-5">
+                            {/* Plan Identity */}
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label>Plan Name</Label>
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs text-muted-foreground uppercase tracking-wide">Plan Name</Label>
                                     <Input
                                         value={formData.name}
                                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                                         placeholder="e.g., Pro Plus"
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label>Slug</Label>
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs text-muted-foreground uppercase tracking-wide">Slug</Label>
                                     <Input
                                         value={formData.slug}
                                         onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
@@ -242,9 +265,10 @@ export default function PlansPage() {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label>Price ($/month)</Label>
+                            {/* Pricing */}
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs text-muted-foreground uppercase tracking-wide">Monthly ($)</Label>
                                     <Input
                                         type="number"
                                         step="0.01"
@@ -253,8 +277,8 @@ export default function PlansPage() {
                                         placeholder="19.00"
                                     />
                                 </div>
-                                <div className="space-y-2">
-                                    <Label>Price ($/year)</Label>
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs text-muted-foreground uppercase tracking-wide">Yearly ($)</Label>
                                     <Input
                                         type="number"
                                         step="0.01"
@@ -263,26 +287,25 @@ export default function PlansPage() {
                                         placeholder="190.00"
                                     />
                                 </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <Label>Scans per Month</Label>
-                                <Input
-                                    type="number"
-                                    value={formData.scans_per_month}
-                                    onChange={(e) => setFormData({ ...formData, scans_per_month: parseInt(e.target.value) || 0 })}
-                                    placeholder="100"
-                                />
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs text-muted-foreground uppercase tracking-wide">Scans/mo</Label>
+                                    <Input
+                                        type="number"
+                                        value={formData.scans_per_month}
+                                        onChange={(e) => setFormData({ ...formData, scans_per_month: parseInt(e.target.value) || 0 })}
+                                        placeholder="100"
+                                    />
+                                </div>
                             </div>
 
                             {/* Reseller Pricing Section */}
-                            <div className="p-4 rounded-lg border border-green-200 bg-green-50 space-y-3">
+                            <div className="p-4 rounded-lg border border-emerald-800/50 bg-emerald-950/40 space-y-3">
                                 <div className="flex items-center gap-2">
-                                    <span className="material-symbols-outlined text-green-600">storefront</span>
-                                    <Label className="text-green-700 font-medium">Reseller Pricing</Label>
+                                    <span className="material-symbols-outlined text-emerald-400 text-base">storefront</span>
+                                    <Label className="text-emerald-400 font-semibold text-xs uppercase tracking-wide">Reseller Pricing</Label>
                                 </div>
-                                <div className="space-y-2">
-                                    <Label className="text-sm">Reseller Discount (%)</Label>
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs text-muted-foreground">Discount (%)</Label>
                                     <Input
                                         type="number"
                                         min="0"
@@ -293,34 +316,35 @@ export default function PlansPage() {
                                     />
                                 </div>
                                 {formData.price_monthly > 0 && (
-                                    <div className="text-sm space-y-1">
+                                    <div className="text-sm space-y-1.5 pt-2 border-t border-emerald-800/30">
                                         <div className="flex justify-between">
-                                            <span className="text-muted-foreground">Retail Price:</span>
+                                            <span className="text-muted-foreground">Retail Price</span>
                                             <span>${formData.price_monthly.toFixed(2)}/mo</span>
                                         </div>
                                         <div className="flex justify-between">
-                                            <span className="text-muted-foreground">Reseller Pays:</span>
-                                            <span className="font-medium text-green-700">${calculatedResellerPrice.toFixed(2)}/mo</span>
+                                            <span className="text-muted-foreground">Reseller Pays</span>
+                                            <span className="font-medium text-emerald-400">${calculatedResellerPrice.toFixed(2)}/mo</span>
                                         </div>
-                                        <div className="flex justify-between border-t pt-1">
-                                            <span className="text-muted-foreground">Reseller Profit:</span>
-                                            <span className="font-bold text-green-700">${resellerProfit.toFixed(2)}/mo</span>
+                                        <div className="flex justify-between pt-1.5 border-t border-emerald-800/30">
+                                            <span className="text-muted-foreground">Reseller Margin</span>
+                                            <span className="font-bold text-emerald-400">${resellerProfit.toFixed(2)}/mo</span>
                                         </div>
                                     </div>
                                 )}
                             </div>
 
-                            <div className="space-y-2">
-                                <Label>Features (one per line)</Label>
+                            {/* Features */}
+                            <div className="space-y-1.5">
+                                <Label className="text-xs text-muted-foreground uppercase tracking-wide">Features (one per line)</Label>
                                 <textarea
-                                    className="w-full p-2 rounded-md border bg-background min-h-[100px]"
+                                    className="w-full p-3 rounded-md border bg-background min-h-[120px] text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                                     value={formData.features}
                                     onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                                    placeholder="100 scans/month&#10;Detailed reports&#10;Priority support"
+                                    placeholder={"15 AI scans per month\nAdvanced plagiarism detection\nDetailed originality reports\nEmail support"}
                                 />
                             </div>
                         </CardContent>
-                        <CardFooter className="flex gap-2">
+                        <CardFooter className="flex gap-3 border-t pt-4">
                             <Button variant="outline" onClick={() => setShowModal(false)} className="flex-1">
                                 Cancel
                             </Button>

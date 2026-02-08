@@ -1,4 +1,163 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
+
+interface Scan {
+    id: string;
+    file_name: string;
+    file_size: number;
+    file_type: string;
+    ai_score: number | null;
+    status: string;
+    word_count: number | null;
+    paragraph_count: number | null;
+    created_at: string;
+    completed_at: string | null;
+    report_path: string | null;
+}
+
 export default function ReportsPage() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const scanId = searchParams.get("scanId");
+
+    const [scan, setScan] = useState<Scan | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const [downloading, setDownloading] = useState(false);
+
+    useEffect(() => {
+        async function fetchReport() {
+            try {
+                if (scanId) {
+                    // Fetch specific scan
+                    const res = await fetch(`/api/scans/${scanId}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        setScan(data.scan);
+                    } else {
+                        setError("Report not found");
+                    }
+                } else {
+                    // Fetch most recent completed scan
+                    const res = await fetch("/api/scans?limit=1");
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (data.scans && data.scans.length > 0) {
+                            setScan(data.scans[0]);
+                        } else {
+                            setError("No scans found. Upload a document to generate a report.");
+                        }
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching report:", err);
+                setError("Failed to load report");
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchReport();
+    }, [scanId]);
+
+    const handleExportPDF = async () => {
+        if (!scan) return;
+        setDownloading(true);
+        try {
+            const response = await fetch("/api/report", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ scanId: scan.id }),
+            });
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error || "Failed to generate PDF");
+            }
+            // Download the PDF blob
+            const blob = await response.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${scan.file_name?.replace(/\.[^/.]+$/, "") || "report"}_ai_report.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            console.error("Export error:", err);
+            alert(err instanceof Error ? err.message : "Failed to export PDF");
+        } finally {
+            setDownloading(false);
+        }
+    };
+
+    const formatFileSize = (bytes: number) => {
+        if (!bytes) return "Unknown";
+        const k = 1024;
+        const sizes = ["Bytes", "KB", "MB", "GB"];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    };
+
+    const formatDate = (dateStr: string) => {
+        return new Date(dateStr).toLocaleDateString("en-US", {
+            year: "numeric", month: "long", day: "numeric",
+            hour: "numeric", minute: "2-digit",
+        });
+    };
+
+    const getScoreColor = (score: number) => {
+        if (score > 50) return { bg: "bg-red-50", text: "text-red-600", badge: "bg-red-100 text-red-700" };
+        if (score > 20) return { bg: "bg-yellow-50", text: "text-yellow-600", badge: "bg-yellow-100 text-yellow-700" };
+        return { bg: "bg-green-50", text: "text-green-600", badge: "bg-green-100 text-green-700" };
+    };
+
+    const getScoreLabel = (score: number) => {
+        if (score > 50) return "High probability of AI content";
+        if (score > 20) return "Moderate probability of AI content";
+        return "Low probability of AI content";
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gray-50 p-8 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                    <p className="text-gray-500">Loading report...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error || !scan) {
+        return (
+            <div className="min-h-screen bg-gray-50 p-8">
+                <div className="max-w-6xl mx-auto text-center py-20">
+                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">No Report Available</h2>
+                    <p className="text-gray-500 mb-6">{error || "Upload a document to generate your first AI analysis report."}</p>
+                    <button
+                        onClick={() => router.push("/")}
+                        className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25"
+                    >
+                        Upload a Document
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    const aiScore = scan.ai_score ?? 0;
+    const humanScore = 100 - aiScore;
+    const colors = getScoreColor(aiScore);
+    const isProcessing = scan.status !== "completed";
+
     return (
         <div className="min-h-screen bg-gray-50 p-8">
             <div className="max-w-6xl mx-auto">
@@ -9,17 +168,33 @@ export default function ReportsPage() {
                         <p className="text-gray-500">Detailed AI detection results for your document</p>
                     </div>
                     <div className="flex gap-3">
-                        <button className="px-5 py-2.5 bg-white rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2">
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                            Export PDF
+                        <button
+                            onClick={handleExportPDF}
+                            disabled={downloading || isProcessing}
+                            className="px-5 py-2.5 bg-white rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50"
+                        >
+                            {downloading ? (
+                                <>
+                                    <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                    Generating...
+                                </>
+                            ) : (
+                                <>
+                                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                    </svg>
+                                    Export PDF
+                                </>
+                            )}
                         </button>
-                        <button className="px-5 py-2.5 bg-white rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2">
+                        <button
+                            onClick={() => router.push("/files")}
+                            className="px-5 py-2.5 bg-white rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2"
+                        >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
-                            Share
+                            All Files
                         </button>
                     </div>
                 </div>
@@ -34,102 +209,123 @@ export default function ReportsPage() {
                                 </svg>
                             </div>
                             <div>
-                                <h3 className="text-xl font-semibold text-gray-900">research_paper_v2.pdf</h3>
-                                <p className="text-gray-500">Scanned on January 15, 2024 at 2:34 PM</p>
+                                <h3 className="text-xl font-semibold text-gray-900">{scan.file_name}</h3>
+                                <p className="text-gray-500">
+                                    Scanned on {formatDate(scan.created_at)}
+                                    {scan.file_size ? ` · ${formatFileSize(scan.file_size)}` : ""}
+                                </p>
                             </div>
                         </div>
                     </div>
                     <div className="p-6">
-                        <div className="grid md:grid-cols-4 gap-6">
-                            <div className="text-center p-6 bg-green-50 rounded-xl">
-                                <div className="text-4xl font-bold text-green-600 mb-1">12%</div>
-                                <div className="text-gray-500">AI Content</div>
+                        {isProcessing ? (
+                            <div className="text-center py-8">
+                                <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                                <p className="text-gray-500 text-lg">Analysis in progress...</p>
+                                <p className="text-gray-400 text-sm mt-1">This may take a few moments</p>
                             </div>
-                            <div className="text-center p-6 bg-gray-50 rounded-xl">
-                                <div className="text-4xl font-bold text-gray-900 mb-1">88%</div>
-                                <div className="text-gray-500">Human Written</div>
+                        ) : (
+                            <div className="grid md:grid-cols-4 gap-6">
+                                <div className={`text-center p-6 ${colors.bg} rounded-xl`}>
+                                    <div className={`text-4xl font-bold ${colors.text} mb-1`}>{aiScore}%</div>
+                                    <div className="text-gray-500">AI Content</div>
+                                </div>
+                                <div className="text-center p-6 bg-gray-50 rounded-xl">
+                                    <div className="text-4xl font-bold text-gray-900 mb-1">{humanScore}%</div>
+                                    <div className="text-gray-500">Human Written</div>
+                                </div>
+                                <div className="text-center p-6 bg-gray-50 rounded-xl">
+                                    <div className="text-4xl font-bold text-gray-900 mb-1">{scan.word_count?.toLocaleString() ?? "N/A"}</div>
+                                    <div className="text-gray-500">Words Analyzed</div>
+                                </div>
+                                <div className="text-center p-6 bg-gray-50 rounded-xl">
+                                    <div className="text-4xl font-bold text-gray-900 mb-1">{scan.paragraph_count ?? "N/A"}</div>
+                                    <div className="text-gray-500">Paragraphs</div>
+                                </div>
                             </div>
-                            <div className="text-center p-6 bg-gray-50 rounded-xl">
-                                <div className="text-4xl font-bold text-gray-900 mb-1">2,847</div>
-                                <div className="text-gray-500">Words Analyzed</div>
-                            </div>
-                            <div className="text-center p-6 bg-gray-50 rounded-xl">
-                                <div className="text-4xl font-bold text-gray-900 mb-1">14</div>
-                                <div className="text-gray-500">Paragraphs</div>
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </div>
 
-                {/* Content Analysis */}
-                <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 mb-8">
-                    <div className="p-6 border-b border-gray-100">
-                        <h2 className="text-xl font-semibold text-gray-900">Content Analysis</h2>
-                        <p className="text-gray-500 mt-1">Paragraph-by-paragraph breakdown</p>
-                    </div>
-                    <div className="p-6 space-y-4">
-                        {[
-                            { para: 1, text: "The rapid advancement of artificial intelligence has fundamentally transformed how we approach complex problem-solving...", score: 5 },
-                            { para: 2, text: "Machine learning algorithms have demonstrated remarkable capabilities in pattern recognition and predictive analytics...", score: 78 },
-                            { para: 3, text: "This research examines the implications of these developments across various industry sectors...", score: 8 },
-                        ].map((item) => (
-                            <div
-                                key={item.para}
-                                className={`p-5 rounded-xl border-l-4 transition-shadow hover:shadow-md ${item.score > 50
-                                        ? 'border-l-red-500 bg-red-50/50'
-                                        : 'border-l-green-500 bg-green-50/50'
-                                    }`}
-                            >
-                                <div className="flex items-center justify-between mb-3">
-                                    <span className="font-medium text-gray-900">Paragraph {item.para}</span>
-                                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${item.score > 50 ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
-                                        }`}>
-                                        {item.score}% AI
-                                    </span>
+                {/* Analysis Result */}
+                {!isProcessing && (
+                    <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 mb-8">
+                        <div className="p-6 border-b border-gray-100">
+                            <h2 className="text-xl font-semibold text-gray-900">Analysis Result</h2>
+                            <p className="text-gray-500 mt-1">Overall AI detection assessment</p>
+                        </div>
+                        <div className="p-6">
+                            <div className={`p-6 rounded-xl ${colors.bg}`}>
+                                <div className="flex items-center gap-6 mb-4">
+                                    <div className={`text-6xl font-bold ${colors.text}`}>{aiScore}%</div>
+                                    <div>
+                                        <p className="font-semibold text-gray-900 text-lg">{getScoreLabel(aiScore)}</p>
+                                        <p className="text-gray-500 mt-1">
+                                            {aiScore < 20
+                                                ? "This document appears to be primarily human-written content."
+                                                : aiScore < 50
+                                                    ? "This document contains some patterns consistent with AI-generated text."
+                                                    : "This document shows strong indicators of AI-generated content."}
+                                        </p>
+                                    </div>
                                 </div>
-                                <p className="text-gray-600">{item.text}</p>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Detection Models */}
-                <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100">
-                    <div className="p-6 border-b border-gray-100">
-                        <h2 className="text-xl font-semibold text-gray-900">Detection Models Used</h2>
-                    </div>
-                    <div className="p-6">
-                        <div className="grid md:grid-cols-3 gap-6">
-                            <div className="p-6 rounded-xl bg-gradient-to-br from-blue-50 to-white border border-blue-100 text-center">
-                                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                    </svg>
+                                {/* Score bar */}
+                                <div className="mt-4">
+                                    <div className="flex justify-between text-sm text-gray-500 mb-2">
+                                        <span>Human Written</span>
+                                        <span>AI Generated</span>
+                                    </div>
+                                    <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                                        <div
+                                            className={`h-full rounded-full transition-all duration-700 ${aiScore > 50 ? "bg-red-500" : aiScore > 20 ? "bg-yellow-500" : "bg-green-500"}`}
+                                            style={{ width: `${aiScore}%` }}
+                                        ></div>
+                                    </div>
                                 </div>
-                                <div className="text-lg font-semibold text-blue-600 mb-1">GPT Detector</div>
-                                <div className="text-gray-500">Confidence: 94%</div>
-                            </div>
-                            <div className="p-6 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100 text-center">
-                                <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                </div>
-                                <div className="text-lg font-semibold text-purple-600 mb-1">Claude Detector</div>
-                                <div className="text-gray-500">Confidence: 91%</div>
-                            </div>
-                            <div className="p-6 rounded-xl bg-gradient-to-br from-green-50 to-white border border-green-100 text-center">
-                                <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                                    </svg>
-                                </div>
-                                <div className="text-lg font-semibold text-green-600 mb-1">Ensemble Model</div>
-                                <div className="text-gray-500">Confidence: 96%</div>
                             </div>
                         </div>
                     </div>
-                </div>
+                )}
+
+                {/* Document Details */}
+                {!isProcessing && (
+                    <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100">
+                        <div className="p-6 border-b border-gray-100">
+                            <h2 className="text-xl font-semibold text-gray-900">Document Details</h2>
+                        </div>
+                        <div className="p-6">
+                            <div className="grid md:grid-cols-3 gap-6">
+                                <div className="p-6 rounded-xl bg-gradient-to-br from-blue-50 to-white border border-blue-100 text-center">
+                                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                    </div>
+                                    <div className="text-lg font-semibold text-blue-600 mb-1">File Type</div>
+                                    <div className="text-gray-500 uppercase">{scan.file_type || "Unknown"}</div>
+                                </div>
+                                <div className="p-6 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100 text-center">
+                                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                                        </svg>
+                                    </div>
+                                    <div className="text-lg font-semibold text-purple-600 mb-1">File Size</div>
+                                    <div className="text-gray-500">{formatFileSize(scan.file_size)}</div>
+                                </div>
+                                <div className="p-6 rounded-xl bg-gradient-to-br from-green-50 to-white border border-green-100 text-center">
+                                    <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                        <svg className="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <div className="text-lg font-semibold text-green-600 mb-1">Completed</div>
+                                    <div className="text-gray-500">{scan.completed_at ? formatDate(scan.completed_at) : "N/A"}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

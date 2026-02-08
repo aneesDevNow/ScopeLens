@@ -1,39 +1,51 @@
-import type { Metadata } from "next";
+"use client";
+
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin-sidebar";
+import { usePathname } from "next/navigation";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
 });
 
-export const metadata: Metadata = {
-  title: "Scope Lens Admin",
-  description: "Admin Portal for Scope Lens",
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const pathname = usePathname();
+
+  // Don't show the sidebar on login or auth pages
+  const isLoginPage = pathname === "/login";
+  const isAuthRoute = pathname?.startsWith("/auth/");
+  const isStandalonePage = isLoginPage || isAuthRoute;
+
   return (
     <html lang="en">
       <head>
+        <title>Scope Lens Admin</title>
+        <meta name="description" content="Admin Portal for Scope Lens" />
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
           rel="stylesheet"
         />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <SidebarProvider>
-          <AdminSidebar />
+        {isStandalonePage ? (
           <main className="flex-1 bg-background">
             {children}
           </main>
-        </SidebarProvider>
+        ) : (
+          <SidebarProvider>
+            <AdminSidebar />
+            <main className="flex-1 bg-background">
+              {children}
+            </main>
+          </SidebarProvider>
+        )}
       </body>
     </html>
   );

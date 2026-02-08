@@ -1,6 +1,57 @@
 import Link from "next/link";
+import { createClient } from "@/lib/supabase/server";
 
-export default function LandingPage() {
+interface Plan {
+  id: string;
+  name: string;
+  slug: string;
+  price_monthly: number;
+  price_yearly: number | null;
+  scans_per_month: number;
+  features: Record<string, boolean>;
+  is_active: boolean;
+}
+
+// Determine plan styling based on slug
+function getPlanStyle(slug: string, index: number) {
+  const isPopular = slug === "professional" || index === 2;
+  return {
+    isPopular,
+    cardClass: isPopular
+      ? "bg-gradient-to-b from-blue-600 to-blue-700 rounded-2xl p-8 shadow-2xl shadow-blue-500/30 relative transform md:scale-105"
+      : "bg-white rounded-2xl p-8 shadow-xl shadow-gray-200/50 border border-gray-100",
+    titleClass: isPopular ? "text-xl font-bold text-white mb-2" : "text-xl font-bold text-gray-900 mb-2",
+    priceClass: isPopular ? "text-4xl font-bold text-white" : "text-4xl font-bold text-gray-900",
+    periodClass: isPopular ? "text-blue-200" : "text-gray-500",
+    descClass: isPopular ? "text-blue-200 mt-2" : "text-gray-500 mt-2",
+    checkBg: isPopular ? "w-5 h-5 bg-white/20 rounded-full flex items-center justify-center" : "w-5 h-5 bg-green-100 rounded-full flex items-center justify-center",
+    checkIcon: isPopular ? "w-3 h-3 text-white" : "w-3 h-3 text-green-600",
+    featureText: isPopular ? "text-white" : "text-gray-700",
+    buttonClass: isPopular
+      ? "w-full py-3.5 bg-white text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-all shadow-lg"
+      : "w-full py-3.5 text-gray-700 font-semibold rounded-xl border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all",
+    buttonText: slug === "free" ? "Get Started" : isPopular ? `Upgrade to ${slug === "professional" ? "Pro" : slug}` : "Choose Plan",
+  };
+}
+
+const planDescriptions: Record<string, string> = {
+  free: "For individuals and students",
+  starter: "For regular users",
+  professional: "For professional educators",
+  institution: "For institutions",
+};
+
+export default async function LandingPage() {
+  // Fetch plans from database
+  const supabase = await createClient();
+  const { data: plans } = await supabase
+    .from("plans")
+    .select("*")
+    .eq("is_active", true)
+    .order("price_monthly", { ascending: true });
+
+  const activePlans = (plans as Plan[]) || [];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       {/* Navbar */}
@@ -151,7 +202,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
+      {/* Dynamic Pricing Section */}
       <section id="pricing" className="py-24 bg-gradient-to-b from-gray-50 to-white">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
@@ -159,151 +210,56 @@ export default function LandingPage() {
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">Simple, Transparent Pricing</h2>
             <p className="text-xl text-gray-600">Choose the plan that fits your needs</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {/* Free Plan */}
-            <div className="bg-white rounded-2xl p-8 shadow-xl shadow-gray-200/50 border border-gray-100">
-              <div className="mb-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Free</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-gray-900">$0</span>
-                  <span className="text-gray-500">/mo</span>
-                </div>
-                <p className="text-gray-500 mt-2">For individuals and students</p>
-              </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-gray-700">5 scans per month</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-gray-700">Basic reports</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-gray-700">Email support</span>
-                </li>
-              </ul>
-              <Link href="/signup">
-                <button className="w-full py-3.5 text-gray-700 font-semibold rounded-xl border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all">
-                  Get Started
-                </button>
-              </Link>
-            </div>
+          <div className={`grid gap-8 max-w-6xl mx-auto ${activePlans.length <= 3 ? 'md:grid-cols-3' : 'md:grid-cols-4'}`}>
+            {activePlans.map((plan, index) => {
+              const style = getPlanStyle(plan.slug, index);
+              const features = plan.features ? Object.keys(plan.features).filter(k => plan.features[k]) : [];
 
-            {/* Pro Plan */}
-            <div className="bg-gradient-to-b from-blue-600 to-blue-700 rounded-2xl p-8 shadow-2xl shadow-blue-500/30 relative transform md:scale-105">
-              <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-sm font-bold rounded-full shadow-lg">
-                Most Popular
-              </div>
-              <div className="mb-6">
-                <h3 className="text-xl font-bold text-white mb-2">Pro</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-white">$19</span>
-                  <span className="text-blue-200">/mo</span>
+              return (
+                <div key={plan.id} className={style.cardClass}>
+                  {style.isPopular && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-sm font-bold rounded-full shadow-lg">
+                      Most Popular
+                    </div>
+                  )}
+                  <div className="mb-6">
+                    <h3 className={style.titleClass}>{plan.name}</h3>
+                    <div className="flex items-baseline gap-1">
+                      <span className={style.priceClass}>
+                        {plan.price_monthly === 0 ? '$0' : `$${Math.round(plan.price_monthly)}`}
+                      </span>
+                      <span className={style.periodClass}>/mo</span>
+                    </div>
+                    <p className={style.descClass}>{planDescriptions[plan.slug] || `${plan.scans_per_month} scans/month`}</p>
+                  </div>
+                  <ul className="space-y-4 mb-8">
+                    <li className="flex items-center gap-3">
+                      <div className={style.checkBg}>
+                        <svg className={style.checkIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <span className={style.featureText}>{plan.scans_per_month} scans per month</span>
+                    </li>
+                    {features.map((feature) => (
+                      <li key={feature} className="flex items-center gap-3">
+                        <div className={style.checkBg}>
+                          <svg className={style.checkIcon} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                        <span className={style.featureText}>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href="/signup">
+                    <button className={style.buttonClass}>
+                      {style.buttonText}
+                    </button>
+                  </Link>
                 </div>
-                <p className="text-blue-200 mt-2">For professional educators</p>
-              </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-white">100 scans per month</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-white">Detailed reports</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-white">Priority support</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-white/20 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-white">API access</span>
-                </li>
-              </ul>
-              <Link href="/signup">
-                <button className="w-full py-3.5 bg-white text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-all shadow-lg">
-                  Upgrade to Pro
-                </button>
-              </Link>
-            </div>
-
-            {/* Enterprise Plan */}
-            <div className="bg-white rounded-2xl p-8 shadow-xl shadow-gray-200/50 border border-gray-100">
-              <div className="mb-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">Enterprise</h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-4xl font-bold text-gray-900">Custom</span>
-                </div>
-                <p className="text-gray-500 mt-2">For institutions</p>
-              </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-gray-700">Unlimited scans</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-gray-700">LMS integration</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-gray-700">Dedicated support</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <div className="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center">
-                    <svg className="w-3 h-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <span className="text-gray-700">Custom branding</span>
-                </li>
-              </ul>
-              <button className="w-full py-3.5 text-gray-700 font-semibold rounded-xl border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all">
-                Contact Sales
-              </button>
-            </div>
+              );
+            })}
           </div>
         </div>
       </section>
