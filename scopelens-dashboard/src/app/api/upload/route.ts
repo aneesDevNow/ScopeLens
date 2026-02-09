@@ -2,6 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { uploadToS3, deleteFromS3, getDocumentsFolder } from "@/lib/s3";
 import JSZip from "jszip";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+
+// Service role client for privileged operations
+function getAdminClient() {
+    return createSupabaseClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+}
 
 // Extract text from DOCX file buffer
 async function extractDocxText(buffer: ArrayBuffer): Promise<string> {
@@ -152,28 +161,12 @@ export async function POST(request: NextRequest) {
                     // It's a new month! Reset usage.
                     console.log(`Resetting usage for subscription ${subscription.id}. New month starts.`);
 
-                    // Service role client needed to update subscription (RLS might block update if not policy allowed, 
-                    // but usually users can't update their own sub status/dates, so we might need service role here 
-                    // or ensure RLS allows this specific update. Ideally this should be a system action.)
-                    // However, we are in a user context. If RLS prevents update, this will fail.
-                    // Let's try regular client first, if it fails we might need an RPC or service role.
-                    // BUT: creating a service client here exposes keys if not careful. 
-                    // Actually, we are in a server component (route handler), so we CAN use service role safely if needed.
-                    // Let's use the current client for now, assuming RLS allows 'service_role' or we have a specific RPC.
-                    // Wait, standard RLS usually blocks user from changing 'scans_used'.
-
-                    // Failsafe: We should probably use service role for this system-level update to ensure it works.
-                    // But we don't have getAdminClient imported here easily without duplicating code.
-                    // Let's try to update with current client. If it fails, we fall back or error.
-                    // Actually, for robustness, we should probably just calculate "virtual" usage if we can't write, 
-                    // but we really want to reset the counter.
-
-                    // Let's stick to the plan: Update the DB.
-                    const { error: resetError } = await supabase
+                    const adminClient = getAdminClient();
+                    const { error: resetError } = await adminClient
                         .from("subscriptions")
                         .update({
                             scans_used: 0,
-                            current_period_start: now.toISOString(), // Start new period today (or strictly 1 month after? Today is safer for "lazy" logic)
+                            current_period_start: now.toISOString(),
                             updated_at: now.toISOString()
                         })
                         .eq("id", subscription.id);
@@ -182,7 +175,6 @@ export async function POST(request: NextRequest) {
                         scansUsed = 0; // Successfully reset
                     } else {
                         console.error("Failed to reset subscription usage:", resetError);
-                        // If update fails, we use the old 'scans_used'. User might be blocked unjustly.
                         scansUsed = subscription.scans_used || 0;
                     }
                 } else {
@@ -297,6 +289,23 @@ export async function POST(request: NextRequest) {
                     status: "waiting",
                 })
                 .single();
+        }
+
+        // Increment scan usage (for paid plans)
+        if (!isFreeTier && subscription) {
+            // Use admin client to bypass RLS
+            const adminClient = getAdminClient();
+            const { error: incError } = await adminClient
+                .rpc('increment_scans_used', { sub_id: subscription.id });
+
+            // If RPC doesn't exist, try direct update
+            if (incError) {
+                // Fallback to direct update (race condition possible but better than nothing)
+                await adminClient
+                    .from("subscriptions")
+                    .update({ scans_used: (scansUsed || 0) + 1 })
+                    .eq("id", subscription.id);
+            }
         }
 
         return NextResponse.json({
