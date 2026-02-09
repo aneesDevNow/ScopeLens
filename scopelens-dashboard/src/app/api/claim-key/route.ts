@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { encryptCookieValue } from '@/lib/cookie-utils';
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 

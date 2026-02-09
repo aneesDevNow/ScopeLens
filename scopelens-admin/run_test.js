@@ -21,10 +21,7 @@ async function uploadFile(token, filename, content) {
             headers: {
                 'Content-Type': `multipart/form-data; boundary=${boundary}`,
                 'Content-Length': Buffer.byteLength(body),
-                'Authorization': `Bearer ${token}`,
-                // Need cookie? Maybe not if Bearer token works. But Supabase auth usually works with headers.
-                // Next.js createClient() looks for cookies or headers.
-                'x-supabase-auth': token // Just in case
+                'Authorization': `Bearer ${token}`
             }
         };
 
@@ -44,14 +41,14 @@ async function uploadFile(token, filename, content) {
 
 async function run() {
     try {
-        const email = 'expiry_test@example.com';
+        const email = 'expiry_test_v2@example.com';
         const password = 'password123';
 
         console.log("1. Creating User...");
-        // Delete potential existing user first (hard with simple API, ignore if fails)
-        // Actually, just try create, if exists, try login.
-
         let userId;
+
+        // Try to delete if exists to start fresh
+        // Can't easily delete by email without list, so just ignore error on create
 
         const { data: createData, error: createError } = await supabase.auth.admin.createUser({
             email,
@@ -60,14 +57,13 @@ async function run() {
         });
 
         if (createError) {
-            console.log("User might exist, trying to find...");
-            const { data: users } = await supabase.auth.admin.listUsers();
-            const user = users.users.find(u => u.email === email);
-            if (user) {
-                userId = user.id;
-                // Reset password to be sure
-                await supabase.auth.admin.updateUserById(userId, { password });
-                console.log("User found and password reset:", userId);
+            console.log("User create error (might exist):", createError.message);
+            // Find user
+            const { data: listData } = await supabase.auth.admin.listUsers();
+            const found = listData.users.find(u => u.email === email);
+            if (found) {
+                userId = found.id;
+                console.log("User found:", userId);
             } else {
                 throw new Error("Could not create or find user");
             }
@@ -86,8 +82,15 @@ async function run() {
         console.log("Logged in.");
 
         console.log("3. Setting valid subscription...");
-        // Get plan
-        const { data: plan } = await supabase.from('plans').select('id').eq('slug', 'professional').single(); // Pro plan
+        const { data: plan, error: planError } = await supabase.from('plans').select('id').eq('slug', 'professional').single();
+        if (planError || !plan) {
+            console.error("Plan fetch error:", planError);
+            // List all plans to debug
+            const { data: allPlans } = await supabase.from('plans').select('id, slug');
+            console.log("Available plans:", allPlans);
+            throw new Error("Cannot find professional plan");
+        }
+
         // Clear existing subs
         await supabase.from('subscriptions').delete().eq('user_id', userId);
 
@@ -95,7 +98,7 @@ async function run() {
         const now = new Date();
         const nextMonth = new Date(now); nextMonth.setMonth(nextMonth.getMonth() + 1);
 
-        const { data: sub } = await supabase.from('subscriptions').insert({
+        const { data: sub, error: subError } = await supabase.from('subscriptions').insert({
             user_id: userId,
             plan_id: plan.id,
             status: 'active',
@@ -103,12 +106,22 @@ async function run() {
             current_period_start: now.toISOString(),
             current_period_end: nextMonth.toISOString()
         }).select().single();
+
+        if (subError) throw subError;
         console.log("Subscription created:", sub.id);
 
-        console.log("4. Testing Upload (Should Succeed)...");
+        console.log("4. Testing Upload (Should Succeed & Increment)...");
         const res1 = await uploadFile(token, 'test1.txt', 'Hello World');
-        console.log("Upload 1 Result:", res1.status, res1.body.substring(0, 100));
-        if (res1.status !== 200) throw new Error("Upload 1 failed");
+        console.log("Upload 1 Result:", res1.status);
+        if (res1.status !== 200) {
+            console.log("Body:", res1.body);
+            throw new Error("Upload 1 failed");
+        }
+
+        // Verify increment
+        const { data: subAfter1 } = await supabase.from('subscriptions').select('scans_used').eq('id', sub.id).single();
+        console.log("Scans Used after Upload 1:", subAfter1.scans_used);
+        if (subAfter1.scans_used !== 1) console.warn("WARNING: Scans used did not increment to 1!");
 
         console.log("5. Testing Expiry (Should Default to Free/Fail)...");
         // Expire sub
@@ -117,18 +130,16 @@ async function run() {
             current_period_end: yesterday.toISOString()
         }).eq('id', sub.id);
 
-        // Also ensure user has > 1 scan in 'scans' table from previous step (res1)
-        // Upload 1 created a scan. Free tier limit is 1.
-        // So a second upload should fail if downgraded to free tier.
+        // Free tier has limit 1. User has 1 scan (from step 4).
+        // So they are AT the limit. Next upload should FAIL.
 
         const res2 = await uploadFile(token, 'test2.txt', 'Expired upload');
-        console.log("Upload 2 Result:", res2.status, res2.body.substring(0, 100));
+        console.log("Upload 2 Result:", res2.status);
 
-        // Expect 403 or similar because limit reached for free tier (1 scan done in res1).
-        if (res2.status !== 403 && res2.status !== 400 && !res2.body.includes('limit reached')) {
-            console.warn("WARNING: Upload 2 should have failed/limited!");
+        if (res2.status === 403 || (res2.status === 400 && res2.body.includes('limit'))) {
+            console.log("SUCCESS: Upload 2 rejected as expected (Expired -> Free Tier Limit).");
         } else {
-            console.log("SUCCESS: Upload 2 rejected as expected.");
+            console.warn("WARNING: Upload 2 should have failed!", res2.status, res2.body);
         }
 
         console.log("6. Testing Lazy Reset...");
@@ -144,36 +155,31 @@ async function run() {
         }).eq('id', sub.id);
 
         const res3 = await uploadFile(token, 'test3.txt', 'Reset upload');
-        console.log("Upload 3 Result:", res3.status, res3.body.substring(0, 100));
+        console.log("Upload 3 Result:", res3.status);
 
-        if (res3.status !== 200) throw new Error("Upload 3 failed (Lazy reset didn't work)");
+        if (res3.status !== 200) {
+            console.log("Body:", res3.body);
+            throw new Error("Upload 3 failed (Lazy reset didn't work)");
+        }
 
         // Verify DB
         const { data: updatedSub } = await supabase.from('subscriptions').select('*').eq('id', sub.id).single();
         console.log("Updated Sub Scans Used:", updatedSub.scans_used);
         console.log("Updated Sub Start Date:", updatedSub.current_period_start);
 
-        if (updatedSub.scans_used !== 0) { // It might be 0 because we reset it, or 1 if the upload increments it?
-            // Actually, the route resets to 0, then we verify strictness. 
-            // Wait, does route increment scans_used? 
-            // Implementation check: 
-            // The upload route resets scans_used to 0, but it does NOT increment it in `subscriptions` table explicitly.
-            // It inserts into `scans` table.
-            // The scan count check logic:
-            // `scansUsed = subscription.scans_used || 0;`
-            // If we reset it to 0, then `scansUsed` is 0. 0 < Limit. OK.
-            // But does the system usually increment `scans_used`?
-            // Looking at `api/upload/route.ts`... I don't see anywhere that INCREMENTS `subscriptions.scans_used`.
-            // It only *checks* it.
-            // Ah, if `scans_used` is never incremented, then the limit is broken unless `scans` table count is used?
-            // In the paid plan block: `scansUsed = subscription.scans_used || 0;`
-            // It assumes some OTHER process increments it (maybe after successful upload?).
-            // I missed that in my review. I should check if `scans_used` is ever incremented.
-            // If not, I need to add increment logic too!
+        // Should be 1 (reset to 0, then incremented to 1) or 0 if increment happened before reset?
+        // Logic in route: Reset happens BEFORE logic checks.
+        // Wait, logic:
+        // 1. Check if reset needed -> Yes -> Reset to 0 -> scansUsed = 0.
+        // 2. Check if scansUsed (0) < Limit. OK.
+        // 3. Process Upload.
+        // 4. Increment scansUsed (0 -> 1).
+        // So final result should be 1.
 
-            // Let's check the code I viewed earlier.
+        if (updatedSub.scans_used === 1) {
+            console.log("SUCCESS: Subscription reset and incremented correctly.");
         } else {
-            console.log("SUCCESS: Subscription reset.");
+            console.warn("WARNING: Unexpected final scans_used:", updatedSub.scans_used);
         }
 
     } catch (e) {

@@ -6,7 +6,7 @@ import {
     toCustomCookieName,
     toSupabaseCookieName,
     getProjectRef
-} from '@/lib/cookie-crypto'
+} from '@/lib/cookie-utils'
 
 export async function updateSession(request: NextRequest) {
     let supabaseResponse = NextResponse.next({

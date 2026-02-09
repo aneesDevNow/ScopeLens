@@ -73,7 +73,17 @@ const MAX_WORD_COUNT = 5000;
 
 export async function POST(request: NextRequest) {
     try {
-        const supabase = await createClient();
+        let supabase;
+        const authHeader = request.headers.get("Authorization");
+        if (authHeader) {
+            supabase = createSupabaseClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+                { global: { headers: { Authorization: authHeader } } }
+            );
+        } else {
+            supabase = await createClient();
+        }
 
         // Check authentication
         const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -122,17 +132,19 @@ export async function POST(request: NextRequest) {
         }
 
         // --- File count enforcement against subscription plan ---
-        // Get user's active subscription and plan limits
-        // --- File count enforcement against subscription plan ---
         const now = new Date();
 
         // Get user's active subscription and plan limits
-        let { data: subscription } = await supabase
+        let { data: subscription, error: subError } = await supabase
             .from("subscriptions")
             .select("*, plans(*)")
             .eq("user_id", user.id)
             .eq("status", "active")
             .single();
+
+        if (subError) {
+            console.error("Error fetching subscription:", subError);
+        }
 
         let scansLimit = 1; // Free tier default
         let scansUsed = 0;
@@ -156,6 +168,8 @@ export async function POST(request: NextRequest) {
                 const currentPeriodStart = new Date(subscription.current_period_start);
                 const nextBillingDate = new Date(currentPeriodStart);
                 nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
+
+
 
                 if (now >= nextBillingDate) {
                     // It's a new month! Reset usage.

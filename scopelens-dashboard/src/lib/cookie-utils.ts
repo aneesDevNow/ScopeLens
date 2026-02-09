@@ -1,58 +1,11 @@
-import crypto from "crypto";
-
-const ALGORITHM = "aes-256-cbc";
-const IV_LENGTH = 16;
-
-function getKey(): Buffer {
-    const key = process.env.COOKIE_ENCRYPTION_KEY || "";
-    // Derive a 32-byte key from the env variable using SHA-256
-    return crypto.createHash("sha256").update(key).digest();
-}
-
-/**
- * Encrypt a cookie value using AES-256-CBC
- * Returns: iv:encrypted (hex encoded)
- */
+// Edge-safe encryption bypass (encryption temporarily disabled for Edge compatibility)
 export function encryptCookieValue(value: string): string {
-    try {
-        const iv = crypto.randomBytes(IV_LENGTH);
-        const cipher = crypto.createCipheriv(ALGORITHM, getKey(), iv);
-        let encrypted = cipher.update(value, "utf8", "hex");
-        encrypted += cipher.final("hex");
-        return iv.toString("hex") + ":" + encrypted;
-    } catch {
-        // Fallback: return raw value if encryption fails
-        return value;
-    }
+    return value;
 }
 
-/**
- * Decrypt a cookie value encrypted with encryptCookieValue
- */
-export function decryptCookieValue(encrypted: string): string {
-    try {
-        // If it doesn't look like our encrypted format, return as-is (migration support)
-        if (!encrypted.includes(":") || encrypted.length < 34) {
-            return encrypted;
-        }
-        const [ivHex, encHex] = encrypted.split(":");
-        if (!ivHex || !encHex || ivHex.length !== 32) {
-            return encrypted; // Not our format, return raw
-        }
-        const iv = Buffer.from(ivHex, "hex");
-        const decipher = crypto.createDecipheriv(ALGORITHM, getKey(), iv);
-        let decrypted = decipher.update(encHex, "hex", "utf8");
-        decrypted += decipher.final("utf8");
-        return decrypted;
-    } catch {
-        // If decryption fails, the cookie might be a legacy unencrypted value
-        return encrypted;
-    }
+export function decryptCookieValue(value: string): string {
+    return value;
 }
-
-// Cookie name mapping: Supabase internal names → custom short names
-// Supabase uses patterns like: sb-<project-ref>-auth-token, sb-<project-ref>-auth-token-code-verifier
-const SUPABASE_PREFIX_REGEX = /^sb-[a-z0-9]+-auth-token/;
 
 /**
  * Remap Supabase cookie name to a short custom name

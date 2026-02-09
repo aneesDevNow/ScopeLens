@@ -6,7 +6,7 @@ import {
     toCustomCookieName,
     toSupabaseCookieName,
     getProjectRef
-} from '@/lib/cookie-crypto'
+} from '@/lib/cookie-utils'
 
 export async function createClient() {
     const cookieStore = await cookies()
