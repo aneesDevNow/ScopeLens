@@ -1,0 +1,13 @@
+{
+    "mcpServers": {
+        "supabase-db": {
+            "command": "node",
+            "args": [
+                "/home/anees/Documents/MCP/postgress-mcp/dist/index.js"
+            ],
+            "env": {
+                "DATABASE_URL": "postgresql://postgres:dtrwpqfjcy1rydl4l7lkmpefiq7e5pxi@10.0.1.41:5432/postgres"
+            }
+        }
+    }
+}

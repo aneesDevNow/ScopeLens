@@ -1,10 +1,10 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 
 # ── Dependencies ──
 FROM base AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # ── Build ──
 FROM base AS builder

@@ -83,8 +83,7 @@ export async function POST(request: Request) {
             });
         }
 
-        const admin = getAdminClient();
-        const { data: created, error: insertError } = await admin
+        const { data: created, error: insertError } = await supabase
             .from("license_keys")
             .insert(keys)
             .select("id, key_code, status, duration_days, created_at");
