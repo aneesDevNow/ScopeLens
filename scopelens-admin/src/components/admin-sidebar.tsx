@@ -15,8 +15,9 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useRole } from "@/lib/role-context";
 
-const navItems = [
+const allNavItems = [
     { title: "Overview", url: "/", icon: "dashboard" },
     { title: "Users", url: "/users", icon: "group" },
     { title: "Plans", url: "/plans", icon: "credit_card" },
@@ -29,8 +30,19 @@ const navItems = [
     { title: "Settings", url: "/settings", icon: "settings" },
 ];
 
+const managerAllowedUrls = ["/licenses", "/ai-detection"];
+
 export function AdminSidebar() {
     const pathname = usePathname();
+    const { role } = useRole();
+
+    const navItems = role === "manager"
+        ? allNavItems.filter((item) => managerAllowedUrls.includes(item.url))
+        : allNavItems;
+
+    const roleLabel = role === "manager" ? "Manager" : "Administrator";
+    const avatarInitials = role === "manager" ? "MG" : "AD";
+    const badgeText = role === "manager" ? "Manager" : "Admin";
 
     return (
         <Sidebar>
@@ -38,7 +50,7 @@ export function AdminSidebar() {
                 <div className="flex items-center gap-3">
                     <img src="/icon.svg" alt="Scope Lens" className="w-10 h-10" />
                     <span className="text-xl font-bold">Scope Lens</span>
-                    <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full">Admin</span>
+                    <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full">{badgeText}</span>
                 </div>
             </SidebarHeader>
             <SidebarContent>
@@ -63,11 +75,11 @@ export function AdminSidebar() {
             <SidebarFooter className="p-4 border-t border-border">
                 <div className="flex items-center gap-3">
                     <Avatar className="h-9 w-9">
-                        <AvatarFallback className="bg-destructive text-destructive-foreground">AD</AvatarFallback>
+                        <AvatarFallback className="bg-destructive text-destructive-foreground">{avatarInitials}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
-                        <span className="text-sm font-medium">Admin User</span>
-                        <span className="text-xs text-muted-foreground">Administrator</span>
+                        <span className="text-sm font-medium">{roleLabel}</span>
+                        <span className="text-xs text-muted-foreground">{roleLabel}</span>
                     </div>
                 </div>
             </SidebarFooter>

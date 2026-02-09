@@ -10,14 +10,14 @@ export async function GET() {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        // Get reseller profile
-        const { data: resellerProfile } = await supabase
-            .from("reseller_profiles")
+        // Get reseller record
+        const { data: reseller } = await supabase
+            .from("resellers")
             .select("id")
             .eq("user_id", user.id)
             .single();
 
-        if (!resellerProfile) {
+        if (!reseller) {
             return NextResponse.json({ error: "Reseller profile not found" }, { status: 404 });
         }
 
@@ -25,7 +25,7 @@ export async function GET() {
         const { data: transactions, error } = await supabase
             .from("reseller_transactions")
             .select("*")
-            .eq("reseller_id", resellerProfile.id)
+            .eq("reseller_id", reseller.id)
             .order("created_at", { ascending: false })
             .limit(100);
 

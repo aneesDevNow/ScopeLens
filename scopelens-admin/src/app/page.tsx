@@ -1,16 +1,45 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminOverviewPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState({
+    totalUsers: 0,
+    monthlyRevenue: 0,
+    scansThisMonth: 0,
+    activeResellers: 0,
+    claimedKeys: 0
+  });
+
   const [showAnnouncementModal, setShowAnnouncementModal] = useState(false);
   const [announcementText, setAnnouncementText] = useState("");
   const [announcementSent, setAnnouncementSent] = useState(false);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const res = await fetch("/api/admin/analytics");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.overview) {
+          setStats(data.overview);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch admin stats", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleAddUser = () => {
     router.push("/users");
@@ -40,10 +69,11 @@ Generated: ${new Date().toLocaleString()}
 
 Platform Metrics
 ----------------
-Total Users: 0
-Monthly Revenue: $0
-Scans This Month: 0
-Active Resellers: 0
+Total Users: ${stats.totalUsers}
+Monthly Revenue: $${stats.monthlyRevenue}
+Scans This Month: ${stats.scansThisMonth}
+Active Resellers: ${stats.activeResellers}
+Keys Claimed: ${stats.claimedKeys}
 
 This report was auto-generated from the ScopeLens Admin Dashboard.
 `;
@@ -71,10 +101,10 @@ This report was auto-generated from the ScopeLens Admin Dashboard.
               <span className="material-symbols-outlined text-primary">group</span>
               Total Users
             </CardDescription>
-            <CardTitle className="text-3xl">0</CardTitle>
+            <CardTitle className="text-3xl">{loading ? "-" : stats.totalUsers}</CardTitle>
           </CardHeader>
           <CardContent>
-            <span className="text-xs text-muted-foreground">No data yet</span>
+            <span className="text-xs text-muted-foreground">Registered accounts</span>
           </CardContent>
         </Card>
         <Card>
@@ -83,10 +113,10 @@ This report was auto-generated from the ScopeLens Admin Dashboard.
               <span className="material-symbols-outlined text-primary">payments</span>
               Monthly Revenue
             </CardDescription>
-            <CardTitle className="text-3xl">$0</CardTitle>
+            <CardTitle className="text-3xl">{loading ? "-" : `$${stats.monthlyRevenue}`}</CardTitle>
           </CardHeader>
           <CardContent>
-            <span className="text-xs text-muted-foreground">No data yet</span>
+            <span className="text-xs text-muted-foreground">Credits purchased this month</span>
           </CardContent>
         </Card>
         <Card>
@@ -95,10 +125,10 @@ This report was auto-generated from the ScopeLens Admin Dashboard.
               <span className="material-symbols-outlined text-primary">analytics</span>
               Scans This Month
             </CardDescription>
-            <CardTitle className="text-3xl">0</CardTitle>
+            <CardTitle className="text-3xl">{loading ? "-" : stats.scansThisMonth}</CardTitle>
           </CardHeader>
           <CardContent>
-            <span className="text-xs text-muted-foreground">No data yet</span>
+            <span className="text-xs text-muted-foreground">Documents processed</span>
           </CardContent>
         </Card>
         <Card>
@@ -107,10 +137,10 @@ This report was auto-generated from the ScopeLens Admin Dashboard.
               <span className="material-symbols-outlined text-primary">handshake</span>
               Active Resellers
             </CardDescription>
-            <CardTitle className="text-3xl">0</CardTitle>
+            <CardTitle className="text-3xl">{loading ? "-" : stats.activeResellers}</CardTitle>
           </CardHeader>
           <CardContent>
-            <span className="text-xs text-muted-foreground">No data yet</span>
+            <span className="text-xs text-muted-foreground">Partners with accounts</span>
           </CardContent>
         </Card>
       </div>
@@ -119,13 +149,21 @@ This report was auto-generated from the ScopeLens Admin Dashboard.
         {/* Recent Signups */}
         <Card>
           <CardHeader>
-            <CardTitle>Recent Signups</CardTitle>
-            <CardDescription>Latest user registrations</CardDescription>
+            <CardTitle>Recent Activity</CardTitle>
+            <CardDescription>System highlights</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-8 text-muted-foreground">
-              <span className="material-symbols-outlined text-3xl mb-2 block">person_off</span>
-              <p className="text-sm">No recent signups</p>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-blue-500">key</span>
+                  <div>
+                    <p className="font-medium text-sm">License Keys Claimed</p>
+                    <p className="text-xs text-muted-foreground">Total keys activated by users</p>
+                  </div>
+                </div>
+                <span className="font-bold text-lg">{loading ? "-" : stats.claimedKeys}</span>
+              </div>
             </div>
           </CardContent>
         </Card>

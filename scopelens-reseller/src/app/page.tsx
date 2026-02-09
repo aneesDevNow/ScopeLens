@@ -95,7 +95,7 @@ export default function ResellerDashboardPage() {
             }
             if (profileRes.ok) {
                 const profileData = await profileRes.json();
-                setProfile(profileData.profile);
+                setProfile(profileData.reseller);
             }
 
             const clientsRes = await fetch("/api/clients");

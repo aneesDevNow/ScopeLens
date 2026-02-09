@@ -29,10 +29,13 @@ export async function POST(request: Request) {
         // Normalize key: trim, uppercase
         const normalizedKey = key_code.trim().toUpperCase();
 
-        // Find the key (user can read available keys via RLS policy)
-        const { data: licenseKey, error: findError } = await supabase
+        // Use service role client to FIND the key (bypassing RLS issue where users can't see available keys)
+        const adminClient = getAdminClient();
+
+        // Find the key
+        const { data: licenseKey, error: findError } = await adminClient
             .from("license_keys")
-            .select("id, plan_id, duration_days, status, plans:plan_id (name, slug, scans_per_month)")
+            .select("id, plan_id, duration_days, status")
             .eq("key_code", normalizedKey)
             .single();
 
@@ -55,7 +58,7 @@ export async function POST(request: Request) {
         const now = new Date();
         const expiresAt = new Date(now.getTime() + licenseKey.duration_days * 24 * 60 * 60 * 1000);
 
-        const { error: claimError } = await supabase
+        const { error: claimError } = await adminClient
             .from("license_keys")
             .update({
                 status: "claimed",
@@ -72,7 +75,7 @@ export async function POST(request: Request) {
         }
 
         // Use service role client for subscription operations (bypasses RLS)
-        const adminClient = getAdminClient();
+        // adminClient is already defined above
 
         // Activate subscription: upsert subscription for this user
         const { data: existingSub } = await adminClient
@@ -107,7 +110,12 @@ export async function POST(request: Request) {
                 });
         }
 
-        const plan = (licenseKey.plans as unknown) as { name: string; slug: string; scans_per_month: number } | null;
+        // Fetch plan details separately to avoid PostgREST relationship issues
+        const { data: plan } = await adminClient
+            .from("plans")
+            .select("name, slug, scans_per_month")
+            .eq("id", licenseKey.plan_id)
+            .single();
 
         return NextResponse.json({
             message: `Plan "${plan?.name || "Premium"}" activated successfully!`,

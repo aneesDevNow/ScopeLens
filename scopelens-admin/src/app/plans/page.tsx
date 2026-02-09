@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { CreditPackageSettings } from "./credit-package-settings";
 
 interface Plan {
     id: string;
@@ -226,6 +227,11 @@ export default function PlansPage() {
                         </CardFooter>
                     </Card>
                 ))}
+            </div>
+
+            {/* Credit Packages */}
+            <div className="mt-8">
+                <CreditPackageSettings />
             </div>
 
             {/* Modal */}

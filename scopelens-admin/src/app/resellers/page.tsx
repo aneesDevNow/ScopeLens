@@ -119,7 +119,7 @@ export default function AdminResellersPage() {
         r.profiles?.email?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const totalCredits = resellers.reduce((sum, r) => sum + r.credit_balance, 0);
+    const totalCredits = resellers.reduce((sum, r) => sum + (r.credit_balance || 0), 0);
     const totalResellers = resellers.length;
     const activeResellers = resellers.filter(r => r.is_active).length;
 
@@ -159,7 +159,7 @@ export default function AdminResellersPage() {
                 <Card>
                     <CardHeader className="pb-2">
                         <CardDescription>Total Purchased</CardDescription>
-                        <CardTitle className="text-3xl">${resellers.reduce((s, r) => s + r.total_purchased, 0).toLocaleString()}</CardTitle>
+                        <CardTitle className="text-3xl">${resellers.reduce((s, r) => s + (r.total_purchased || 0), 0).toLocaleString()}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <span className="text-xs text-muted-foreground">All time</span>
@@ -168,7 +168,7 @@ export default function AdminResellersPage() {
                 <Card>
                     <CardHeader className="pb-2">
                         <CardDescription>Total Spent</CardDescription>
-                        <CardTitle className="text-3xl">${resellers.reduce((s, r) => s + r.total_spent, 0).toLocaleString()}</CardTitle>
+                        <CardTitle className="text-3xl">${resellers.reduce((s, r) => s + (r.total_spent || 0), 0).toLocaleString()}</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <span className="text-xs text-muted-foreground">On client activations</span>
@@ -234,10 +234,10 @@ export default function AdminResellersPage() {
                                         </td>
                                         <td className="p-4">
                                             <span className="text-lg font-semibold text-green-600">
-                                                ${reseller.credit_balance.toLocaleString()}
+                                                ${(reseller.credit_balance || 0).toLocaleString()}
                                             </span>
                                         </td>
-                                        <td className="p-4">${reseller.total_spent.toLocaleString()}</td>
+                                        <td className="p-4">${(reseller.total_spent || 0).toLocaleString()}</td>
                                         <td className="p-4">{reseller.client_count || 0}</td>
                                         <td className="p-4">
                                             <Badge variant={reseller.is_active ? "default" : "destructive"}>

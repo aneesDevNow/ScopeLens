@@ -15,49 +15,64 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-interface ResellerProfile {
-    company_name: string | null;
+interface Profile {
+    first_name: string | null;
+    last_name: string | null;
+    avatar_url: string | null;
     credit_balance: number;
-    referral_code: string;
-    status: string;
 }
 
 const navItems = [
-    { title: "Dashboard", url: "/dashboard", icon: "dashboard" },
+    { title: "Dashboard", url: "/", icon: "dashboard" },
+    { title: "Buy Credits", url: "/billing", icon: "add_card" },
     { title: "Generate Keys", url: "/keys", icon: "vpn_key" },
-    { title: "My Keys", url: "/keys/history", icon: "history" },
-    { title: "Buy Credits", url: "/billing", icon: "account_balance_wallet" },
+    { title: "Key History", url: "/keys/history", icon: "history" },
     { title: "Settings", url: "/settings", icon: "settings" },
 ];
 
 export function AppSidebar() {
     const pathname = usePathname();
-    const [profile, setProfile] = useState<ResellerProfile | null>(null);
+    const [profile, setProfile] = useState<Profile | null>(null);
 
     useEffect(() => {
-        async function fetchResellerData() {
+        async function fetchUserData() {
             try {
                 const res = await fetch("/api/profile");
                 if (res.ok) {
                     const data = await res.json();
-                    setProfile(data.reseller);
+                    setProfile({
+                        ...data.profile,
+                        credit_balance: data.reseller?.credit_balance || 0
+                    });
                 }
             } catch (err) {
-                console.error("Error fetching reseller data:", err);
+                console.error("Error fetching user data:", err);
             }
         }
-        fetchResellerData();
+
+        fetchUserData();
     }, []);
 
-    const displayName = profile?.company_name || "Reseller";
-    const initials = displayName.substring(0, 2).toUpperCase();
+    const displayName = profile
+        ? `${profile.first_name || ""} ${profile.last_name || ""}`.trim() || "Reseller"
+        : "Loading...";
+
+    const initials = profile
+        ? `${(profile.first_name || "R")[0]}${(profile.last_name || "")[0] || ""}`.toUpperCase()
+        : "...";
+
+    // Format currency (assuming USD for now, can use context if needed but keeping it simple for sidebar)
+    const formattedBalance = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+    }).format(profile?.credit_balance || 0);
 
     return (
         <Sidebar>
             <SidebarHeader className="p-4 border-b">
-                <Link href="/dashboard" className="flex items-center gap-3">
+                <Link href="/" className="flex items-center gap-3">
                     <img src="/icon.svg" alt="Scope Lens" className="w-10 h-10" />
                     <span className="text-xl font-bold text-gray-900">Scope Lens</span>
                 </Link>
@@ -67,61 +82,31 @@ export function AppSidebar() {
                     <SidebarGroupLabel>Reseller Portal</SidebarGroupLabel>
                     <SidebarGroupContent>
                         <SidebarMenu>
-                            {navItems.map((item) => {
-                                const isActive = pathname === item.url ||
-                                    (item.url !== "/dashboard" && pathname.startsWith(item.url) && item.url !== "/keys") ||
-                                    (item.url === "/keys" && pathname === "/keys");
-                                return (
-                                    <SidebarMenuItem key={item.title}>
-                                        <SidebarMenuButton asChild isActive={isActive}>
-                                            <Link href={item.url}>
-                                                <span className="material-symbols-outlined">{item.icon}</span>
-                                                <span>{item.title}</span>
-                                            </Link>
-                                        </SidebarMenuButton>
-                                    </SidebarMenuItem>
-                                );
-                            })}
+                            {navItems.map((item) => (
+                                <SidebarMenuItem key={item.title}>
+                                    <SidebarMenuButton asChild isActive={pathname === item.url}>
+                                        <Link href={item.url}>
+                                            <span className="material-symbols-outlined">{item.icon}</span>
+                                            <span>{item.title}</span>
+                                        </Link>
+                                    </SidebarMenuButton>
+                                </SidebarMenuItem>
+                            ))}
                         </SidebarMenu>
-                    </SidebarGroupContent>
-                </SidebarGroup>
-
-                {/* Credit Balance Card */}
-                <SidebarGroup>
-                    <SidebarGroupLabel>Balance</SidebarGroupLabel>
-                    <SidebarGroupContent>
-                        <div className="mx-2 p-4 bg-blue-50 rounded-xl border border-blue-100">
-                            <div className="flex items-center gap-2 mb-1">
-                                <span className="material-symbols-outlined text-blue-600 text-lg">account_balance_wallet</span>
-                                <span className="text-xs text-gray-500">Credits</span>
-                            </div>
-                            <p className="text-2xl font-bold text-blue-600">
-                                ${profile?.credit_balance?.toLocaleString() || "0"}
-                            </p>
-                            <Link
-                                href="/billing"
-                                className="mt-2 inline-flex items-center gap-1 text-xs text-blue-600 hover:text-blue-700 font-medium"
-                            >
-                                Top Up
-                                <span className="material-symbols-outlined text-xs">arrow_forward</span>
-                            </Link>
-                        </div>
                     </SidebarGroupContent>
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter className="p-4 border-t">
                 <div className="flex items-center gap-3">
                     <Avatar className="h-9 w-9">
+                        <AvatarImage src={profile?.avatar_url || ""} />
                         <AvatarFallback className="bg-primary text-primary-foreground">
                             {initials}
                         </AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                         <span className="text-sm font-medium">{displayName}</span>
-                        <div className="flex items-center gap-1">
-                            <span className="material-symbols-outlined text-blue-600 text-xs">verified</span>
-                            <span className="text-xs text-muted-foreground">Verified Partner</span>
-                        </div>
+                        <span className="text-xs text-muted-foreground">Balance: {formattedBalance}</span>
                     </div>
                 </div>
             </SidebarFooter>

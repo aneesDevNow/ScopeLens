@@ -21,16 +21,10 @@ export async function GET() {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
-        // Fetch all resellers with their profiles and client counts
+        // 1. Fetch all resellers raw
         const { data: resellers, error } = await supabase
-            .from("reseller_profiles")
-            .select(`
-                *,
-                profiles:user_id (
-                    full_name,
-                    email
-                )
-            `)
+            .from("resellers")
+            .select("*")
             .order("created_at", { ascending: false });
 
         if (error) {
@@ -38,20 +32,41 @@ export async function GET() {
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
 
-        // Get client counts for each reseller
-        const resellersWithCounts = await Promise.all(
-            (resellers || []).map(async (reseller) => {
-                const { count } = await supabase
-                    .from("reseller_clients")
-                    .select("*", { count: "exact", head: true })
-                    .eq("reseller_id", reseller.id)
-                    .eq("status", "active");
+        // 2. Fetch profiles for these resellers
+        const userIds = (resellers || []).map(r => r.user_id);
+        const { data: profiles } = await supabase
+            .from("profiles")
+            .select("id, full_name, email")
+            .in("id", userIds);
 
-                return { ...reseller, client_count: count || 0 };
+        const profileMap = new Map(profiles?.map(p => [p.id, p]));
+
+        // 3. Merge data and get client counts
+        const resellersWithDetails = await Promise.all(
+            (resellers || []).map(async (reseller) => {
+                const userProfile = profileMap.get(reseller.user_id);
+
+                // Get client count (safely)
+                let clientCount = 0;
+                try {
+                    const { count } = await supabase
+                        .from("reseller_clients")
+                        .select("*", { count: "exact", head: true })
+                        .eq("reseller_id", reseller.id);
+                    clientCount = count || 0;
+                } catch (e) {
+                    // ignore
+                }
+
+                return {
+                    ...reseller,
+                    profiles: userProfile || { full_name: 'Unknown', email: 'Unknown' },
+                    client_count: clientCount
+                };
             })
         );
 
-        return NextResponse.json({ resellers: resellersWithCounts });
+        return NextResponse.json({ resellers: resellersWithDetails });
     } catch (error) {
         console.error("Resellers API error:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });

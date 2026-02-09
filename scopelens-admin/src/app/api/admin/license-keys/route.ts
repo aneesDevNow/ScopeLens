@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createAdminClient } from "@supabase/supabase-js";
 import crypto from "crypto";
+
+const getAdminClient = () => {
+    return createAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+};
 
 // Generate license key: SL-XXXXX-XXXXX-XXXXX-XXXXX
 function generateLicenseKey(): string {
@@ -34,8 +42,8 @@ export async function POST(request: Request) {
             .eq("id", user.id)
             .single();
 
-        if (!profile || profile.role !== "admin") {
-            return NextResponse.json({ error: "Admin only" }, { status: 403 });
+        if (!profile || !["admin", "manager"].includes(profile.role)) {
+            return NextResponse.json({ error: "Unauthorized role" }, { status: 403 });
         }
 
         const body = await request.json();
@@ -75,7 +83,8 @@ export async function POST(request: Request) {
             });
         }
 
-        const { data: created, error: insertError } = await supabase
+        const admin = getAdminClient();
+        const { data: created, error: insertError } = await admin
             .from("license_keys")
             .insert(keys)
             .select("id, key_code, status, duration_days, created_at");
@@ -111,35 +120,71 @@ export async function GET(request: Request) {
             .eq("id", user.id)
             .single();
 
-        if (!profile || profile.role !== "admin") {
-            return NextResponse.json({ error: "Admin only" }, { status: 403 });
+        if (!profile || !["admin", "manager"].includes(profile.role)) {
+            return NextResponse.json({ error: "Unauthorized role" }, { status: 403 });
         }
 
         const { searchParams } = new URL(request.url);
         const status = searchParams.get("status");
         const batch_id = searchParams.get("batch_id");
 
-        let query = supabase
+        // Use admin client to bypass RLS
+        const admin = getAdminClient();
+
+        let query = admin
             .from("license_keys")
-            .select(`
-                id, key_code, status, duration_days, batch_id, 
-                claimed_at, expires_at, created_at,
-                plans:plan_id (name, slug),
-                claimed_profile:claimed_by (first_name, last_name)
-            `)
+            .select("*")
             .order("created_at", { ascending: false })
             .limit(200);
 
         if (status) query = query.eq("status", status);
         if (batch_id) query = query.eq("batch_id", batch_id);
 
-        const { data: keys, error: keysError } = await query;
+        const { data: rawKeys, error: keysError } = await query;
 
         if (keysError) {
             return NextResponse.json({ error: keysError.message }, { status: 500 });
         }
 
-        return NextResponse.json({ keys: keys || [] });
+        const keysList = rawKeys || [];
+
+        // Batch-fetch plan names
+        const planIds = [...new Set(keysList.map(k => k.plan_id).filter(Boolean))];
+        let planMap = new Map<string, { name: string; slug: string }>();
+        if (planIds.length > 0) {
+            const { data: plans } = await admin
+                .from("plans")
+                .select("id, name, slug")
+                .in("id", planIds);
+            planMap = new Map((plans || []).map(p => [p.id, { name: p.name, slug: p.slug }]));
+        }
+
+        // Batch-fetch claimed-by profiles
+        const claimedByIds = [...new Set(keysList.map(k => k.claimed_by).filter(Boolean))];
+        let profileMap = new Map<string, { first_name: string; last_name: string }>();
+        if (claimedByIds.length > 0) {
+            const { data: profiles } = await admin
+                .from("profiles")
+                .select("id, first_name, last_name")
+                .in("id", claimedByIds);
+            profileMap = new Map((profiles || []).map(p => [p.id, { first_name: p.first_name, last_name: p.last_name }]));
+        }
+
+        // Merge data
+        const keys = keysList.map(key => ({
+            id: key.id,
+            key_code: key.key_code,
+            status: key.status,
+            duration_days: key.duration_days,
+            batch_id: key.batch_id,
+            claimed_at: key.claimed_at,
+            expires_at: key.expires_at,
+            created_at: key.created_at,
+            plans: planMap.get(key.plan_id) || null,
+            claimed_profile: key.claimed_by ? (profileMap.get(key.claimed_by) || null) : null,
+        }));
+
+        return NextResponse.json({ keys });
     } catch {
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
@@ -161,8 +206,8 @@ export async function DELETE(request: Request) {
             .eq("id", user.id)
             .single();
 
-        if (!profile || profile.role !== "admin") {
-            return NextResponse.json({ error: "Admin only" }, { status: 403 });
+        if (!profile || !["admin", "manager"].includes(profile.role)) {
+            return NextResponse.json({ error: "Unauthorized role" }, { status: 403 });
         }
 
         const { searchParams } = new URL(request.url);

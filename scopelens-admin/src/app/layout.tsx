@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AdminSidebar } from "@/components/admin-sidebar";
+import { RoleProvider } from "@/lib/role-context";
 import { usePathname } from "next/navigation";
 
 const inter = Inter({
@@ -39,12 +40,14 @@ export default function RootLayout({
             {children}
           </main>
         ) : (
-          <SidebarProvider>
-            <AdminSidebar />
-            <main className="flex-1 bg-background">
-              {children}
-            </main>
-          </SidebarProvider>
+          <RoleProvider>
+            <SidebarProvider>
+              <AdminSidebar />
+              <main className="flex-1 bg-background">
+                {children}
+              </main>
+            </SidebarProvider>
+          </RoleProvider>
         )}
       </body>
     </html>

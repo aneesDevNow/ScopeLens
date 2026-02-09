@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { CreditPackageSettings } from "./credit-package-settings";
 
 export default function SettingsPage() {
     const [logoUrl, setLogoUrl] = useState<string | null>(null);
@@ -149,9 +148,6 @@ export default function SettingsPage() {
                         </div>
                     </CardContent>
                 </Card>
-
-                {/* Credit Packages */}
-                <CreditPackageSettings />
             </div>
         </div>
     );

@@ -16,7 +16,7 @@ export async function GET() {
 
         const { data: subscription, error } = await supabase
             .from('subscriptions')
-            .select('*, plans(*)')
+            .select('*')
             .eq('user_id', user.id)
             .eq('status', 'active')
             .single()
@@ -34,17 +34,24 @@ export async function GET() {
                 plan: freePlan,
                 usage: {
                     scans_used: 0,
-                    scans_limit: freePlan?.scans_per_month || 5,
+                    scans_limit: freePlan?.scans_per_month || 5, // Default backup value
                 },
             })
         }
 
+        // Fetch plan details separately
+        const { data: plan } = await supabase
+            .from('plans')
+            .select('*')
+            .eq('id', subscription.plan_id)
+            .single()
+
         return NextResponse.json({
             subscription,
-            plan: subscription.plans,
+            plan: plan,
             usage: {
                 scans_used: subscription.scans_used,
-                scans_limit: subscription.plans?.scans_per_month || 0,
+                scans_limit: plan?.scans_per_month || 0,
             },
         })
     } catch (err) {

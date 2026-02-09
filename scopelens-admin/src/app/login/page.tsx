@@ -55,15 +55,16 @@ export default function AdminLoginPage() {
                 return;
             }
 
-            if (profile.role !== "admin") {
-                setError("Access denied. Administrator privileges required.");
+            const allowedRoles = ["admin", "manager"];
+            if (!allowedRoles.includes(profile.role)) {
+                setError("Access denied. Administrator or manager privileges required.");
                 await supabase.auth.signOut();
                 setLoading(false);
                 return;
             }
 
-            // Success - redirect to admin dashboard
-            router.push("/");
+            // Success - redirect based on role
+            router.push(profile.role === "manager" ? "/licenses" : "/");
         } catch (err) {
             console.error("Login error:", err);
             setError("An error occurred. Please try again.");

@@ -73,7 +73,7 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(loginUrl)
     }
 
-    // Role isolation: only admin users can access the admin dashboard
+    // Role isolation: only admin and manager users can access the admin dashboard
     if (user && !isApiRoute && !isLoginPage && !isAuthCallback) {
         const { data: profile } = await supabase
             .from('profiles')
@@ -81,12 +81,25 @@ export async function updateSession(request: NextRequest) {
             .eq('id', user.id)
             .single()
 
-        if (profile?.role !== 'admin') {
-            // Non-admin users cannot access admin dashboard — redirect to login with error
+        const allowedRoles = ['admin', 'manager']
+        if (!profile?.role || !allowedRoles.includes(profile.role)) {
+            // Unauthorized users cannot access admin dashboard — redirect to login with error
             const loginUrl = request.nextUrl.clone()
             loginUrl.pathname = '/login'
             loginUrl.searchParams.set('error', 'not_admin')
             return NextResponse.redirect(loginUrl)
+        }
+
+        // Manager route restriction: only /licenses and /ai-detection
+        if (profile.role === 'manager') {
+            const managerAllowedPaths = ['/licenses', '/ai-detection']
+            const currentPath = request.nextUrl.pathname
+            const isAllowed = managerAllowedPaths.some(p => currentPath === p || currentPath.startsWith(p + '/'))
+            if (!isAllowed) {
+                const redirectUrl = request.nextUrl.clone()
+                redirectUrl.pathname = '/licenses'
+                return NextResponse.redirect(redirectUrl)
+            }
         }
     }
 
