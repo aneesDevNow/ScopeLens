@@ -145,9 +145,9 @@ export default function ResellerLandingPage() {
                             <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 text-indigo-600">
                                 <span className="material-symbols-outlined text-3xl">sell</span>
                             </div>
-                            <h3 className="text-xl font-bold text-slate-700 mb-3">Bulk License Discounts</h3>
+                            <h3 className="text-xl font-bold text-slate-700 mb-3">Bulk Work Purchase Discounts</h3>
                             <p className="text-slate-500 leading-relaxed">
-                                Access exclusive wholesale pricing tiers when purchasing licenses in volume for your educational or enterprise clients.
+                                Access exclusive wholesale pricing tiers when purchasing work purchase keys in volume for your educational or enterprise clients.
                             </p>
                         </div>
 
@@ -158,7 +158,7 @@ export default function ResellerLandingPage() {
                             </div>
                             <h3 className="text-xl font-bold text-slate-700 mb-3">Dedicated Dashboard</h3>
                             <p className="text-slate-500 leading-relaxed">
-                                Manage all your client licenses, track usage, issue keys, and view earnings from a single, intuitive reseller portal.
+                                Manage all your client work purchases, track usage, issue keys, and view earnings from a single, intuitive reseller portal.
                             </p>
                         </div>
                     </div>
@@ -199,7 +199,7 @@ export default function ResellerLandingPage() {
                             </div>
                             <h3 className="text-lg font-bold text-slate-700 mb-2">2. Buy in Bulk</h3>
                             <p className="text-slate-500 text-sm max-w-xs mx-auto">
-                                Purchase license keys at discounted rates through your dedicated dashboard. The more you buy, the more you save.
+                                Purchase work purchase keys at discounted rates through your dedicated dashboard. The more you buy, the more you save.
                             </p>
                         </div>
 

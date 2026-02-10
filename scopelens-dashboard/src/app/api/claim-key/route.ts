@@ -11,7 +11,7 @@ function getAdminClient() {
     );
 }
 
-// POST /api/claim-key — User claims a license key to activate a plan
+// POST /api/claim-key — User claims a work purchase key to activate a plan
 export async function POST(request: Request) {
     try {
         const supabase = await createClient();
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
         const { key_code } = body;
 
         if (!key_code || typeof key_code !== "string") {
-            return NextResponse.json({ error: "License key is required" }, { status: 400 });
+            return NextResponse.json({ error: "Work purchase key is required" }, { status: 400 });
         }
 
         // Normalize key: trim, uppercase
@@ -41,7 +41,7 @@ export async function POST(request: Request) {
             .single();
 
         if (findError || !licenseKey) {
-            return NextResponse.json({ error: "Invalid license key" }, { status: 404 });
+            return NextResponse.json({ error: "Invalid work purchase key" }, { status: 404 });
         }
 
         if (licenseKey.status !== "available") {

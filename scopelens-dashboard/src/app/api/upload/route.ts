@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
             .select("*, plans(*)")
             .eq("user_id", user.id)
             .eq("status", "active")
-            .single();
+            .maybeSingle();
 
         if (subError) {
             console.error("Error fetching subscription:", subError);
@@ -290,16 +290,20 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Failed to create scan record", details: scanError.message }, { status: 500 });
         }
 
-        // Insert into scan_queue for processing
+        // Insert into scan_queue for processing (use admin client to bypass RLS)
         if (textContent && textContent.length > 0) {
-            await supabase
+            const adminClient = getAdminClient();
+            const { error: queueError } = await adminClient
                 .from("scan_queue")
                 .insert({
                     scan_id: scan.id,
                     input_text: textContent,
                     status: "waiting",
-                })
-                .single();
+                });
+
+            if (queueError) {
+                console.error("Failed to insert into scan_queue:", queueError);
+            }
         }
 
         // Increment scan usage (for paid plans)

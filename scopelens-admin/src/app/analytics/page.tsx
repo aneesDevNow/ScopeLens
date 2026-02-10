@@ -150,7 +150,7 @@ export default function AnalyticsPage() {
                                         { label: "Total Users", value: totalUsers, icon: "group" },
                                         { label: "New Today", value: data?.newUsersToday || 0, icon: "person_add" },
                                         { label: "Active Resellers", value: data?.activeResellers || 0, icon: "handshake" },
-                                        { label: "License Keys Claimed", value: data?.claimedKeys || 0, icon: "key" },
+                                        { label: "Work Purchase Keys Claimed", value: data?.claimedKeys || 0, icon: "key" },
                                     ].map(item => (
                                         <div key={item.label} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                                             <div className="flex items-center gap-3">

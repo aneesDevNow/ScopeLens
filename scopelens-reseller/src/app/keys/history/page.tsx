@@ -76,7 +76,7 @@ export default function KeyHistoryPage() {
                     My Customers
                 </h1>
                 <p className="text-slate-500 text-base font-normal">
-                    Track all your generated license keys and their claim status
+                    Track all your generated work purchase keys and their claim status
                 </p>
             </div>
 
@@ -87,8 +87,8 @@ export default function KeyHistoryPage() {
                         key={f.value}
                         onClick={() => setFilter(f.value)}
                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === f.value
-                                ? "bg-primary/10 text-primary border border-primary/20"
-                                : "bg-white text-slate-500 border border-slate-100 hover:bg-slate-50"
+                            ? "bg-primary/10 text-primary border border-primary/20"
+                            : "bg-white text-slate-500 border border-slate-100 hover:bg-slate-50"
                             }`}
                     >
                         {f.label} <span className="ml-1 opacity-70">({f.count})</span>

@@ -218,8 +218,8 @@ export default function PlansPage() {
                             </svg>
                         </div>
                         <div className="flex-1">
-                            <h3 className="text-lg font-semibold text-slate-700 mb-1">Have a License Key?</h3>
-                            <p className="text-slate-500 text-sm mb-4">Enter your license key to activate a subscription plan.</p>
+                            <h3 className="text-lg font-semibold text-slate-700 mb-1">Have a Work Purchase Key?</h3>
+                            <p className="text-slate-500 text-sm mb-4">Enter your work purchase key to activate a subscription plan.</p>
                             <div className="flex gap-3">
                                 <input
                                     type="text"

@@ -187,8 +187,8 @@ function CheckoutContent() {
                         </div>
                         <h1 className="text-2xl font-bold text-slate-700 mb-3">Direct Payment Unavailable</h1>
                         <p className="text-slate-500 leading-relaxed mb-6">
-                            Direct payment is currently unavailable. Please contact your reseller to purchase a license key,
-                            or use a license key if you already have one.
+                            Direct payment is currently unavailable. Please contact your reseller to purchase a work purchase key,
+                            or use a work purchase key if you already have one.
                         </p>
                         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                             <a
@@ -209,7 +209,7 @@ function CheckoutContent() {
                                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                                 </svg>
-                                Use License Key
+                                Use Work Purchase Key
                             </Link>
                         </div>
                     </div>

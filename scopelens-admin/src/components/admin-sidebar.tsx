@@ -24,7 +24,7 @@ const allNavItems = [
     { title: "AI Detection", url: "/ai-detection", icon: "smart_toy" },
     { title: "Analytics", url: "/analytics", icon: "analytics" },
     { title: "Resellers", url: "/resellers", icon: "handshake" },
-    { title: "Licenses", url: "/licenses", icon: "key" },
+    { title: "Work Purchases", url: "/licenses", icon: "key" },
     { title: "Support", url: "/support", icon: "support_agent" },
     { title: "System", url: "/system", icon: "monitoring" },
     { title: "Settings", url: "/settings", icon: "settings" },

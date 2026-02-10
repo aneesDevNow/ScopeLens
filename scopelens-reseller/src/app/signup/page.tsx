@@ -139,7 +139,7 @@ export default function SignupPage() {
                 <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
                     <div className="text-center mb-8">
                         <h1 className="text-2xl font-bold text-slate-700 mb-2">Create Reseller Account</h1>
-                        <p className="text-slate-500">Start distributing ScopeLens licenses</p>
+                        <p className="text-slate-500">Start distributing ScopeLens work purchase keys</p>
                     </div>
 
                     <form className="space-y-4" onSubmit={handleSubmit}>

@@ -88,7 +88,7 @@ function BillingContent() {
                     Credit History
                 </h1>
                 <p className="text-slate-500 text-base font-normal">
-                    Purchase credits to generate license keys for your clients
+                    Purchase credits to generate work purchase keys for your clients
                 </p>
             </div>
 
@@ -123,7 +123,7 @@ function BillingContent() {
                 </div>
                 <p className="text-4xl font-bold relative z-10">{formatPrice(reseller?.credit_balance || 0)}</p>
                 <p className="text-indigo-200 mt-2 text-sm relative z-10">
-                    Credits are used to generate license keys at reseller discount prices
+                    Credits are used to generate work purchase keys at reseller discount prices
                 </p>
             </div>
 

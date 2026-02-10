@@ -241,7 +241,7 @@ export default function LandingPage() {
               <div className="flex-1 text-center md:text-left">
                 <h3 className="text-2xl font-bold text-slate-700 mb-2">Become a Reseller</h3>
                 <p className="text-slate-500 leading-relaxed">
-                  Earn commissions by selling ScopeLens license keys to educational institutions, teachers, and students.
+                  Earn commissions by selling ScopeLens work purchase keys to educational institutions, teachers, and students.
                   Get your own dashboard, generate keys, and track your revenue.
                 </p>
               </div>

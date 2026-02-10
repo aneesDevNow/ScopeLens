@@ -128,9 +128,9 @@ export default function LicensesPage() {
     };
 
     const handleDownload = (key: LicenseKey) => {
-        const content = `ScopeLens License Certificate
+        const content = `ScopeLens Work Purchase Certificate
 ================================
-License Key: ${key.key_code}
+Work Purchase Key: ${key.key_code}
 Plan: ${key.plans?.name || "N/A"}
 Duration: ${key.duration_days} days
 Status: ${key.status}
@@ -138,7 +138,7 @@ Generated: ${new Date(key.created_at).toLocaleDateString()}
 ${key.claimed_at ? `Claimed: ${new Date(key.claimed_at).toLocaleDateString()}` : ""}
 ${key.expires_at ? `Expires: ${new Date(key.expires_at).toLocaleDateString()}` : ""}
 ================================
-This license is valid for use with ScopeLens AI Detection Platform.
+This work purchase key is valid for use with ScopeLens AI Detection Platform.
 `;
         const blob = new Blob([content], { type: "text/plain" });
         const url = URL.createObjectURL(blob);
@@ -174,8 +174,8 @@ This license is valid for use with ScopeLens AI Detection Platform.
     return (
         <div className="p-6">
             <div className="mb-6">
-                <h1 className="text-2xl font-bold">License Key Generator</h1>
-                <p className="text-muted-foreground">Generate and manage license keys</p>
+                <h1 className="text-2xl font-bold">Work Purchase Key Generator</h1>
+                <p className="text-muted-foreground">Generate and manage work purchase keys</p>
             </div>
 
             {/* Stats */}
@@ -209,8 +209,8 @@ This license is valid for use with ScopeLens AI Detection Platform.
             {/* Generator */}
             <Card className="mb-8">
                 <CardHeader>
-                    <CardTitle>Generate New License Keys</CardTitle>
-                    <CardDescription>Create license keys for users or resellers</CardDescription>
+                    <CardTitle>Generate New Work Purchase Keys</CardTitle>
+                    <CardDescription>Create work purchase keys for users or resellers</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="grid md:grid-cols-3 gap-4 mb-4">
@@ -265,7 +265,7 @@ This license is valid for use with ScopeLens AI Detection Platform.
                     <div className="flex items-center justify-between">
                         <div>
                             <CardTitle>
-                                License Keys
+                                Work Purchase Keys
                                 {statusFilter && (
                                     <Badge variant="secondary" className="ml-2 text-xs">
                                         {statusFilter}
@@ -293,7 +293,7 @@ This license is valid for use with ScopeLens AI Detection Platform.
                     ) : keys.length === 0 ? (
                         <div className="text-center py-12 text-muted-foreground">
                             <span className="material-symbols-outlined text-4xl mb-2 block">key_off</span>
-                            No license keys found
+                            No work purchase keys found
                         </div>
                     ) : (
                         <div className="space-y-3">
@@ -339,7 +339,7 @@ This license is valid for use with ScopeLens AI Detection Platform.
                                             variant="ghost"
                                             size="sm"
                                             onClick={() => handleDownload(key)}
-                                            title="Download license"
+                                            title="Download work purchase key"
                                         >
                                             <span className="material-symbols-outlined">download</span>
                                         </Button>

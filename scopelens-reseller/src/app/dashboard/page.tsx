@@ -152,14 +152,14 @@ export default function ResellerDashboard() {
             extra: "Active accounts",
         },
         {
-            label: "Keys Generated",
+            label: "Work Purchase Keys Generated",
             value: String(stats?.total_keys || 0),
             icon: "key",
             iconStyle: "text-indigo-600 bg-indigo-500/10",
             extra: "Lifetime total",
         },
         {
-            label: "Available Keys",
+            label: "Available Work Purchase Keys",
             value: String(stats?.available_keys || 0),
             icon: "check_circle",
             iconStyle: "text-orange-600 bg-orange-500/10",
@@ -233,7 +233,7 @@ export default function ResellerDashboard() {
                         <div className="p-5 border-b border-slate-100">
                             <h2 className="text-slate-700 text-lg font-bold leading-tight flex items-center gap-2">
                                 <span className="material-symbols-outlined text-primary">encrypted</span>
-                                Generate Customer Keys
+                                Generate Customer Work Purchase Keys
                             </h2>
                         </div>
                         <div className="p-5 flex flex-col gap-4">
@@ -376,7 +376,7 @@ export default function ResellerDashboard() {
                                             <td colSpan={5} className="p-8 text-center text-slate-500">
                                                 <div className="flex flex-col items-center gap-2">
                                                     <span className="material-symbols-outlined text-4xl opacity-30">vpn_key</span>
-                                                    <p>No keys generated yet. Use the form to generate your first key.</p>
+                                                    <p>No work purchase keys generated yet. Use the form to generate your first key.</p>
                                                 </div>
                                             </td>
                                         </tr>

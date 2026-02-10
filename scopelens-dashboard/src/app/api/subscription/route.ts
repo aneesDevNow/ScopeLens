@@ -19,7 +19,7 @@ export async function GET() {
             .select('*')
             .eq('user_id', user.id)
             .eq('status', 'active')
-            .single()
+            .maybeSingle()
 
         // Helper: return free plan response
         const returnFreePlan = async () => {

@@ -120,7 +120,7 @@ export default function GenerateKeysPage() {
                         Key Management
                     </h1>
                     <p className="text-slate-500 text-base font-normal">
-                        Generate license keys at discounted reseller prices
+                        Generate work purchase keys at discounted reseller prices
                     </p>
                 </div>
                 <Link
