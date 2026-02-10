@@ -14,15 +14,15 @@ export function decryptCookieValue(value: string): string {
  * sb-xxx-auth-token.0, .1, etc → sl_t.0, sl_t.1
  */
 export function toCustomCookieName(supabaseName: string): string {
-    if (supabaseName.match(/^sb-[a-z0-9]+-auth-token-code-verifier$/)) {
+    if (supabaseName.match(/^sb-[a-z0-9-]+-auth-token-code-verifier$/)) {
         return "sl_v";
     }
     // Chunked tokens: sb-xxx-auth-token.0, .1, etc
-    const chunkMatch = supabaseName.match(/^sb-[a-z0-9]+-auth-token\.(\d+)$/);
+    const chunkMatch = supabaseName.match(/^sb-[a-z0-9-]+-auth-token\.(\d+)$/);
     if (chunkMatch) {
         return `sl_t.${chunkMatch[1]}`;
     }
-    if (supabaseName.match(/^sb-[a-z0-9]+-auth-token$/)) {
+    if (supabaseName.match(/^sb-[a-z0-9-]+-auth-token$/)) {
         return "sl_t";
     }
     // Not a Supabase cookie, keep as-is
@@ -56,7 +56,8 @@ export function getProjectRef(): string {
     // Cloud Supabase: https://xxx.supabase.co
     const cloudMatch = url.match(/https?:\/\/([a-z0-9]+)\.supabase/);
     if (cloudMatch) return cloudMatch[1];
-    // Self-hosted: use full hostname as project ref
-    const selfHostedMatch = url.match(/https?:\/\/([^/]+)/);
-    return selfHostedMatch?.[1]?.replace(/[.:]/g, '_') || "";
+    // Self-hosted: use first subdomain as project ref (matches what Supabase uses internally)
+    // e.g. https://scopelens-supabase.membercore.dev → scopelens-supabase
+    const selfHostedMatch = url.match(/https?:\/\/([^./]+)/);
+    return selfHostedMatch?.[1] || "";
 }
