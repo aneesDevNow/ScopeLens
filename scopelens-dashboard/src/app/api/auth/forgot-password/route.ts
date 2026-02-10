@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
 
         const supabase = await createClient()
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://app.scopelens.ai'}/reset-password`,
+            redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://scopelens.ai'}/reset-password`,
         })
 
         if (error) {
