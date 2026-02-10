@@ -11,7 +11,7 @@ export async function GET(request: Request) {
 
         let query = supabase
             .from("scan_queue")
-            .select("*, zerogpt_accounts(label)")
+            .select("*")
             .order("created_at", { ascending: false })
             .limit(limit);
 
@@ -24,6 +24,25 @@ export async function GET(request: Request) {
         if (error) {
             return NextResponse.json({ error: error.message }, { status: 500 });
         }
+
+        // Look up account labels separately
+        const accountIds = [...new Set((queue || []).map((q: { account_id: string | null }) => q.account_id).filter(Boolean))];
+        let accountLabels: Record<string, string> = {};
+        if (accountIds.length > 0) {
+            const { data: accounts } = await supabase
+                .from("zerogpt_accounts")
+                .select("id, label")
+                .in("id", accountIds);
+            if (accounts) {
+                accountLabels = Object.fromEntries(accounts.map((a: { id: string; label: string }) => [a.id, a.label]));
+            }
+        }
+
+        // Merge account labels into queue items
+        const enrichedQueue = (queue || []).map((item: { account_id: string | null;[key: string]: unknown }) => ({
+            ...item,
+            zerogpt_accounts: item.account_id ? { label: accountLabels[item.account_id] || "Unknown" } : null,
+        }));
 
         // Get stats
         const { data: allItems } = await supabase
@@ -45,7 +64,7 @@ export async function GET(request: Request) {
             }
         });
 
-        return NextResponse.json({ queue: queue || [], stats });
+        return NextResponse.json({ queue: enrichedQueue, stats });
     } catch (error) {
         console.error("Error fetching queue:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
