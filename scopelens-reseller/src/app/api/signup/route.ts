@@ -9,7 +9,7 @@ const supabaseAdmin = createClient(
 
 export async function POST(request: Request) {
     try {
-        const { email, password, companyName } = await request.json();
+        const { email, password, companyName, country } = await request.json();
 
         if (!email || !password || !companyName) {
             return NextResponse.json({ error: "All fields are required" }, { status: 400 });
@@ -27,6 +27,7 @@ export async function POST(request: Request) {
             user_metadata: {
                 company_name: companyName,
                 role: "reseller",
+                country: country || null,
             },
         });
 
@@ -47,6 +48,7 @@ export async function POST(request: Request) {
                 email,
                 first_name: companyName,
                 role: "reseller",
+                country: country || null,
             }, { onConflict: "id" });
 
         if (profileError) {

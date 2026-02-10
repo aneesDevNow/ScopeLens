@@ -26,6 +26,8 @@ function generateLicenseKey(): string {
     return `SL-${parts.join("-")}`;
 }
 
+const VALID_CLAIM_HOURS = [5, 24, 48];
+
 // POST /api/admin/license-keys — Generate license keys (admin only)
 export async function POST(request: Request) {
     try {
@@ -47,7 +49,7 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { plan_id, quantity = 1, duration_days = 30, reseller_id } = body;
+        const { plan_id, quantity = 1, claim_hours = 24, reseller_id } = body;
 
         if (!plan_id) {
             return NextResponse.json({ error: "plan_id is required" }, { status: 400 });
@@ -55,6 +57,10 @@ export async function POST(request: Request) {
 
         if (quantity < 1 || quantity > 100) {
             return NextResponse.json({ error: "Quantity must be 1-100" }, { status: 400 });
+        }
+
+        if (!VALID_CLAIM_HOURS.includes(claim_hours)) {
+            return NextResponse.json({ error: "claim_hours must be 5, 24, or 48" }, { status: 400 });
         }
 
         // Verify plan exists
@@ -68,15 +74,21 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: "Plan not found" }, { status: 404 });
         }
 
+        // Calculate claim deadline
+        const now = new Date();
+        const claimDeadline = new Date(now.getTime() + claim_hours * 60 * 60 * 1000);
+
         // Generate batch of keys
         const batchId = crypto.randomUUID();
-        const keys: { key_code: string; plan_id: string; duration_days: number; generated_by: string; batch_id: string; reseller_id: string | null }[] = [];
+        const keys: { key_code: string; plan_id: string; duration_days: number; claim_hours: number; claim_deadline: string; generated_by: string; batch_id: string; reseller_id: string | null }[] = [];
 
         for (let i = 0; i < quantity; i++) {
             keys.push({
                 key_code: generateLicenseKey(),
                 plan_id,
-                duration_days,
+                duration_days: 30, // Fixed: subscription lasts 30 days after claiming
+                claim_hours,
+                claim_deadline: claimDeadline.toISOString(),
                 generated_by: user.id,
                 batch_id: batchId,
                 reseller_id: reseller_id || null,
@@ -86,7 +98,7 @@ export async function POST(request: Request) {
         const { data: created, error: insertError } = await supabase
             .from("license_keys")
             .insert(keys)
-            .select("id, key_code, status, duration_days, created_at");
+            .select("id, key_code, status, duration_days, claim_hours, claim_deadline, created_at");
 
         if (insertError) {
             return NextResponse.json({ error: insertError.message }, { status: 500 });
@@ -175,6 +187,8 @@ export async function GET(request: Request) {
             key_code: key.key_code,
             status: key.status,
             duration_days: key.duration_days,
+            claim_hours: key.claim_hours,
+            claim_deadline: key.claim_deadline,
             batch_id: key.batch_id,
             claimed_at: key.claimed_at,
             expires_at: key.expires_at,

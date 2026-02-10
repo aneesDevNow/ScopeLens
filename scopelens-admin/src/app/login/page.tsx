@@ -78,8 +78,8 @@ export default function AdminLoginPage() {
             <Card className="w-full max-w-md">
                 <CardHeader className="text-center">
                     <div className="flex items-center justify-center gap-3 mb-4">
-                        <img src="/icon.svg" alt="Scope Lens" className="w-12 h-12" />
-                        <span className="text-2xl font-bold">Scope Lens</span>
+                        <img src="/icon.svg" alt="ScopeLens" className="w-12 h-12" />
+                        <span className="text-2xl font-bold">ScopeLens</span>
                     </div>
                     <CardTitle className="text-xl">Admin Login</CardTitle>
                     <CardDescription>Sign in to access the admin portal</CardDescription>

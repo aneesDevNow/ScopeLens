@@ -59,7 +59,7 @@ export default function ResellerSidebar() {
                             Reseller Portal
                         </h1>
                         <p className="text-text-secondary-light text-xs font-normal leading-normal mt-1">
-                            Scope Lens Admin
+                            ScopeLens Admin
                         </p>
                     </div>
 

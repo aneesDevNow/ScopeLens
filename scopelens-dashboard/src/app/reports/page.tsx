@@ -122,10 +122,10 @@ function ReportsPageContent() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 p-8 flex items-center justify-center">
+            <div className="min-h-screen bg-slate-50 p-8 flex items-center justify-center">
                 <div className="text-center">
                     <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-500">Loading report...</p>
+                    <p className="text-slate-500">Loading report...</p>
                 </div>
             </div>
         );
@@ -133,15 +133,15 @@ function ReportsPageContent() {
 
     if (error || !scan) {
         return (
-            <div className="min-h-screen bg-gray-50 p-8">
+            <div className="min-h-screen bg-slate-50 p-8">
                 <div className="max-w-6xl mx-auto text-center py-20">
-                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                        <svg className="w-10 h-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg className="w-10 h-10 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                     </div>
-                    <h2 className="text-2xl font-bold text-gray-900 mb-2">No Report Available</h2>
-                    <p className="text-gray-500 mb-6">{error || "Upload a document to generate your first AI analysis report."}</p>
+                    <h2 className="text-2xl font-bold text-slate-700 mb-2">No Report Available</h2>
+                    <p className="text-slate-500 mb-6">{error || "Upload a document to generate your first AI analysis report."}</p>
                     <button
                         onClick={() => router.push("/")}
                         className="px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25"
@@ -159,19 +159,19 @@ function ReportsPageContent() {
     const isProcessing = scan.status !== "completed";
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
+        <div className="min-h-screen bg-slate-50 p-8">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-8">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">AI Analysis Report</h1>
-                        <p className="text-gray-500">Detailed AI detection results for your document</p>
+                        <h1 className="text-3xl font-bold text-slate-700 mb-2">AI Analysis Report</h1>
+                        <p className="text-slate-500">Detailed AI detection results for your document</p>
                     </div>
                     <div className="flex gap-3">
                         <button
                             onClick={handleExportPDF}
                             disabled={downloading || isProcessing}
-                            className="px-5 py-2.5 bg-white rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50"
+                            className="px-5 py-2.5 bg-white rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50"
                         >
                             {downloading ? (
                                 <>
@@ -189,7 +189,7 @@ function ReportsPageContent() {
                         </button>
                         <button
                             onClick={() => router.push("/files")}
-                            className="px-5 py-2.5 bg-white rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors shadow-sm flex items-center gap-2"
+                            className="px-5 py-2.5 bg-white rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2"
                         >
                             <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -200,8 +200,8 @@ function ReportsPageContent() {
                 </div>
 
                 {/* Summary Card */}
-                <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 mb-8">
-                    <div className="p-6 border-b border-gray-100">
+                <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 mb-8">
+                    <div className="p-6 border-b border-slate-100">
                         <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
                                 <svg className="w-7 h-7 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -209,8 +209,8 @@ function ReportsPageContent() {
                                 </svg>
                             </div>
                             <div>
-                                <h3 className="text-xl font-semibold text-gray-900">{scan.file_name}</h3>
-                                <p className="text-gray-500">
+                                <h3 className="text-xl font-semibold text-slate-700">{scan.file_name}</h3>
+                                <p className="text-slate-500">
                                     Scanned on {formatDate(scan.created_at)}
                                     {scan.file_size ? ` · ${formatFileSize(scan.file_size)}` : ""}
                                 </p>
@@ -221,26 +221,26 @@ function ReportsPageContent() {
                         {isProcessing ? (
                             <div className="text-center py-8">
                                 <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                                <p className="text-gray-500 text-lg">Analysis in progress...</p>
-                                <p className="text-gray-400 text-sm mt-1">This may take a few moments</p>
+                                <p className="text-slate-500 text-lg">Analysis in progress...</p>
+                                <p className="text-slate-400 text-sm mt-1">This may take a few moments</p>
                             </div>
                         ) : (
                             <div className="grid md:grid-cols-4 gap-6">
                                 <div className={`text-center p-6 ${colors.bg} rounded-xl`}>
                                     <div className={`text-4xl font-bold ${colors.text} mb-1`}>{aiScore}%</div>
-                                    <div className="text-gray-500">AI Content</div>
+                                    <div className="text-slate-500">AI Content</div>
                                 </div>
-                                <div className="text-center p-6 bg-gray-50 rounded-xl">
-                                    <div className="text-4xl font-bold text-gray-900 mb-1">{humanScore}%</div>
-                                    <div className="text-gray-500">Human Written</div>
+                                <div className="text-center p-6 bg-slate-50 rounded-xl">
+                                    <div className="text-4xl font-bold text-slate-700 mb-1">{humanScore}%</div>
+                                    <div className="text-slate-500">Human Written</div>
                                 </div>
-                                <div className="text-center p-6 bg-gray-50 rounded-xl">
-                                    <div className="text-4xl font-bold text-gray-900 mb-1">{scan.word_count?.toLocaleString() ?? "N/A"}</div>
-                                    <div className="text-gray-500">Words Analyzed</div>
+                                <div className="text-center p-6 bg-slate-50 rounded-xl">
+                                    <div className="text-4xl font-bold text-slate-700 mb-1">{scan.word_count?.toLocaleString() ?? "N/A"}</div>
+                                    <div className="text-slate-500">Words Analyzed</div>
                                 </div>
-                                <div className="text-center p-6 bg-gray-50 rounded-xl">
-                                    <div className="text-4xl font-bold text-gray-900 mb-1">{scan.paragraph_count ?? "N/A"}</div>
-                                    <div className="text-gray-500">Paragraphs</div>
+                                <div className="text-center p-6 bg-slate-50 rounded-xl">
+                                    <div className="text-4xl font-bold text-slate-700 mb-1">{scan.paragraph_count ?? "N/A"}</div>
+                                    <div className="text-slate-500">Paragraphs</div>
                                 </div>
                             </div>
                         )}
@@ -249,18 +249,18 @@ function ReportsPageContent() {
 
                 {/* Analysis Result */}
                 {!isProcessing && (
-                    <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 mb-8">
-                        <div className="p-6 border-b border-gray-100">
-                            <h2 className="text-xl font-semibold text-gray-900">Analysis Result</h2>
-                            <p className="text-gray-500 mt-1">Overall AI detection assessment</p>
+                    <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 mb-8">
+                        <div className="p-6 border-b border-slate-100">
+                            <h2 className="text-xl font-semibold text-slate-700">Analysis Result</h2>
+                            <p className="text-slate-500 mt-1">Overall AI detection assessment</p>
                         </div>
                         <div className="p-6">
                             <div className={`p-6 rounded-xl ${colors.bg}`}>
                                 <div className="flex items-center gap-6 mb-4">
                                     <div className={`text-6xl font-bold ${colors.text}`}>{aiScore}%</div>
                                     <div>
-                                        <p className="font-semibold text-gray-900 text-lg">{getScoreLabel(aiScore)}</p>
-                                        <p className="text-gray-500 mt-1">
+                                        <p className="font-semibold text-slate-700 text-lg">{getScoreLabel(aiScore)}</p>
+                                        <p className="text-slate-500 mt-1">
                                             {aiScore < 20
                                                 ? "This document appears to be primarily human-written content."
                                                 : aiScore < 50
@@ -271,11 +271,11 @@ function ReportsPageContent() {
                                 </div>
                                 {/* Score bar */}
                                 <div className="mt-4">
-                                    <div className="flex justify-between text-sm text-gray-500 mb-2">
+                                    <div className="flex justify-between text-sm text-slate-500 mb-2">
                                         <span>Human Written</span>
                                         <span>AI Generated</span>
                                     </div>
-                                    <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                                    <div className="h-3 bg-slate-200 rounded-full overflow-hidden">
                                         <div
                                             className={`h-full rounded-full transition-all duration-700 ${aiScore > 50 ? "bg-red-500" : aiScore > 20 ? "bg-yellow-500" : "bg-green-500"}`}
                                             style={{ width: `${aiScore}%` }}
@@ -289,9 +289,9 @@ function ReportsPageContent() {
 
                 {/* Document Details */}
                 {!isProcessing && (
-                    <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100">
-                        <div className="p-6 border-b border-gray-100">
-                            <h2 className="text-xl font-semibold text-gray-900">Document Details</h2>
+                    <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100">
+                        <div className="p-6 border-b border-slate-100">
+                            <h2 className="text-xl font-semibold text-slate-700">Document Details</h2>
                         </div>
                         <div className="p-6">
                             <div className="grid md:grid-cols-3 gap-6">
@@ -302,7 +302,7 @@ function ReportsPageContent() {
                                         </svg>
                                     </div>
                                     <div className="text-lg font-semibold text-blue-600 mb-1">File Type</div>
-                                    <div className="text-gray-500 uppercase">{scan.file_type || "Unknown"}</div>
+                                    <div className="text-slate-500 uppercase">{scan.file_type || "Unknown"}</div>
                                 </div>
                                 <div className="p-6 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100 text-center">
                                     <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -311,7 +311,7 @@ function ReportsPageContent() {
                                         </svg>
                                     </div>
                                     <div className="text-lg font-semibold text-purple-600 mb-1">File Size</div>
-                                    <div className="text-gray-500">{formatFileSize(scan.file_size)}</div>
+                                    <div className="text-slate-500">{formatFileSize(scan.file_size)}</div>
                                 </div>
                                 <div className="p-6 rounded-xl bg-gradient-to-br from-green-50 to-white border border-green-100 text-center">
                                     <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -320,7 +320,7 @@ function ReportsPageContent() {
                                         </svg>
                                     </div>
                                     <div className="text-lg font-semibold text-green-600 mb-1">Completed</div>
-                                    <div className="text-gray-500">{scan.completed_at ? formatDate(scan.completed_at) : "N/A"}</div>
+                                    <div className="text-slate-500">{scan.completed_at ? formatDate(scan.completed_at) : "N/A"}</div>
                                 </div>
                             </div>
                         </div>
@@ -334,10 +334,10 @@ function ReportsPageContent() {
 export default function ReportsPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-screen bg-gray-50 p-8 flex items-center justify-center">
+            <div className="min-h-screen bg-slate-50 p-8 flex items-center justify-center">
                 <div className="text-center">
                     <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                    <p className="text-gray-500">Loading report...</p>
+                    <p className="text-slate-500">Loading report...</p>
                 </div>
             </div>
         }>

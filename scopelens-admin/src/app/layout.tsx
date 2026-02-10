@@ -27,8 +27,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>Scope Lens Admin</title>
-        <meta name="description" content="Admin Portal for Scope Lens" />
+        <title>ScopeLens Admin</title>
+        <meta name="description" content="Admin Portal for ScopeLens" />
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
           rel="stylesheet"

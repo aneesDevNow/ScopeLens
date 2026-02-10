@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 
 function ScopeLensLogo() {
@@ -27,6 +27,31 @@ export default function SignupPage() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
+
+    // Auto-detect country on mount
+    useEffect(() => {
+        async function detectCountry() {
+            try {
+                const match = document.cookie.match(/(^| )user_country=([^;]+)/);
+                if (match) {
+                    setDetectedCountry(decodeURIComponent(match[2]));
+                    return;
+                }
+                const res = await fetch("https://api.country.is/", { signal: AbortSignal.timeout(5000) });
+                if (res.ok) {
+                    const data = await res.json();
+                    const country = data.country || "US";
+                    setDetectedCountry(country);
+                    const expires = new Date(Date.now() + 7 * 864e5).toUTCString();
+                    document.cookie = `user_country=${country}; expires=${expires}; path=/; SameSite=Lax`;
+                }
+            } catch {
+                // Silently fail
+            }
+        }
+        detectCountry();
+    }, []);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -48,7 +73,7 @@ export default function SignupPage() {
             const res = await fetch("/api/signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password, companyName }),
+                body: JSON.stringify({ email, password, companyName, country: detectedCountry }),
             });
 
             const data = await res.json();
@@ -73,19 +98,19 @@ export default function SignupPage() {
                     <div className="text-center mb-8">
                         <div className="inline-flex items-center gap-3">
                             <ScopeLensLogo />
-                            <span className="text-2xl font-bold text-gray-900">Scope Lens</span>
+                            <span className="text-2xl font-bold text-slate-700">ScopeLens</span>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8 text-center">
+                    <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 text-center">
                         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                             <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                             </svg>
                         </div>
-                        <h2 className="text-xl font-bold text-gray-900 mb-2">Account Created!</h2>
-                        <p className="text-gray-500 mb-6">
-                            Your reseller account has been created for <strong className="text-gray-700">{email}</strong>. You can now sign in to your portal.
+                        <h2 className="text-xl font-bold text-slate-700 mb-2">Account Created!</h2>
+                        <p className="text-slate-500 mb-6">
+                            Your reseller account has been created for <strong className="text-slate-600">{email}</strong>. You can now sign in to your portal.
                         </p>
                         <Link
                             href="/login"
@@ -106,15 +131,15 @@ export default function SignupPage() {
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-3">
                         <ScopeLensLogo />
-                        <span className="text-2xl font-bold text-gray-900">Scope Lens</span>
+                        <span className="text-2xl font-bold text-slate-700">ScopeLens</span>
                     </div>
                 </div>
 
                 {/* Signup Card */}
-                <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+                <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
                     <div className="text-center mb-8">
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Reseller Account</h1>
-                        <p className="text-gray-500">Start distributing Scope Lens licenses</p>
+                        <h1 className="text-2xl font-bold text-slate-700 mb-2">Create Reseller Account</h1>
+                        <p className="text-slate-500">Start distributing ScopeLens licenses</p>
                     </div>
 
                     <form className="space-y-4" onSubmit={handleSubmit}>
@@ -128,7 +153,7 @@ export default function SignupPage() {
                         )}
 
                         <div className="space-y-2">
-                            <label htmlFor="companyName" className="text-sm font-medium text-gray-700">Company / Business Name</label>
+                            <label htmlFor="companyName" className="text-sm font-medium text-slate-600">Company / Business Name</label>
                             <input
                                 id="companyName"
                                 type="text"
@@ -136,12 +161,12 @@ export default function SignupPage() {
                                 value={companyName}
                                 onChange={(e) => setCompanyName(e.target.value)}
                                 required
-                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
+                            <label htmlFor="email" className="text-sm font-medium text-slate-600">Email</label>
                             <input
                                 id="email"
                                 type="email"
@@ -149,12 +174,12 @@ export default function SignupPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
+                            <label htmlFor="password" className="text-sm font-medium text-slate-600">Password</label>
                             <input
                                 id="password"
                                 type="password"
@@ -163,12 +188,12 @@ export default function SignupPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 minLength={6}
-                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirm Password</label>
+                            <label htmlFor="confirmPassword" className="text-sm font-medium text-slate-600">Confirm Password</label>
                             <input
                                 id="confirmPassword"
                                 type="password"
@@ -177,7 +202,7 @@ export default function SignupPage() {
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 required
                                 minLength={6}
-                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                             />
                         </div>
 
@@ -197,7 +222,7 @@ export default function SignupPage() {
                         </button>
                     </form>
 
-                    <p className="text-center text-sm text-gray-500 mt-6">
+                    <p className="text-center text-sm text-slate-500 mt-6">
                         Already have an account?{" "}
                         <Link href="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">
                             Sign In
@@ -216,8 +241,8 @@ export default function SignupPage() {
                 </div>
 
                 {/* Footer */}
-                <p className="text-center text-gray-400 text-sm mt-6">
-                    © 2024 Scope Lens. All rights reserved.
+                <p className="text-center text-slate-400 text-sm mt-6">
+                    © {new Date().getFullYear()} ScopeLens. All rights reserved.
                 </p>
             </div>
         </div>

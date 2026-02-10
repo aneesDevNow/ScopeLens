@@ -48,7 +48,7 @@ export default function SettingsPage() {
             <div className="min-h-[60vh] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-text-secondary-light">Loading settings...</p>
+                    <p className="text-slate-500">Loading settings...</p>
                 </div>
             </div>
         );
@@ -58,27 +58,27 @@ export default function SettingsPage() {
         <div className="max-w-3xl">
             {/* Header */}
             <div className="flex flex-col gap-1 mb-8">
-                <h1 className="text-text-light text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
+                <h1 className="text-slate-700 text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
                     Settings
                 </h1>
-                <p className="text-text-secondary-light text-base font-normal">
+                <p className="text-slate-500 text-base font-normal">
                     Manage your reseller account
                 </p>
             </div>
 
             <div className="space-y-6">
                 {/* Account Info */}
-                <div className="bg-surface-light rounded-xl border border-border-light shadow-sm overflow-hidden">
-                    <div className="p-5 border-b border-border-light">
-                        <h2 className="text-text-light text-lg font-bold leading-tight">Account Information</h2>
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-lg shadow-slate-200/50 overflow-hidden">
+                    <div className="p-5 border-b border-slate-100">
+                        <h2 className="text-slate-700 text-lg font-bold leading-tight">Account Information</h2>
                     </div>
                     <div className="p-5 space-y-4">
-                        <div className="flex justify-between items-center py-3 border-b border-border-light/50">
-                            <span className="text-sm text-text-secondary-light">Company Name</span>
-                            <span className="font-medium text-text-light">{reseller?.company_name || "—"}</span>
+                        <div className="flex justify-between items-center py-3 border-b border-slate-100">
+                            <span className="text-sm text-slate-500">Company Name</span>
+                            <span className="font-medium text-slate-700">{reseller?.company_name || "—"}</span>
                         </div>
-                        <div className="flex justify-between items-center py-3 border-b border-border-light/50">
-                            <span className="text-sm text-text-secondary-light">Status</span>
+                        <div className="flex justify-between items-center py-3 border-b border-slate-100">
+                            <span className="text-sm text-slate-500">Status</span>
                             <span className={`inline-flex items-center gap-1.5 text-xs font-medium ${reseller?.status === "active" ? "text-green-600" :
                                     reseller?.status === "pending" ? "text-yellow-600" : "text-red-600"
                                 }`}>
@@ -88,13 +88,13 @@ export default function SettingsPage() {
                                 {reseller?.status?.charAt(0).toUpperCase() + (reseller?.status?.slice(1) || "")}
                             </span>
                         </div>
-                        <div className="flex justify-between items-center py-3 border-b border-border-light/50">
-                            <span className="text-sm text-text-secondary-light">Commission Rate</span>
-                            <span className="font-medium text-text-light">{reseller?.commission_rate || 0}%</span>
+                        <div className="flex justify-between items-center py-3 border-b border-slate-100">
+                            <span className="text-sm text-slate-500">Commission Rate</span>
+                            <span className="font-medium text-slate-700">{reseller?.commission_rate || 0}%</span>
                         </div>
                         <div className="flex justify-between items-center py-3">
-                            <span className="text-sm text-text-secondary-light">Member Since</span>
-                            <span className="font-medium text-text-light">
+                            <span className="text-sm text-slate-500">Member Since</span>
+                            <span className="font-medium text-slate-700">
                                 {reseller?.created_at ? new Date(reseller.created_at).toLocaleDateString() : "—"}
                             </span>
                         </div>
@@ -102,15 +102,15 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Referral Code */}
-                <div className="bg-surface-light rounded-xl border border-border-light shadow-sm overflow-hidden">
-                    <div className="p-5 border-b border-border-light">
-                        <h2 className="text-text-light text-lg font-bold leading-tight">Referral Code</h2>
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-lg shadow-slate-200/50 overflow-hidden">
+                    <div className="p-5 border-b border-slate-100">
+                        <h2 className="text-slate-700 text-lg font-bold leading-tight">Referral Code</h2>
                     </div>
                     <div className="p-5">
-                        <p className="text-sm text-text-secondary-light mb-4">Share this code to track referrals</p>
+                        <p className="text-sm text-slate-500 mb-4">Share this code to track referrals</p>
                         <div className="flex items-center gap-3">
-                            <div className="flex-1 px-4 py-3 bg-background-light rounded-lg border border-border-light">
-                                <code className="font-mono text-lg font-bold text-text-light">{reseller?.referral_code}</code>
+                            <div className="flex-1 px-4 py-3 bg-slate-50 rounded-lg border border-slate-100">
+                                <code className="font-mono text-lg font-bold text-slate-700">{reseller?.referral_code}</code>
                             </div>
                             <button
                                 onClick={copyReferralCode}

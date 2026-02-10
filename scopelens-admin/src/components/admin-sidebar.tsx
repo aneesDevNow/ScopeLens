@@ -48,8 +48,8 @@ export function AdminSidebar() {
         <Sidebar>
             <SidebarHeader className="p-4 border-b border-border">
                 <div className="flex items-center gap-3">
-                    <img src="/icon.svg" alt="Scope Lens" className="w-10 h-10" />
-                    <span className="text-xl font-bold">Scope Lens</span>
+                    <img src="/icon.svg" alt="ScopeLens" className="w-10 h-10" />
+                    <span className="text-xl font-bold">ScopeLens</span>
                     <span className="text-xs bg-destructive text-destructive-foreground px-2 py-0.5 rounded-full">{badgeText}</span>
                 </div>
             </SidebarHeader>

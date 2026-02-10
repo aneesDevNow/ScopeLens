@@ -27,7 +27,7 @@ export async function GET() {
             )
         }
 
-        return NextResponse.json({ profile })
+        return NextResponse.json({ profile, country: user.user_metadata?.country || null })
     } catch (err) {
         console.error('Profile API error:', err)
         return NextResponse.json(

@@ -21,8 +21,8 @@ export async function GET() {
             .eq('status', 'active')
             .single()
 
-        if (error || !subscription) {
-            // Return free plan if no active subscription
+        // Helper: return free plan response
+        const returnFreePlan = async () => {
             const { data: freePlan } = await supabase
                 .from('plans')
                 .select('*')
@@ -34,9 +34,21 @@ export async function GET() {
                 plan: freePlan,
                 usage: {
                     scans_used: 0,
-                    scans_limit: freePlan?.scans_per_month || 5, // Default backup value
+                    scans_limit: freePlan?.scans_per_day || 1,
                 },
             })
+        }
+
+        if (error || !subscription) {
+            return returnFreePlan()
+        }
+
+        // Check if subscription period has expired
+        const now = new Date()
+        const periodEnd = new Date(subscription.current_period_end)
+        if (periodEnd < now) {
+            // Subscription expired — fall back to free tier
+            return returnFreePlan()
         }
 
         // Fetch plan details separately
@@ -51,7 +63,7 @@ export async function GET() {
             plan: plan,
             usage: {
                 scans_used: subscription.scans_used,
-                scans_limit: plan?.scans_per_month || 0,
+                scans_limit: plan?.scans_per_day || 0,
             },
         })
     } catch (err) {

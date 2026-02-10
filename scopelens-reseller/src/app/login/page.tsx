@@ -56,15 +56,15 @@ export default function LoginPage() {
                                 <rect x="132" y="118" width="14" height="45" rx="7" fill="white" opacity="0.95" transform="rotate(45, 139, 140)" />
                             </svg>
                         </div>
-                        <span className="text-2xl font-bold text-gray-900">Scope Lens</span>
+                        <span className="text-2xl font-bold text-slate-700">ScopeLens</span>
                     </div>
                 </div>
 
                 {/* Login Card */}
-                <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border border-gray-100 p-8">
+                <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
                     <div className="text-center mb-8">
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h1>
-                        <p className="text-gray-500">Sign in to your reseller portal</p>
+                        <h1 className="text-2xl font-bold text-slate-700 mb-2">Welcome Back</h1>
+                        <p className="text-slate-500">Sign in to your reseller portal</p>
                     </div>
 
                     <form className="space-y-5" onSubmit={handleSubmit}>
@@ -78,7 +78,7 @@ export default function LoginPage() {
                         )}
 
                         <div className="space-y-2">
-                            <label htmlFor="email" className="text-sm font-medium text-gray-700">Email</label>
+                            <label htmlFor="email" className="text-sm font-medium text-slate-600">Email</label>
                             <input
                                 id="email"
                                 type="email"
@@ -86,12 +86,12 @@ export default function LoginPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
-                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                             />
                         </div>
 
                         <div className="space-y-2">
-                            <label htmlFor="password" className="text-sm font-medium text-gray-700">Password</label>
+                            <label htmlFor="password" className="text-sm font-medium text-slate-600">Password</label>
                             <input
                                 id="password"
                                 type="password"
@@ -99,7 +99,7 @@ export default function LoginPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
-                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                             />
                         </div>
 
@@ -119,7 +119,7 @@ export default function LoginPage() {
                         </button>
                     </form>
 
-                    <p className="text-center text-sm text-gray-500 mt-6">
+                    <p className="text-center text-sm text-slate-500 mt-6">
                         Don&apos;t have an account?{" "}
                         <Link href="/signup" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">
                             Sign Up
@@ -138,8 +138,8 @@ export default function LoginPage() {
                 </div>
 
                 {/* Footer */}
-                <p className="text-center text-gray-400 text-sm mt-6">
-                    © 2024 Scope Lens. All rights reserved.
+                <p className="text-center text-slate-400 text-sm mt-6">
+                    © {new Date().getFullYear()} ScopeLens. All rights reserved.
                 </p>
             </div>
         </div>

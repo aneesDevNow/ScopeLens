@@ -126,7 +126,7 @@ export default function PaymentPage() {
             <div className="min-h-[60vh] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-gray-500">Loading payment information...</p>
+                    <p className="text-slate-500">Loading payment information...</p>
                 </div>
             </div>
         );
@@ -137,8 +137,8 @@ export default function PaymentPage() {
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900">Payment Methods</h1>
-                    <p className="text-gray-500 mt-1">Manage your payment methods and billing history</p>
+                    <h1 className="text-3xl font-bold text-slate-700">Payment Methods</h1>
+                    <p className="text-slate-500 mt-1">Manage your payment methods and billing history</p>
                 </div>
                 <CurrencySwitcher />
             </div>
@@ -147,15 +147,15 @@ export default function PaymentPage() {
                 {/* Payment Methods */}
                 <div className="lg:col-span-2 space-y-6">
                     {/* Saved Cards */}
-                    <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 p-6">
+                    <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 p-6">
                         <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
                                     <span className="material-symbols-outlined text-blue-600">credit_card</span>
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-semibold text-gray-900">Payment Methods</h2>
-                                    <p className="text-sm text-gray-500">Your saved cards</p>
+                                    <h2 className="text-lg font-semibold text-slate-700">Payment Methods</h2>
+                                    <p className="text-sm text-slate-500">Your saved cards</p>
                                 </div>
                             </div>
                             <button
@@ -169,28 +169,28 @@ export default function PaymentPage() {
 
                         {paymentMethods.length === 0 ? (
                             <div className="text-center py-8">
-                                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <span className="material-symbols-outlined text-gray-400 text-3xl">credit_card_off</span>
+                                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                    <span className="material-symbols-outlined text-slate-400 text-3xl">credit_card_off</span>
                                 </div>
-                                <p className="text-gray-500">No payment methods added yet</p>
+                                <p className="text-slate-500">No payment methods added yet</p>
                             </div>
                         ) : (
                             <div className="space-y-3">
                                 {paymentMethods.map((method) => (
                                     <div
                                         key={method.id}
-                                        className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${method.isDefault ? "border-blue-600 bg-blue-50" : "border-gray-200"
+                                        className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all ${method.isDefault ? "border-blue-600 bg-blue-50" : "border-slate-200"
                                             }`}
                                     >
                                         <div className="flex items-center gap-4">
-                                            <div className="w-12 h-8 bg-gradient-to-br from-gray-700 to-gray-900 rounded-lg flex items-center justify-center text-white text-xs font-bold">
+                                            <div className="w-12 h-8 bg-gradient-to-br from-slate-700 to-slate-800 rounded-lg flex items-center justify-center text-white text-xs font-bold">
                                                 {method.brand}
                                             </div>
                                             <div>
-                                                <p className="font-medium text-gray-900">
+                                                <p className="font-medium text-slate-700">
                                                     •••• •••• •••• {method.last4}
                                                 </p>
-                                                <p className="text-sm text-gray-500">
+                                                <p className="text-sm text-slate-500">
                                                     Expires {method.expMonth.toString().padStart(2, "0")}/{method.expYear}
                                                 </p>
                                             </div>
@@ -211,7 +211,7 @@ export default function PaymentPage() {
                                             )}
                                             <button
                                                 onClick={() => handleRemoveCard(method.id)}
-                                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                                                className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                                             >
                                                 <span className="material-symbols-outlined text-xl">delete</span>
                                             </button>
@@ -223,40 +223,40 @@ export default function PaymentPage() {
                     </div>
 
                     {/* Invoice History */}
-                    <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 p-6">
+                    <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 p-6">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center">
                                 <span className="material-symbols-outlined text-purple-600">receipt_long</span>
                             </div>
                             <div>
-                                <h2 className="text-lg font-semibold text-gray-900">Invoice History</h2>
-                                <p className="text-sm text-gray-500">Your recent transactions</p>
+                                <h2 className="text-lg font-semibold text-slate-700">Invoice History</h2>
+                                <p className="text-sm text-slate-500">Your recent transactions</p>
                             </div>
                         </div>
 
                         <div className="overflow-x-auto">
                             <table className="w-full">
                                 <thead>
-                                    <tr className="border-b border-gray-100">
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Date</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Description</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Amount</th>
-                                        <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Status</th>
-                                        <th className="text-right py-3 px-4 text-sm font-medium text-gray-500"></th>
+                                    <tr className="border-b border-slate-100">
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-500">Date</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-500">Description</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-500">Amount</th>
+                                        <th className="text-left py-3 px-4 text-sm font-medium text-slate-500">Status</th>
+                                        <th className="text-right py-3 px-4 text-sm font-medium text-slate-500"></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {invoices.map((invoice) => (
-                                        <tr key={invoice.id} className="border-b border-gray-50 hover:bg-gray-50">
-                                            <td className="py-4 px-4 text-sm text-gray-900">
+                                        <tr key={invoice.id} className="border-b border-slate-50 hover:bg-slate-50">
+                                            <td className="py-4 px-4 text-sm text-slate-700">
                                                 {new Date(invoice.date).toLocaleDateString("en-US", {
                                                     month: "short",
                                                     day: "numeric",
                                                     year: "numeric",
                                                 })}
                                             </td>
-                                            <td className="py-4 px-4 text-sm text-gray-900">{invoice.description}</td>
-                                            <td className="py-4 px-4 text-sm font-medium text-gray-900">
+                                            <td className="py-4 px-4 text-sm text-slate-700">{invoice.description}</td>
+                                            <td className="py-4 px-4 text-sm font-medium text-slate-700">
                                                 {formatPrice(invoice.amount)}
                                             </td>
                                             <td className="py-4 px-4">
@@ -284,32 +284,32 @@ export default function PaymentPage() {
 
                 {/* Billing Summary */}
                 <div>
-                    <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 p-6 sticky top-8">
-                        <h2 className="text-lg font-semibold text-gray-900 mb-6">Billing Summary</h2>
+                    <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 p-6 sticky top-8">
+                        <h2 className="text-lg font-semibold text-slate-700 mb-6">Billing Summary</h2>
 
                         {/* Current Plan */}
-                        <div className="p-4 bg-gray-50 rounded-xl border border-gray-100 mb-6">
-                            <p className="text-sm text-gray-500 mb-1">Current Plan</p>
-                            <p className="text-xl font-bold text-gray-900">No Active Plan</p>
-                            <p className="text-sm text-gray-500">Subscribe to get started</p>
+                        <div className="p-4 bg-slate-50 rounded-xl border border-slate-100 mb-6">
+                            <p className="text-sm text-slate-500 mb-1">Current Plan</p>
+                            <p className="text-xl font-bold text-slate-700">No Active Plan</p>
+                            <p className="text-sm text-slate-500">Subscribe to get started</p>
                         </div>
 
                         {/* Next Payment */}
                         <div className="space-y-3 mb-6">
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">Next Payment</span>
-                                <span className="text-gray-900 font-medium">—</span>
+                                <span className="text-slate-500">Next Payment</span>
+                                <span className="text-slate-700 font-medium">—</span>
                             </div>
                             <div className="flex justify-between text-sm">
-                                <span className="text-gray-500">Amount Due</span>
-                                <span className="text-gray-900 font-medium">—</span>
+                                <span className="text-slate-500">Amount Due</span>
+                                <span className="text-slate-700 font-medium">—</span>
                             </div>
                         </div>
 
-                        <div className="pt-4 border-t border-gray-100 space-y-3">
+                        <div className="pt-4 border-t border-slate-100 space-y-3">
                             <Link
                                 href="/plans"
-                                className="w-full py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
+                                className="w-full py-3 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-all flex items-center justify-center gap-2"
                             >
                                 <span className="material-symbols-outlined text-lg">swap_horiz</span>
                                 Change Plan
@@ -327,10 +327,10 @@ export default function PaymentPage() {
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                     <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
                         <div className="flex items-center justify-between mb-6">
-                            <h3 className="text-xl font-bold text-gray-900">Add New Card</h3>
+                            <h3 className="text-xl font-bold text-slate-700">Add New Card</h3>
                             <button
                                 onClick={() => setShowAddCard(false)}
-                                className="p-2 hover:bg-gray-100 rounded-full transition-all"
+                                className="p-2 hover:bg-slate-100 rounded-full transition-all"
                             >
                                 <span className="material-symbols-outlined">close</span>
                             </button>
@@ -338,18 +338,18 @@ export default function PaymentPage() {
 
                         <form onSubmit={handleAddCard} className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Cardholder Name</label>
+                                <label className="block text-sm font-medium text-slate-600 mb-2">Cardholder Name</label>
                                 <input
                                     type="text"
                                     value={cardName}
                                     onChange={(e) => setCardName(e.target.value)}
                                     placeholder="John Doe"
                                     required
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">Card Number</label>
+                                <label className="block text-sm font-medium text-slate-600 mb-2">Card Number</label>
                                 <input
                                     type="text"
                                     value={cardNumber}
@@ -357,12 +357,12 @@ export default function PaymentPage() {
                                     placeholder="4242 4242 4242 4242"
                                     maxLength={19}
                                     required
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
+                                    className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
                                 />
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">Expiry Date</label>
+                                    <label className="block text-sm font-medium text-slate-600 mb-2">Expiry Date</label>
                                     <input
                                         type="text"
                                         value={expiry}
@@ -370,11 +370,11 @@ export default function PaymentPage() {
                                         placeholder="MM/YY"
                                         maxLength={5}
                                         required
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
+                                        className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-2">CVC</label>
+                                    <label className="block text-sm font-medium text-slate-600 mb-2">CVC</label>
                                     <input
                                         type="text"
                                         value={cvc}
@@ -382,7 +382,7 @@ export default function PaymentPage() {
                                         placeholder="123"
                                         maxLength={4}
                                         required
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
+                                        className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
                                     />
                                 </div>
                             </div>
@@ -391,7 +391,7 @@ export default function PaymentPage() {
                                 <button
                                     type="button"
                                     onClick={() => setShowAddCard(false)}
-                                    className="flex-1 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-all"
+                                    className="flex-1 py-3 bg-slate-100 text-slate-600 font-medium rounded-xl hover:bg-slate-200 transition-all"
                                 >
                                     Cancel
                                 </button>

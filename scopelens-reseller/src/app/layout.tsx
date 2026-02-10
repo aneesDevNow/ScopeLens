@@ -24,7 +24,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className="bg-background-light text-text-light font-display h-screen flex overflow-hidden">
+      <body className="bg-slate-50 text-slate-700 font-display h-screen flex overflow-hidden">
         <LayoutInner>{children}</LayoutInner>
       </body>
     </html>

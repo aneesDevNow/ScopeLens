@@ -13,6 +13,7 @@ function AuthCallbackContent() {
     useEffect(() => {
         const accessToken = searchParams.get("access_token");
         const refreshToken = searchParams.get("refresh_token");
+        const plan = searchParams.get("plan");
 
         if (accessToken && refreshToken) {
             const supabase = createClient();
@@ -26,7 +27,8 @@ function AuthCallbackContent() {
                     console.error("Auth error:", error);
                 } else {
                     setStatus("Success! Redirecting...");
-                    router.push("/");
+                    // If a plan was selected, go straight to checkout
+                    router.push(plan ? `/checkout?plan=${plan}` : "/");
                 }
             });
         } else {

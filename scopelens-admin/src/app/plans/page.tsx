@@ -17,7 +17,7 @@ interface Plan {
     reseller_price_monthly: number;
     reseller_price_yearly: number;
     reseller_discount_percent: number;
-    scans_per_month: number;
+    scans_per_day: number;
     features: Record<string, boolean>;
     is_active: boolean;
 }
@@ -33,7 +33,7 @@ export default function PlansPage() {
         price_monthly: 0,
         price_yearly: 0,
         reseller_discount_percent: 20,
-        scans_per_month: 100,
+        scans_per_day: 100,
         features: "",
     });
 
@@ -63,7 +63,7 @@ export default function PlansPage() {
             price_monthly: 0,
             price_yearly: 0,
             reseller_discount_percent: 20,
-            scans_per_month: 100,
+            scans_per_day: 100,
             features: "",
         });
         setShowModal(true);
@@ -78,7 +78,7 @@ export default function PlansPage() {
             price_monthly: plan.price_monthly,
             price_yearly: plan.price_yearly,
             reseller_discount_percent: plan.reseller_discount_percent || 20,
-            scans_per_month: plan.scans_per_month,
+            scans_per_day: plan.scans_per_day,
             features: featuresArray.join("\n"),
         });
         setShowModal(true);
@@ -102,7 +102,7 @@ export default function PlansPage() {
             reseller_price_monthly,
             reseller_price_yearly,
             reseller_discount_percent: formData.reseller_discount_percent,
-            scans_per_month: formData.scans_per_month,
+            scans_per_day: formData.scans_per_day,
             features,
             is_active: true,
         };
@@ -175,7 +175,7 @@ export default function PlansPage() {
                                 <span className="text-sm text-muted-foreground">/mo</span>
                             </div>
                             <p className="text-sm text-muted-foreground">
-                                {plan.scans_per_month === -1 ? "Unlimited" : plan.scans_per_month} scans/month
+                                {plan.scans_per_day === -1 ? "Unlimited" : plan.scans_per_day} scans/day
                             </p>
                             {plan.price_yearly > 0 && (
                                 <p className="text-xs text-muted-foreground">
@@ -294,11 +294,11 @@ export default function PlansPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs text-muted-foreground uppercase tracking-wide">Scans/mo</Label>
+                                    <Label className="text-xs text-muted-foreground uppercase tracking-wide">Scans/day</Label>
                                     <Input
                                         type="number"
-                                        value={formData.scans_per_month}
-                                        onChange={(e) => setFormData({ ...formData, scans_per_month: parseInt(e.target.value) || 0 })}
+                                        value={formData.scans_per_day}
+                                        onChange={(e) => setFormData({ ...formData, scans_per_day: parseInt(e.target.value) || 0 })}
                                         placeholder="100"
                                     />
                                 </div>
@@ -346,7 +346,7 @@ export default function PlansPage() {
                                     className="w-full p-3 rounded-md border bg-background min-h-[120px] text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                                     value={formData.features}
                                     onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                                    placeholder={"15 AI scans per month\nAdvanced plagiarism detection\nDetailed originality reports\nEmail support"}
+                                    placeholder={"15 AI scans per day\nAdvanced plagiarism detection\nDetailed originality reports\nEmail support"}
                                 />
                             </div>
                         </CardContent>

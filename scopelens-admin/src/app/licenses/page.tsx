@@ -16,6 +16,8 @@ interface LicenseKey {
     key_code: string;
     status: string;
     duration_days: number;
+    claim_hours: number | null;
+    claim_deadline: string | null;
     batch_id: string | null;
     claimed_at: string | null;
     expires_at: string | null;
@@ -35,7 +37,7 @@ export default function LicensesPage() {
     // Generator form state
     const [selectedPlanId, setSelectedPlanId] = useState("");
     const [quantity, setQuantity] = useState(1);
-    const [durationDays, setDurationDays] = useState(30);
+    const [claimHours, setClaimHours] = useState(24);
 
     const fetchKeys = useCallback(async () => {
         try {
@@ -85,7 +87,7 @@ export default function LicensesPage() {
                 body: JSON.stringify({
                     plan_id: selectedPlanId,
                     quantity,
-                    duration_days: durationDays,
+                    claim_hours: claimHours,
                 }),
             });
 
@@ -227,16 +229,15 @@ This license is valid for use with ScopeLens AI Detection Platform.
                             </select>
                         </div>
                         <div className="space-y-2">
-                            <label className="text-sm font-medium">Duration (days)</label>
+                            <label className="text-sm font-medium">Claim Time Limit</label>
                             <select
                                 className="w-full p-2 rounded-md border bg-background"
-                                value={durationDays}
-                                onChange={(e) => setDurationDays(parseInt(e.target.value))}
+                                value={claimHours}
+                                onChange={(e) => setClaimHours(parseInt(e.target.value))}
                             >
-                                <option value={30}>30 days</option>
-                                <option value={90}>90 days</option>
-                                <option value={180}>180 days</option>
-                                <option value={365}>1 year</option>
+                                <option value={5}>5 hours</option>
+                                <option value={24}>24 hours</option>
+                                <option value={48}>48 hours</option>
                             </select>
                         </div>
                         <div className="space-y-2">
@@ -303,7 +304,7 @@ This license is valid for use with ScopeLens AI Detection Platform.
                                         <div>
                                             <div className="font-mono font-medium">{key.key_code}</div>
                                             <div className="text-xs text-muted-foreground">
-                                                {key.plans?.name || "Unknown Plan"} · {key.duration_days} days
+                                                {key.plans?.name || "Unknown Plan"} · {key.claim_hours ? `${key.claim_hours}h claim window` : `${key.duration_days} days`}
                                                 {key.claimed_at && ` · Claimed ${new Date(key.claimed_at).toLocaleDateString()}`}
                                                 {getClaimedByName(key) && ` by ${getClaimedByName(key)}`}
                                             </div>
@@ -311,6 +312,9 @@ This license is valid for use with ScopeLens AI Detection Platform.
                                                 Created {new Date(key.created_at).toLocaleDateString("en-US", {
                                                     month: "short", day: "numeric", year: "numeric"
                                                 })}
+                                                {key.claim_deadline && key.status === "available" && ` · Claim by ${new Date(key.claim_deadline).toLocaleString("en-US", {
+                                                    month: "short", day: "numeric", hour: "numeric", minute: "2-digit"
+                                                })}`}
                                                 {key.expires_at && ` · Expires ${new Date(key.expires_at).toLocaleDateString("en-US", {
                                                     month: "short", day: "numeric", year: "numeric"
                                                 })}`}

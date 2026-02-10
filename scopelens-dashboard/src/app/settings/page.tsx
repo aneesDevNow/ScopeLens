@@ -186,18 +186,18 @@ export default function SettingsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 p-8">
+        <div className="min-h-screen bg-slate-50 p-8">
             <div className="max-w-3xl mx-auto">
                 {/* Header */}
                 <div className="mb-8">
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">Settings</h1>
-                    <p className="text-gray-500">Manage your account preferences</p>
+                    <h1 className="text-3xl font-bold text-slate-700 mb-2">Settings</h1>
+                    <p className="text-slate-500">Manage your account preferences</p>
                 </div>
 
                 <div className="space-y-6">
                     {/* Profile Card */}
-                    <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100">
-                        <div className="p-6 border-b border-gray-100">
+                    <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100">
+                        <div className="p-6 border-b border-slate-100">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
                                     <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -205,43 +205,43 @@ export default function SettingsPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-semibold text-gray-900">Profile Information</h2>
-                                    <p className="text-gray-500 text-sm">Update your personal details</p>
+                                    <h2 className="text-lg font-semibold text-slate-700">Profile Information</h2>
+                                    <p className="text-slate-500 text-sm">Update your personal details</p>
                                 </div>
                             </div>
                         </div>
                         <div className="p-6 space-y-5">
                             {loading ? (
-                                <p className="text-gray-400">Loading...</p>
+                                <p className="text-slate-400">Loading...</p>
                             ) : (
                                 <>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">First Name</label>
+                                            <label className="text-sm font-medium text-slate-600">First Name</label>
                                             <input
                                                 type="text"
                                                 value={firstName}
                                                 onChange={(e) => setFirstName(e.target.value)}
-                                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             />
                                         </div>
                                         <div className="space-y-2">
-                                            <label className="text-sm font-medium text-gray-700">Last Name</label>
+                                            <label className="text-sm font-medium text-slate-600">Last Name</label>
                                             <input
                                                 type="text"
                                                 value={lastName}
                                                 onChange={(e) => setLastName(e.target.value)}
-                                                className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                             />
                                         </div>
                                     </div>
                                     <div className="space-y-2">
-                                        <label className="text-sm font-medium text-gray-700">Email</label>
+                                        <label className="text-sm font-medium text-slate-600">Email</label>
                                         <input
                                             type="email"
                                             value={profile?.email || ""}
                                             disabled
-                                            className="w-full px-4 py-3 bg-gray-100 rounded-xl border border-gray-200 text-gray-500 cursor-not-allowed"
+                                            className="w-full px-4 py-3 bg-slate-100 rounded-xl border border-slate-200 text-slate-500 cursor-not-allowed"
                                         />
                                     </div>
 
@@ -265,8 +265,8 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Security Card */}
-                    <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100">
-                        <div className="p-6 border-b border-gray-100">
+                    <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100">
+                        <div className="p-6 border-b border-slate-100">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                                     <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -274,17 +274,17 @@ export default function SettingsPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-semibold text-gray-900">Security</h2>
-                                    <p className="text-gray-500 text-sm">Manage your password and 2FA</p>
+                                    <h2 className="text-lg font-semibold text-slate-700">Security</h2>
+                                    <p className="text-slate-500 text-sm">Manage your password and 2FA</p>
                                 </div>
                             </div>
                         </div>
                         <div className="p-6 space-y-4">
                             {/* Password */}
-                            <div className="flex items-center justify-between p-5 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <div className="flex items-center justify-between p-5 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
                                 <div>
-                                    <div className="font-medium text-gray-900">Password</div>
-                                    <div className="text-sm text-gray-500">Change your account password</div>
+                                    <div className="font-medium text-slate-700">Password</div>
+                                    <div className="text-sm text-slate-500">Change your account password</div>
                                 </div>
                                 <button
                                     onClick={() => {
@@ -294,24 +294,24 @@ export default function SettingsPage() {
                                         setNewPassword("");
                                         setConfirmNewPassword("");
                                     }}
-                                    className="px-5 py-2 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-white hover:border-gray-300 transition-colors"
+                                    className="px-5 py-2 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-white hover:border-slate-300 transition-colors"
                                 >
                                     Change Password
                                 </button>
                             </div>
 
                             {/* 2FA */}
-                            <div className="flex items-center justify-between p-5 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <div className="flex items-center justify-between p-5 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
                                 <div>
-                                    <div className="font-medium text-gray-900">Two-Factor Authentication</div>
-                                    <div className="text-sm text-gray-500">
+                                    <div className="font-medium text-slate-700">Two-Factor Authentication</div>
+                                    <div className="text-sm text-slate-500">
                                         {twoFactorEnabled ? "2FA is currently enabled" : "Add an extra layer of security"}
                                     </div>
                                 </div>
                                 <button
                                     onClick={handleToggle2FA}
                                     disabled={twoFactorLoading}
-                                    className={`w-14 h-8 rounded-full relative cursor-pointer transition-colors duration-300 ${twoFactorEnabled ? "bg-green-500" : "bg-gray-300"
+                                    className={`w-14 h-8 rounded-full relative cursor-pointer transition-colors duration-300 ${twoFactorEnabled ? "bg-green-500" : "bg-slate-300"
                                         } ${twoFactorLoading ? "opacity-50" : ""}`}
                                 >
                                     <div
@@ -324,8 +324,8 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Notifications Card */}
-                    <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100">
-                        <div className="p-6 border-b border-gray-100">
+                    <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100">
+                        <div className="p-6 border-b border-slate-100">
                             <div className="flex items-center gap-3">
                                 <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
                                     <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -333,21 +333,21 @@ export default function SettingsPage() {
                                     </svg>
                                 </div>
                                 <div>
-                                    <h2 className="text-lg font-semibold text-gray-900">Notifications</h2>
-                                    <p className="text-gray-500 text-sm">Choose what you want to be notified about</p>
+                                    <h2 className="text-lg font-semibold text-slate-700">Notifications</h2>
+                                    <p className="text-slate-500 text-sm">Choose what you want to be notified about</p>
                                 </div>
                             </div>
                         </div>
                         <div className="p-6 space-y-4">
                             {/* Email Notifications */}
-                            <div className="flex items-center justify-between p-5 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <div className="flex items-center justify-between p-5 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
                                 <div>
-                                    <div className="font-medium text-gray-900">Email Notifications</div>
-                                    <div className="text-sm text-gray-500">Receive scan results via email</div>
+                                    <div className="font-medium text-slate-700">Email Notifications</div>
+                                    <div className="text-sm text-slate-500">Receive scan results via email</div>
                                 </div>
                                 <button
                                     onClick={handleToggleEmailNotifications}
-                                    className={`w-14 h-8 rounded-full relative cursor-pointer transition-colors duration-300 ${emailNotifications ? "bg-blue-600" : "bg-gray-300"
+                                    className={`w-14 h-8 rounded-full relative cursor-pointer transition-colors duration-300 ${emailNotifications ? "bg-blue-600" : "bg-slate-300"
                                         }`}
                                 >
                                     <div
@@ -358,14 +358,14 @@ export default function SettingsPage() {
                             </div>
 
                             {/* Weekly Report */}
-                            <div className="flex items-center justify-between p-5 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors">
+                            <div className="flex items-center justify-between p-5 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
                                 <div>
-                                    <div className="font-medium text-gray-900">Weekly Report</div>
-                                    <div className="text-sm text-gray-500">Get a weekly summary of your activity</div>
+                                    <div className="font-medium text-slate-700">Weekly Report</div>
+                                    <div className="text-sm text-slate-500">Get a weekly summary of your activity</div>
                                 </div>
                                 <button
                                     onClick={handleToggleWeeklyReport}
-                                    className={`w-14 h-8 rounded-full relative cursor-pointer transition-colors duration-300 ${weeklyReport ? "bg-blue-600" : "bg-gray-300"
+                                    className={`w-14 h-8 rounded-full relative cursor-pointer transition-colors duration-300 ${weeklyReport ? "bg-blue-600" : "bg-slate-300"
                                         }`}
                                 >
                                     <div
@@ -383,44 +383,44 @@ export default function SettingsPage() {
             {showPasswordModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
                     <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
-                        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                            <h3 className="text-lg font-semibold text-gray-900">Change Password</h3>
+                        <div className="flex items-center justify-between p-6 border-b border-slate-100">
+                            <h3 className="text-lg font-semibold text-slate-700">Change Password</h3>
                             <button
                                 onClick={() => setShowPasswordModal(false)}
-                                className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-100 transition-colors"
+                                className="w-8 h-8 flex items-center justify-center text-slate-400 hover:text-slate-500 rounded-lg hover:bg-slate-100 transition-colors"
                             >
                                 ✕
                             </button>
                         </div>
                         <div className="p-6 space-y-4">
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Current Password</label>
+                                <label className="text-sm font-medium text-slate-600">Current Password</label>
                                 <input
                                     type="password"
                                     value={currentPassword}
                                     onChange={(e) => setCurrentPassword(e.target.value)}
                                     placeholder="••••••••"
-                                    className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">New Password</label>
+                                <label className="text-sm font-medium text-slate-600">New Password</label>
                                 <input
                                     type="password"
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
                                     placeholder="••••••••"
-                                    className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
                             <div className="space-y-2">
-                                <label className="text-sm font-medium text-gray-700">Confirm New Password</label>
+                                <label className="text-sm font-medium text-slate-600">Confirm New Password</label>
                                 <input
                                     type="password"
                                     value={confirmNewPassword}
                                     onChange={(e) => setConfirmNewPassword(e.target.value)}
                                     placeholder="••••••••"
-                                    className="w-full px-4 py-3 bg-gray-50 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                 />
                             </div>
 
@@ -433,10 +433,10 @@ export default function SettingsPage() {
                                 </div>
                             )}
                         </div>
-                        <div className="p-6 border-t border-gray-100 flex gap-3 justify-end">
+                        <div className="p-6 border-t border-slate-100 flex gap-3 justify-end">
                             <button
                                 onClick={() => setShowPasswordModal(false)}
-                                className="px-5 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                                className="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-medium hover:bg-slate-50 transition-colors"
                             >
                                 Cancel
                             </button>

@@ -1,12 +1,9 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, useCallback, useRef, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
 interface CreditPackage {
     id: string;
@@ -16,22 +13,101 @@ interface CreditPackage {
     price: number;
 }
 
+interface BankInfo {
+    id: string;
+    name: string;
+    accountTitle: string;
+    accountNumber: string;
+}
+
+function ScopeLensLogo() {
+    return (
+        <div className="w-9 h-9 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-800 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" className="w-5 h-5">
+                <circle cx="100" cy="88" r="45" fill="none" stroke="white" strokeWidth="8" opacity="0.95" />
+                <circle cx="100" cy="88" r="32" fill="none" stroke="white" strokeWidth="4" opacity="0.7" />
+                <circle cx="92" cy="80" r="8" fill="white" opacity="0.4" />
+                <line x1="70" y1="78" x2="130" y2="78" stroke="white" strokeWidth="3" opacity="0.6" strokeLinecap="round" />
+                <line x1="75" y1="88" x2="125" y2="88" stroke="white" strokeWidth="3" opacity="0.8" strokeLinecap="round" />
+                <line x1="70" y1="98" x2="130" y2="98" stroke="white" strokeWidth="3" opacity="0.6" strokeLinecap="round" />
+                <rect x="132" y="118" width="14" height="45" rx="7" fill="white" opacity="0.95" transform="rotate(45, 139, 140)" />
+            </svg>
+        </div>
+    );
+}
+
+type VerificationStatus = "idle" | "submitting" | "polling" | "verified" | "rejected" | "timeout" | "error";
+
 function CheckoutContent() {
     const searchParams = useSearchParams();
     const packageId = searchParams.get("package");
     const router = useRouter();
-    const { formatPrice } = useCurrency();
+    const { formatPrice, currency } = useCurrency();
 
     const [pkg, setPkg] = useState<CreditPackage | null>(null);
     const [loading, setLoading] = useState(true);
     const [processing, setProcessing] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    // Form state
+    // Payment method
+    const [paymentMethod, setPaymentMethod] = useState<"card" | "paypal" | "bank_transfer">("card");
+    const [screenshot, setScreenshot] = useState<File | null>(null);
+
+    // Bank transfer fields
+    const [banks, setBanks] = useState<BankInfo[]>([]);
+    const [selectedBank, setSelectedBank] = useState<string>("");
+    const [senderName, setSenderName] = useState("");
+
+    // Verification state
+    const [verificationStatus, setVerificationStatus] = useState<VerificationStatus>("idle");
+    const [transactionId, setTransactionId] = useState<string | null>(null);
+    const pollTimerRef = useRef<NodeJS.Timeout | null>(null);
+    const pollCountRef = useRef(0);
+
+    // Form state (card)
     const [cardName, setCardName] = useState("");
     const [cardNumber, setCardNumber] = useState("");
     const [expiry, setExpiry] = useState("");
     const [cvc, setCvc] = useState("");
+    const [country, setCountry] = useState("United States");
+    const [zip, setZip] = useState("");
+
+    useEffect(() => {
+        if (currency === "PKR") {
+            setPaymentMethod("bank_transfer");
+        } else {
+            setPaymentMethod("card");
+        }
+    }, [currency]);
+
+    // Fetch banks when payment method is bank_transfer
+    useEffect(() => {
+        if (paymentMethod === "bank_transfer") {
+            fetch("/api/payment/banks")
+                .then(res => res.json())
+                .then(data => {
+                    if (data.banks) {
+                        setBanks(data.banks);
+                        if (data.banks.length > 0 && !selectedBank) {
+                            setSelectedBank(data.banks[0].id);
+                        }
+                    }
+                })
+                .catch(err => console.error("Failed to fetch banks:", err));
+        }
+    }, [paymentMethod, selectedBank]);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            if (file.size > 5 * 1024 * 1024) {
+                setError("File size must be under 5MB");
+                return;
+            }
+            setScreenshot(file);
+            setError(null);
+        }
+    };
 
     useEffect(() => {
         if (!packageId) {
@@ -56,6 +132,13 @@ function CheckoutContent() {
         fetchPackage();
     }, [packageId]);
 
+    // Cleanup polling on unmount
+    useEffect(() => {
+        return () => {
+            if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+        };
+    }, []);
+
     const formatCardNumber = (value: string) => {
         const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
         const matches = v.match(/\d{4,16}/g);
@@ -70,10 +153,56 @@ function CheckoutContent() {
     const formatExpiry = (value: string) => {
         const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
         if (v.length >= 2) {
-            return v.substring(0, 2) + "/" + v.substring(2, 4);
+            return v.substring(0, 2) + " / " + v.substring(2, 4);
         }
         return v;
     };
+
+    // Convert file to base64
+    const fileToBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = reject;
+        });
+    };
+
+    // Poll for verification status
+    const startPolling = useCallback((txId: string) => {
+        setVerificationStatus("polling");
+        pollCountRef.current = 0;
+
+        pollTimerRef.current = setInterval(async () => {
+            pollCountRef.current += 1;
+
+            // Stop after 60 polls (2 minutes at 2s intervals)
+            if (pollCountRef.current > 60) {
+                if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+                setVerificationStatus("timeout");
+                return;
+            }
+
+            try {
+                const res = await fetch(`/api/payment/verify?transaction_id=${encodeURIComponent(txId)}`);
+                const data = await res.json();
+
+                if (data.status === "verified") {
+                    if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+                    setVerificationStatus("verified");
+                    setTimeout(() => {
+                        router.push("/billing?success=true");
+                    }, 2000);
+                } else if (data.status === "rejected") {
+                    if (pollTimerRef.current) clearInterval(pollTimerRef.current);
+                    setVerificationStatus("rejected");
+                }
+                // "pending" / "manual_review" → keep polling
+            } catch {
+                // Network error — keep trying
+            }
+        }, 2000);
+    }, [router]);
 
     async function handlePurchase(e: React.FormEvent) {
         e.preventDefault();
@@ -82,9 +211,62 @@ function CheckoutContent() {
         setProcessing(true);
         setError(null);
 
-        // Simulate network delay for "processing"
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        if (paymentMethod === "bank_transfer") {
+            if (!screenshot) {
+                setError("Please upload a payment screenshot");
+                setProcessing(false);
+                return;
+            }
+            if (!senderName.trim()) {
+                setError("Please enter the sender name");
+                setProcessing(false);
+                return;
+            }
 
+            try {
+                setVerificationStatus("submitting");
+                const screenshotBase64 = await fileToBase64(screenshot);
+                const bank = banks.find(b => b.id === selectedBank);
+
+                const res = await fetch("/api/payment/verify", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        packageId: pkg.id,
+                        screenshotBase64,
+                        senderName: senderName.trim(),
+                        bankName: bank?.name || selectedBank,
+                    }),
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                    setError(data.error || "Failed to submit payment");
+                    setVerificationStatus("error");
+                    setProcessing(false);
+                    return;
+                }
+
+                setTransactionId(data.transaction_id);
+
+                if (data.status === "verified") {
+                    setVerificationStatus("verified");
+                    setTimeout(() => router.push("/billing?success=true"), 2000);
+                } else {
+                    // Start polling for verification
+                    startPolling(data.transaction_id);
+                }
+            } catch (err) {
+                console.error("Bank transfer error:", err);
+                setError("Network error. Please try again.");
+                setVerificationStatus("error");
+                setProcessing(false);
+            }
+            return;
+        }
+
+        // Card / PayPal flow
         try {
             const res = await fetch("/api/billing/purchase", {
                 method: "POST",
@@ -100,9 +282,6 @@ function CheckoutContent() {
                 return;
             }
 
-            // Success! Redirect to billing with success param (or handle here)
-            // Ideally we'd show a success page, but user asked for "success message" which we can do via query param or simple state
-            // Let's redirect to billing
             router.push("/billing?success=true");
         } catch (err) {
             console.error("Purchase error:", err);
@@ -111,12 +290,115 @@ function CheckoutContent() {
         }
     }
 
+    // ─── Verification Overlay ──────────────────────────────────
+    if (verificationStatus !== "idle" && verificationStatus !== "error") {
+        return (
+            <div className="h-screen flex items-center justify-center bg-slate-50">
+                <div className="w-full max-w-md mx-auto text-center p-8">
+                    {verificationStatus === "submitting" && (
+                        <div className="space-y-4">
+                            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                            <h2 className="text-xl font-bold text-slate-700">Submitting Payment</h2>
+                            <p className="text-sm text-slate-500">Uploading your screenshot for verification...</p>
+                        </div>
+                    )}
+
+                    {verificationStatus === "polling" && (
+                        <div className="space-y-4">
+                            <div className="relative w-20 h-20 mx-auto">
+                                <div className="absolute inset-0 border-4 border-blue-200 rounded-full"></div>
+                                <div className="absolute inset-0 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                                <div className="absolute inset-3 bg-blue-50 rounded-full flex items-center justify-center">
+                                    <svg className="w-8 h-8 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <h2 className="text-xl font-bold text-slate-700">Verifying Payment</h2>
+                            <p className="text-sm text-slate-500">
+                                Our AI is analyzing your payment screenshot.<br />
+                                This usually takes less than a minute.
+                            </p>
+                            <div className="w-48 h-1.5 bg-slate-200 rounded-full mx-auto overflow-hidden">
+                                <div className="h-full bg-blue-600 rounded-full animate-pulse" style={{ width: "60%" }}></div>
+                            </div>
+                        </div>
+                    )}
+
+                    {verificationStatus === "verified" && (
+                        <div className="space-y-4">
+                            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                                <svg className="w-10 h-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                            </div>
+                            <h2 className="text-xl font-bold text-green-700">Payment Verified!</h2>
+                            <p className="text-sm text-slate-500">Your credits have been added. Redirecting...</p>
+                        </div>
+                    )}
+
+                    {verificationStatus === "rejected" && (
+                        <div className="space-y-4">
+                            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto">
+                                <svg className="w-10 h-10 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </div>
+                            <h2 className="text-xl font-bold text-red-700">Verification Failed</h2>
+                            <p className="text-sm text-slate-500">
+                                The payment screenshot could not be verified.<br />
+                                Please ensure you uploaded the correct receipt.
+                            </p>
+                            <button
+                                onClick={() => {
+                                    setVerificationStatus("idle");
+                                    setProcessing(false);
+                                    setScreenshot(null);
+                                    setTransactionId(null);
+                                }}
+                                className="px-6 py-2.5 bg-slate-100 text-slate-700 font-semibold text-sm rounded-lg hover:bg-slate-200 transition-colors"
+                            >
+                                Try Again
+                            </button>
+                        </div>
+                    )}
+
+                    {verificationStatus === "timeout" && (
+                        <div className="space-y-4">
+                            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto">
+                                <svg className="w-10 h-10 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                            </div>
+                            <h2 className="text-xl font-bold text-amber-700">Under Review</h2>
+                            <p className="text-sm text-slate-500">
+                                Your payment is being manually reviewed.<br />
+                                You&apos;ll receive an email once it&apos;s approved.
+                            </p>
+                            {transactionId && (
+                                <p className="text-xs text-slate-400 font-mono">
+                                    Reference: {transactionId.slice(0, 8)}...
+                                </p>
+                            )}
+                            <Link
+                                href="/billing?success=pending_approval"
+                                className="inline-flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-semibold text-sm rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all"
+                            >
+                                Back to Billing
+                            </Link>
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    }
+
     if (loading) {
         return (
-            <div className="min-h-[60vh] flex items-center justify-center">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-muted-foreground">Loading checkout...</p>
+            <div className="h-screen flex items-center justify-center">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-sm text-slate-500">Loading checkout...</p>
                 </div>
             </div>
         );
@@ -124,167 +406,456 @@ function CheckoutContent() {
 
     if (!pkg) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
-                    <span className="material-symbols-outlined text-red-600 text-3xl">error</span>
+            <div className="h-screen flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <svg className="w-7 h-7 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h1 className="text-xl font-bold text-slate-700 mb-1">Package Not Found</h1>
+                    <p className="text-sm text-slate-500 mb-4">The selected package does not exist.</p>
+                    <Link
+                        href="/billing"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all"
+                    >
+                        Back to Billing
+                    </Link>
                 </div>
-                <h1 className="text-2xl font-bold">Package Not Found</h1>
-                <p className="text-muted-foreground">The package you are looking for does not exist.</p>
-                <Link href="/billing">
-                    <Button>Back to Billing</Button>
-                </Link>
             </div>
         );
     }
 
     const totalCredits = pkg.credits + (pkg.bonus_credits || 0);
+    const currentBank = banks.find(b => b.id === selectedBank);
 
     return (
-        <div className="max-w-4xl mx-auto py-8 px-4">
-            <Link href="/billing" className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground mb-6 transition-colors">
-                <span className="material-symbols-outlined mr-2 text-lg">arrow_back</span>
-                Back to Billing
-            </Link>
+        <div className="h-screen flex flex-col overflow-hidden">
+            {/* Top Navbar */}
+            <nav className="bg-white border-b border-slate-200 px-6 py-3 flex-shrink-0">
+                <div className="max-w-6xl mx-auto flex items-center justify-between">
+                    <Link href="/billing" className="flex items-center gap-2.5">
+                        <ScopeLensLogo />
+                        <span className="text-lg font-bold text-slate-700">Scope Lens</span>
+                    </Link>
+                    <div className="flex items-center gap-1.5 text-slate-500 text-xs">
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                        <span className="font-medium">Secure Checkout</span>
+                    </div>
+                </div>
+            </nav>
 
-            <h1 className="text-3xl font-bold mb-2">Checkout</h1>
-            <p className="text-muted-foreground mb-8">Complete your credit purchase securely</p>
+            {/* Scrollable Content Area */}
+            <div className="flex-1 overflow-y-auto">
+                <div className="max-w-6xl mx-auto px-6 py-6">
+                    {/* Page Header */}
+                    <div className="mb-5">
+                        <h1 className="text-2xl font-bold text-slate-700 mb-1">Secure Checkout</h1>
+                        <p className="text-sm text-slate-500">Complete your purchase to add credits to your account.</p>
+                    </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
-                {/* Left: Payment Form */}
-                <div className="md:col-span-2 space-y-6">
-                    <div className="bg-card border rounded-xl p-6 shadow-sm">
-                        <div className="flex items-center gap-3 mb-6">
-                            <span className="material-symbols-outlined text-primary text-2xl">credit_card</span>
-                            <h2 className="text-xl font-semibold">Payment Details</h2>
+                    {/* Progress Bar */}
+                    <div className="mb-6">
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm font-bold text-slate-700">Payment Details</span>
+                            <span className="text-xs text-slate-500">Step 2 of 3</span>
                         </div>
+                        <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div className="h-full bg-gradient-to-r from-blue-600 to-blue-500 rounded-full" style={{ width: "66%" }}></div>
+                        </div>
+                    </div>
 
-                        {error && (
-                            <div className="mb-6 p-4 rounded-lg bg-red-50 border border-red-200 flex items-center gap-3">
-                                <span className="material-symbols-outlined text-red-600">error</span>
-                                <p className="text-red-800 text-sm font-medium">{error}</p>
-                            </div>
-                        )}
+                    <form onSubmit={handlePurchase}>
+                        <div className="grid lg:grid-cols-3 gap-6">
+                            {/* Left Column: Payment Form */}
+                            <div className="lg:col-span-2 space-y-5">
+                                {/* Payment Method Card */}
+                                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                                    <h2 className="text-base font-bold text-slate-700 mb-4">Payment Method</h2>
 
-                        <form onSubmit={handlePurchase} className="space-y-4">
-                            <div className="space-y-2">
-                                <Label htmlFor="cardName">Cardholder Name</Label>
-                                <Input
-                                    id="cardName"
-                                    placeholder="John Doe"
-                                    value={cardName}
-                                    onChange={(e) => setCardName(e.target.value)}
-                                    required
-                                />
-                            </div>
+                                    {/* Method Selector */}
+                                    <div className="grid grid-cols-2 gap-3 mb-5">
+                                        {currency === "PKR" ? (
+                                            <button
+                                                type="button"
+                                                onClick={() => setPaymentMethod("bank_transfer")}
+                                                className={`col-span-2 flex items-center justify-center gap-2.5 p-3 rounded-lg border-2 transition-all text-sm border-blue-600 bg-blue-50/50`}
+                                            >
+                                                <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                                                </svg>
+                                                <span className="font-semibold text-slate-700">Bank Transfer (PK Only)</span>
+                                            </button>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPaymentMethod("card")}
+                                                    className={`flex items-center gap-2.5 p-3 rounded-lg border-2 transition-all text-sm ${paymentMethod === "card"
+                                                        ? "border-blue-600 bg-blue-50/50"
+                                                        : "border-slate-200 hover:border-slate-300"
+                                                        }`}
+                                                >
+                                                    <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                                    </svg>
+                                                    <span className="font-semibold text-slate-700">Credit Card</span>
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPaymentMethod("paypal")}
+                                                    className={`flex items-center gap-2.5 p-3 rounded-lg border-2 transition-all text-sm ${paymentMethod === "paypal"
+                                                        ? "border-blue-600 bg-blue-50/50"
+                                                        : "border-slate-200 hover:border-slate-300"
+                                                        }`}
+                                                >
+                                                    <svg className="w-5 h-5 text-blue-700" viewBox="0 0 24 24" fill="currentColor">
+                                                        <path d="M7.076 21.337H2.47a.641.641 0 01-.633-.74L4.944 2.818A.764.764 0 015.7 2.16h6.152c2.07 0 3.58.465 4.454 1.393.847.908 1.108 2.21.773 3.863-.018.087-.04.181-.06.27-.022.089-.048.185-.078.288l-.012.048v.209l.146.084c.61.353 1.093.83 1.426 1.424a4.49 4.49 0 01.52 2.476c-.064.625-.222 1.244-.47 1.827a4.91 4.91 0 01-1.062 1.49 4.26 4.26 0 01-1.527.929c-.592.224-1.262.338-1.985.338h-.473a1.163 1.163 0 00-1.149.98l-.036.193-.61 3.874-.028.14a.096.096 0 01-.024.063.092.092 0 01-.058.024H7.076z" />
+                                                    </svg>
+                                                    <span className="font-semibold text-slate-700">PayPal</span>
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="cardNumber">Card Number</Label>
-                                <div className="relative">
-                                    <Input
-                                        id="cardNumber"
-                                        placeholder="0000 0000 0000 0000"
-                                        value={cardNumber}
-                                        onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                                        maxLength={19}
-                                        required
-                                        className="pl-10 font-mono"
-                                    />
-                                    <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-lg">credit_card</span>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="expiry">Expiry</Label>
-                                    <Input
-                                        id="expiry"
-                                        placeholder="MM/YY"
-                                        value={expiry}
-                                        onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                                        maxLength={5}
-                                        required
-                                        className="font-mono"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="cvc">CVC</Label>
-                                    <Input
-                                        id="cvc"
-                                        placeholder="123"
-                                        value={cvc}
-                                        onChange={(e) => setCvc(e.target.value.replace(/\D/g, "").slice(0, 4))}
-                                        maxLength={4}
-                                        required
-                                        className="font-mono"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="pt-4">
-                                <Button
-                                    type="submit"
-                                    className="w-full h-12 text-lg font-semibold"
-                                    disabled={processing}
-                                >
-                                    {processing ? (
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                            Processing...
+                                    {error && (
+                                        <div className="mb-4 p-3 text-xs text-red-700 bg-red-50 rounded-lg border border-red-100 flex items-center gap-2">
+                                            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            {error}
                                         </div>
-                                    ) : (
-                                        `Pay ${formatPrice(pkg.price)}`
                                     )}
-                                </Button>
-                                <p className="text-xs text-center text-muted-foreground mt-3 flex items-center justify-center gap-1">
-                                    <span className="material-symbols-outlined text-sm">lock</span>
-                                    Payments are simulated for development
-                                </p>
+
+                                    {paymentMethod === "bank_transfer" && (
+                                        <div className="space-y-5">
+                                            {/* Bank Details */}
+                                            <div className="bg-slate-50 rounded-lg p-4 border border-slate-200">
+                                                <h3 className="text-sm font-semibold text-slate-700 mb-3 flex items-center gap-2">
+                                                    <svg className="w-4 h-4 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                    </svg>
+                                                    Bank Details — Transfer to this account
+                                                </h3>
+                                                <div className="grid grid-cols-2 gap-4 text-sm">
+                                                    <div>
+                                                        <p className="text-xs text-slate-500 mb-0.5">Bank Name</p>
+                                                        <p className="font-medium text-slate-700">{currentBank?.name || "—"}</p>
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-xs text-slate-500 mb-0.5">Account Title</p>
+                                                        <p className="font-medium text-slate-700">{currentBank?.accountTitle || "—"}</p>
+                                                    </div>
+                                                    <div className="col-span-2">
+                                                        <p className="text-xs text-slate-500 mb-0.5">Account Number / IBAN</p>
+                                                        <p className="font-mono font-medium text-slate-700 tracking-wide">{currentBank?.accountNumber || "—"}</p>
+                                                    </div>
+                                                    <div className="col-span-2">
+                                                        <p className="text-xs text-slate-500 mb-0.5">Amount to Transfer</p>
+                                                        <p className="font-bold text-blue-600 text-lg">{formatPrice(pkg.price)}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Sender Name */}
+                                            <div className="space-y-1.5">
+                                                <label className="text-sm font-medium text-slate-600">Sender Name (as on bank account)</label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="e.g. Muhammad Ahmed"
+                                                    value={senderName}
+                                                    onChange={(e) => setSenderName(e.target.value)}
+                                                    required
+                                                    className="w-full px-3 py-2.5 bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm text-slate-700 placeholder:text-slate-400"
+                                                />
+                                            </div>
+
+                                            {/* Bank Selection (if multiple) */}
+                                            {banks.length > 1 && (
+                                                <div className="space-y-1.5">
+                                                    <label className="text-sm font-medium text-slate-600">Select Bank</label>
+                                                    <div className="relative">
+                                                        <select
+                                                            value={selectedBank}
+                                                            onChange={(e) => setSelectedBank(e.target.value)}
+                                                            className="w-full appearance-none px-3 py-2.5 bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm text-slate-700 cursor-pointer"
+                                                        >
+                                                            {banks.map(bank => (
+                                                                <option key={bank.id} value={bank.id}>{bank.name}</option>
+                                                            ))}
+                                                        </select>
+                                                        <svg className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                        </svg>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Screenshot Upload */}
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium text-slate-600">Upload Payment Screenshot</label>
+                                                <div className="relative border-2 border-dashed border-slate-300 rounded-lg p-6 hover:border-blue-500 transition-colors text-center cursor-pointer">
+                                                    <input
+                                                        type="file"
+                                                        accept="image/*"
+                                                        onChange={handleFileChange}
+                                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                        required
+                                                    />
+                                                    {screenshot ? (
+                                                        <div className="flex items-center justify-center gap-2 text-green-600">
+                                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                            <span className="text-sm font-medium">{screenshot.name}</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="space-y-1">
+                                                            <svg className="w-8 h-8 text-slate-400 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                                                            </svg>
+                                                            <p className="text-sm text-slate-500">Click to upload or drag and drop</p>
+                                                            <p className="text-xs text-slate-400">PNG, JPG up to 5MB</p>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {paymentMethod === "card" && (
+                                        <div className="space-y-4">
+                                            {/* Card Number */}
+                                            <div className="space-y-1.5">
+                                                <label className="text-sm font-medium text-slate-600">Card Number</label>
+                                                <div className="relative">
+                                                    <svg className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                                    </svg>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="0000 0000 0000 0000"
+                                                        value={cardNumber}
+                                                        onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
+                                                        maxLength={19}
+                                                        required
+                                                        className="w-full pl-10 pr-4 py-2.5 bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm text-slate-700 placeholder:text-slate-400"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Expiry + CVC */}
+                                            <div className="grid grid-cols-2 gap-3">
+                                                <div className="space-y-1.5">
+                                                    <label className="text-sm font-medium text-slate-600">Expiration Date</label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="MM / YY"
+                                                        value={expiry}
+                                                        onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                                                        maxLength={7}
+                                                        required
+                                                        className="w-full px-3 py-2.5 bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm text-slate-700 placeholder:text-slate-400"
+                                                    />
+                                                </div>
+                                                <div className="space-y-1.5">
+                                                    <label className="text-sm font-medium text-slate-600">CVC</label>
+                                                    <input
+                                                        type="text"
+                                                        placeholder="123"
+                                                        value={cvc}
+                                                        onChange={(e) => setCvc(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                                                        maxLength={4}
+                                                        required
+                                                        className="w-full px-3 py-2.5 bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono text-sm text-slate-700 placeholder:text-slate-400"
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Cardholder Name */}
+                                            <div className="space-y-1.5">
+                                                <label className="text-sm font-medium text-slate-600">Cardholder Name</label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="Full Name on Card"
+                                                    value={cardName}
+                                                    onChange={(e) => setCardName(e.target.value)}
+                                                    required
+                                                    className="w-full px-3 py-2.5 bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm text-slate-700 placeholder:text-slate-400"
+                                                />
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {paymentMethod === "paypal" && (
+                                        <div className="text-center py-6">
+                                            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+                                                <svg className="w-6 h-6 text-blue-700" viewBox="0 0 24 24" fill="currentColor">
+                                                    <path d="M7.076 21.337H2.47a.641.641 0 01-.633-.74L4.944 2.818A.764.764 0 015.7 2.16h6.152c2.07 0 3.58.465 4.454 1.393.847.908 1.108 2.21.773 3.863-.018.087-.04.181-.06.27-.022.089-.048.185-.078.288l-.012.048v.209l.146.084c.61.353 1.093.83 1.426 1.424a4.49 4.49 0 01.52 2.476c-.064.625-.222 1.244-.47 1.827a4.91 4.91 0 01-1.062 1.49 4.26 4.26 0 01-1.527.929c-.592.224-1.262.338-1.985.338h-.473a1.163 1.163 0 00-1.149.98l-.036.193-.61 3.874-.028.14a.096.096 0 01-.024.063.092.092 0 01-.058.024H7.076z" />
+                                                </svg>
+                                            </div>
+                                            <p className="text-slate-500 text-xs">You will be redirected to PayPal to complete your purchase.</p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Billing Address */}
+                                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                                    <h2 className="text-base font-bold text-slate-700 mb-4">Billing Address</h2>
+
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div className="space-y-1.5">
+                                            <label className="text-sm font-medium text-slate-600">Country or Region</label>
+                                            <div className="relative">
+                                                <select
+                                                    value={country}
+                                                    onChange={(e) => setCountry(e.target.value)}
+                                                    className="w-full appearance-none px-3 py-2.5 bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm text-slate-700 cursor-pointer"
+                                                >
+                                                    <option>United States</option>
+                                                    <option>United Kingdom</option>
+                                                    <option>Canada</option>
+                                                    <option>Australia</option>
+                                                    <option>Germany</option>
+                                                    <option>France</option>
+                                                    <option>India</option>
+                                                    <option>Pakistan</option>
+                                                    <option>Other</option>
+                                                </select>
+                                                <svg className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                                </svg>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-1.5">
+                                            <label className="text-sm font-medium text-slate-600">ZIP / Postal Code</label>
+                                            <input
+                                                type="text"
+                                                placeholder="12345"
+                                                value={zip}
+                                                onChange={(e) => setZip(e.target.value)}
+                                                className="w-full px-3 py-2.5 bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm text-slate-700 placeholder:text-slate-400"
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Security Badges + Button Row */}
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="flex items-center gap-4 text-[10px] text-slate-400">
+                                        <div className="flex items-center gap-1.5">
+                                            <svg className="w-3.5 h-3.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                            </svg>
+                                            <span className="font-medium">SSL Encrypted</span>
+                                        </div>
+                                        <div className="flex items-center gap-1.5">
+                                            <svg className="w-3.5 h-3.5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                            </svg>
+                                            <span className="font-medium">PCI DSS Compliant</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Complete Purchase Button */}
+                                    <button
+                                        type="submit"
+                                        disabled={processing}
+                                        className="px-8 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white font-bold text-sm rounded-lg hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-shrink-0"
+                                    >
+                                        {processing ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                                                Processing...
+                                            </>
+                                        ) : paymentMethod === "bank_transfer" ? (
+                                            "Submit Proof"
+                                        ) : (
+                                            "Complete Purchase"
+                                        )}
+                                    </button>
+                                </div>
                             </div>
-                        </form>
-                    </div>
+
+                            {/* Right Column: Order Summary */}
+                            <div className="lg:col-span-1">
+                                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
+                                    <h2 className="text-base font-bold text-slate-700 mb-4">Order Summary</h2>
+
+                                    {/* Package Info */}
+                                    <div className="mb-4">
+                                        <div className="flex items-start justify-between mb-1">
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-700">{pkg.name}</p>
+                                                <p className="text-xs text-blue-600">Credit Package</p>
+                                            </div>
+                                            <p className="text-sm font-bold text-slate-700">{formatPrice(pkg.price)}</p>
+                                        </div>
+
+                                        <div className="mt-2 flex flex-wrap gap-1.5">
+                                            <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-50 rounded-full text-xs text-blue-700 font-medium">
+                                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                                {totalCredits} credits
+                                            </span>
+                                            {pkg.bonus_credits > 0 && (
+                                                <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 rounded-full text-xs text-green-700 font-medium">
+                                                    +{pkg.bonus_credits} bonus
+                                                </span>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* Price Breakdown */}
+                                    <div className="border-t border-slate-100 pt-3 space-y-2">
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-500">Subtotal</span>
+                                            <span className="text-slate-700">{formatPrice(pkg.price)}</span>
+                                        </div>
+                                        <div className="flex justify-between text-xs">
+                                            <span className="text-slate-500">Tax (Estimated)</span>
+                                            <span className="text-slate-700">$0.00</span>
+                                        </div>
+                                        <div className="flex justify-between items-center pt-2 border-t border-slate-100">
+                                            <span className="text-sm font-bold text-slate-700">Total Due</span>
+                                            <span className="text-lg font-bold text-blue-600">{formatPrice(pkg.price)}</span>
+                                        </div>
+                                    </div>
+
+                                    {/* Terms */}
+                                    <p className="text-[10px] text-slate-400 text-center mt-4 leading-relaxed">
+                                        By completing your purchase, you agree to our{" "}
+                                        <a href="#" className="text-slate-500 underline hover:text-blue-600 transition-colors">Terms of Service</a>.
+                                    </p>
+                                </div>
+
+                                {/* Testimonial */}
+                                <div className="mt-4 text-center px-2">
+                                    <div className="flex justify-center gap-0.5 mb-2">
+                                        {[...Array(5)].map((_, i) => (
+                                            <svg key={i} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                            </svg>
+                                        ))}
+                                    </div>
+                                    <p className="text-xs text-slate-500 italic leading-relaxed mb-1">
+                                        &ldquo;Scope Lens has revolutionized how our department handles grading.&rdquo;
+                                    </p>
+                                    <p className="text-xs font-semibold text-slate-500">— Dr. Sarah Jenkins, NYU</p>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
 
-                {/* Right: Order Summary */}
-                <div className="md:col-span-1">
-                    <div className="bg-muted/30 border rounded-xl p-6 sticky top-8">
-                        <h2 className="text-lg font-semibold mb-4">Order Summary</h2>
-
-                        <div className="bg-background rounded-lg p-4 border mb-4">
-                            <div className="flex justify-between items-start mb-2">
-                                <div>
-                                    <h3 className="font-semibold">{pkg.name}</h3>
-                                    <p className="text-sm text-muted-foreground">{pkg.credits} credits</p>
-                                </div>
-                                <p className="font-bold text-lg">{formatPrice(pkg.price)}</p>
-                            </div>
-                            {pkg.bonus_credits > 0 && (
-                                <div className="mt-2 text-sm text-green-600 flex items-center gap-1 bg-green-50 p-2 rounded-md">
-                                    <span className="material-symbols-outlined text-sm">add_circle</span>
-                                    +{pkg.bonus_credits} bonus credits
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="space-y-3 text-sm border-t pt-4">
-                            <div className="flex justify-between text-muted-foreground">
-                                <span>Subtotal</span>
-                                <span>{formatPrice(pkg.price)}</span>
-                            </div>
-                            <div className="flex justify-between text-muted-foreground">
-                                <span>Tax</span>
-                                <span>$0.00</span>
-                            </div>
-                            <div className="flex justify-between font-bold text-lg pt-2 border-t text-foreground">
-                                <span>Total</span>
-                                <span>{formatPrice(pkg.price)}</span>
-                            </div>
-                            <div className="flex justify-between text-sm text-primary pt-1">
-                                <span>Total Credits</span>
-                                <span>{totalCredits}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                {/* Footer */}
+                <footer className="text-center text-xs text-slate-400 py-3 border-t border-slate-100">
+                    © {new Date().getFullYear()} Scope Lens. All rights reserved.
+                </footer>
             </div>
         </div>
     );
@@ -293,8 +864,11 @@ function CheckoutContent() {
 export default function CheckoutPage() {
     return (
         <Suspense fallback={
-            <div className="min-h-[60vh] flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div className="h-screen flex items-center justify-center">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-sm text-slate-500">Loading checkout...</p>
+                </div>
             </div>
         }>
             <CheckoutContent />

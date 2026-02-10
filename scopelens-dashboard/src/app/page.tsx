@@ -7,7 +7,7 @@ interface Subscription {
   subscription: unknown | null;
   plan: {
     name: string;
-    scans_per_month: number;
+    scans_per_day: number;
   } | null;
   usage: {
     scans_used: number;
@@ -166,16 +166,16 @@ export default function UploadHubPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
+    <div className="min-h-screen bg-slate-50 p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Upload Hub</h1>
-          <p className="text-gray-500">Upload documents to scan for AI-generated content</p>
+          <h1 className="text-3xl font-bold text-slate-700 mb-2">Upload Hub</h1>
+          <p className="text-slate-500">Upload documents to scan for AI-generated content</p>
         </div>
 
         {/* Upload Area */}
-        <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100 mb-8 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 mb-8 overflow-hidden">
           <input
             ref={fileInputRef}
             type="file"
@@ -185,7 +185,7 @@ export default function UploadHubPage() {
           />
           <div
             className={`p-16 text-center cursor-pointer transition-all duration-300
-              ${isDragging ? 'bg-blue-50 border-2 border-dashed border-blue-400' : 'hover:bg-gray-50'}
+              ${isDragging ? 'bg-blue-50 border-2 border-dashed border-blue-400' : 'hover:bg-slate-50'}
               ${uploading ? 'pointer-events-none opacity-60' : ''}`}
             onClick={() => fileInputRef.current?.click()}
             onDragOver={handleDragOver}
@@ -195,8 +195,8 @@ export default function UploadHubPage() {
             {uploading ? (
               <div className="flex flex-col items-center">
                 <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">{uploadProgress}</h3>
-                <p className="text-gray-500">Please wait...</p>
+                <h3 className="text-xl font-semibold text-slate-700 mb-2">{uploadProgress}</h3>
+                <p className="text-slate-500">Please wait...</p>
               </div>
             ) : (
               <div className="flex flex-col items-center">
@@ -205,11 +205,11 @@ export default function UploadHubPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                <h3 className="text-xl font-semibold text-slate-700 mb-2">
                   {isDragging ? "Drop your file here" : "Drop your files here"}
                 </h3>
-                <p className="text-gray-500 mb-4">or click to browse from your computer</p>
-                <p className="text-sm text-gray-400">Supports DOCX, TXT up to 20MB • {creditsRemaining} scan{creditsRemaining !== 1 ? 's' : ''} remaining</p>
+                <p className="text-slate-500 mb-4">or click to browse from your computer</p>
+                <p className="text-sm text-slate-400">Supports DOCX, TXT up to 20MB • {creditsRemaining} scan{creditsRemaining !== 1 ? 's' : ''} remaining</p>
               </div>
             )}
           </div>
@@ -218,52 +218,52 @@ export default function UploadHubPage() {
         {/* Stats Cards */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           {/* Scans Completed */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg shadow-gray-200/50 border border-gray-100">
+          <div className="bg-white rounded-2xl p-6 shadow-lg shadow-slate-200/50 border border-slate-100">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-gray-600 font-medium">This Month</span>
+              <span className="text-slate-500 font-medium">Today</span>
               <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
                 <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
             </div>
-            <div className="text-4xl font-bold text-gray-900 mb-1">{loading ? "..." : scansCompleted}</div>
-            <p className="text-gray-400 text-sm">Scans Completed</p>
+            <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : scansCompleted}</div>
+            <p className="text-slate-400 text-sm">Scans Completed</p>
           </div>
 
           {/* Credits Remaining */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg shadow-gray-200/50 border border-gray-100">
+          <div className="bg-white rounded-2xl p-6 shadow-lg shadow-slate-200/50 border border-slate-100">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-gray-600 font-medium">Remaining</span>
+              <span className="text-slate-500 font-medium">Remaining</span>
               <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center">
                 <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
             </div>
-            <div className="text-4xl font-bold text-gray-900 mb-1">{loading ? "..." : creditsRemaining}</div>
-            <p className="text-gray-400 text-sm">Credits Available</p>
+            <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : creditsRemaining}</div>
+            <p className="text-slate-400 text-sm">Credits Available</p>
           </div>
 
           {/* Current Plan */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg shadow-gray-200/50 border border-gray-100">
+          <div className="bg-white rounded-2xl p-6 shadow-lg shadow-slate-200/50 border border-slate-100">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-gray-600 font-medium">Your Plan</span>
+              <span className="text-slate-500 font-medium">Your Plan</span>
               <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center">
                 <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                 </svg>
               </div>
             </div>
-            <div className="text-4xl font-bold text-gray-900 mb-1">{loading ? "..." : subscription?.plan?.name || "Free"}</div>
-            <p className="text-gray-400 text-sm">{scansLimit} scans/month</p>
+            <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : subscription?.plan?.name || "Free"}</div>
+            <p className="text-slate-400 text-sm">{scansLimit} scans/day</p>
           </div>
         </div>
 
         {/* Recent Scans */}
-        <div className="bg-white rounded-2xl shadow-lg shadow-gray-200/50 border border-gray-100">
-          <div className="flex items-center justify-between p-6 border-b border-gray-100">
-            <h2 className="text-xl font-semibold text-gray-900">Recent Scans</h2>
+        <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100">
+          <div className="flex items-center justify-between p-6 border-b border-slate-100">
+            <h2 className="text-xl font-semibold text-slate-700">Recent Scans</h2>
             <button
               onClick={() => router.push("/files")}
               className="text-blue-600 hover:text-blue-700 font-medium text-sm flex items-center gap-1"
@@ -276,22 +276,22 @@ export default function UploadHubPage() {
           </div>
           <div className="p-6">
             {loading ? (
-              <p className="text-gray-400 text-center py-8">Loading...</p>
+              <p className="text-slate-400 text-center py-8">Loading...</p>
             ) : scans.length === 0 ? (
               <div className="text-center py-12">
-                <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <p className="text-gray-500">No scans yet. Upload a document to get started!</p>
+                <p className="text-slate-500">No scans yet. Upload a document to get started!</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {scans.map((scan) => (
                   <div
                     key={scan.id}
-                    className="flex items-center justify-between p-4 rounded-xl bg-gray-50 hover:bg-gray-100 transition-colors"
+                    className="flex items-center justify-between p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors"
                   >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -300,8 +300,8 @@ export default function UploadHubPage() {
                         </svg>
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900">{scan.file_name}</p>
-                        <p className="text-sm text-gray-400">{formatDate(scan.created_at)}</p>
+                        <p className="font-medium text-slate-700">{scan.file_name}</p>
+                        <p className="text-sm text-slate-400">{formatDate(scan.created_at)}</p>
                       </div>
                     </div>
                     {scan.status === "completed" ? (
@@ -312,12 +312,12 @@ export default function UploadHubPage() {
                         {scan.ai_score}% AI
                       </div>
                     ) : scan.status === "pending" || scan.status === "processing" ? (
-                      <div className="flex items-center gap-2 text-gray-400 text-sm">
+                      <div className="flex items-center gap-2 text-slate-400 text-sm">
                         <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
                         Processing...
                       </div>
                     ) : (
-                      <span className="text-gray-400 text-sm">{scan.status}</span>
+                      <span className="text-slate-400 text-sm">{scan.status}</span>
                     )}
                   </div>
                 ))}

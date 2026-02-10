@@ -7,20 +7,20 @@ export default function ResellerPage() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
             {/* Navbar */}
-            <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-gray-100">
+            <nav className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-slate-100">
                 <div className="container mx-auto flex h-20 items-center justify-between px-6">
                     <Link href="/" className="flex items-center gap-3">
-                        <img src="/icon.svg" alt="Scope Lens" className="w-11 h-11" />
-                        <span className="text-xl font-bold text-gray-900">Scope Lens</span>
+                        <img src="/icon.svg" alt="ScopeLens" className="w-11 h-11" />
+                        <span className="text-xl font-bold text-slate-700">ScopeLens</span>
                     </Link>
                     <div className="hidden md:flex items-center gap-8">
-                        <Link href="/#features" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Features</Link>
-                        <Link href="/#pricing" className="text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors">Pricing</Link>
+                        <Link href="/#features" className="text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors">Features</Link>
+                        <Link href="/#pricing" className="text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors">Pricing</Link>
                         <Link href="/reseller" className="text-sm font-medium text-blue-600">Resellers</Link>
                     </div>
                     <div className="flex items-center gap-4">
                         <Link href={`${process.env.RESELLER_DASHBOARD}/login`}>
-                            <button className="px-5 py-2.5 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors">
+                            <button className="px-5 py-2.5 text-sm font-medium text-slate-600 hover:text-slate-700 transition-colors">
                                 Log In
                             </button>
                         </Link>
@@ -39,12 +39,12 @@ export default function ResellerPage() {
                     <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
                         {/* Text Content */}
                         <div className="flex-1 text-center lg:text-left">
-                            <h1 className="text-5xl lg:text-6xl font-black tracking-tight text-gray-900 mb-6 leading-[1.1]">
+                            <h1 className="text-5xl lg:text-6xl font-black tracking-tight text-slate-700 mb-6 leading-[1.1]">
                                 Grow Your<br />
                                 Business with<br />
-                                <span className="text-blue-600">Scope Lens</span>
+                                <span className="text-blue-600">ScopeLens</span>
                             </h1>
-                            <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                            <p className="text-xl text-slate-500 mb-10 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
                                 Partner with the leading AI detection platform. Unlock new revenue streams with competitive margins, bulk discounts, and exclusive tools designed for your success.
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -55,7 +55,7 @@ export default function ResellerPage() {
                                 </Link>
                                 <button
                                     onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })}
-                                    className="inline-flex items-center justify-center px-8 py-4 bg-gray-100 text-gray-700 font-bold rounded-lg hover:bg-gray-200 transition-all text-lg w-full sm:w-auto"
+                                    className="inline-flex items-center justify-center px-8 py-4 bg-slate-100 text-slate-600 font-bold rounded-lg hover:bg-slate-200 transition-all text-lg w-full sm:w-auto"
                                 >
                                     Learn More
                                 </button>
@@ -64,10 +64,10 @@ export default function ResellerPage() {
 
                         {/* Hero Image */}
                         <div className="flex-1 relative w-full max-w-2xl lg:max-w-none">
-                            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-gray-200 bg-white">
+                            <div className="relative rounded-2xl overflow-hidden shadow-2xl border border-slate-200 bg-white">
                                 <Image
                                     src="/images/reseller-hero.png"
-                                    alt="Scope Lens Reseller Dashboard"
+                                    alt="ScopeLens Reseller Dashboard"
                                     width={800}
                                     height={500}
                                     className="w-full h-auto object-cover"
@@ -85,11 +85,11 @@ export default function ResellerPage() {
             </section>
 
             {/* Benefits Section */}
-            <section id="benefits" className="py-24 bg-gray-50/50">
+            <section id="benefits" className="py-24 bg-slate-50/50">
                 <div className="container mx-auto px-6">
                     <div className="mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Why Partner with Us?</h2>
-                        <p className="text-xl text-gray-600">Our reseller program is built to help you succeed with high-demand AI tools.</p>
+                        <h2 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4">Why Partner with Us?</h2>
+                        <p className="text-xl text-slate-500">Our reseller program is built to help you succeed with high-demand AI tools.</p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">
@@ -98,8 +98,8 @@ export default function ResellerPage() {
                             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-6 text-blue-600">
                                 <span className="material-symbols-outlined text-3xl">trending_up</span>
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">Competitive Margins</h3>
-                            <p className="text-gray-600 leading-relaxed">
+                            <h3 className="text-xl font-bold text-slate-700 mb-3">Competitive Margins</h3>
+                            <p className="text-slate-500 leading-relaxed">
                                 Earn significant profit on every sale with our industry-leading reseller commission rates designed to maximize your ROI.
                             </p>
                         </div>
@@ -109,8 +109,8 @@ export default function ResellerPage() {
                             <div className="w-12 h-12 bg-indigo-100 rounded-xl flex items-center justify-center mb-6 text-indigo-600">
                                 <span className="material-symbols-outlined text-3xl">sell</span>
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">Bulk License Discounts</h3>
-                            <p className="text-gray-600 leading-relaxed">
+                            <h3 className="text-xl font-bold text-slate-700 mb-3">Bulk License Discounts</h3>
+                            <p className="text-slate-500 leading-relaxed">
                                 Access exclusive wholesale pricing tiers when purchasing licenses in volume for your educational or enterprise clients.
                             </p>
                         </div>
@@ -120,8 +120,8 @@ export default function ResellerPage() {
                             <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-6 text-purple-600">
                                 <span className="material-symbols-outlined text-3xl">dashboard</span>
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-3">Dedicated Dashboard</h3>
-                            <p className="text-gray-600 leading-relaxed">
+                            <h3 className="text-xl font-bold text-slate-700 mb-3">Dedicated Dashboard</h3>
+                            <p className="text-slate-500 leading-relaxed">
                                 Manage all your client licenses, track usage, issue keys, and view earnings from a single, intuitive reseller portal.
                             </p>
                         </div>
@@ -133,49 +133,49 @@ export default function ResellerPage() {
             <section className="py-24 bg-white">
                 <div className="container mx-auto px-6">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">How it Works</h2>
-                        <p className="text-xl text-gray-600">Start selling Scope Lens in three simple steps.</p>
+                        <h2 className="text-3xl md:text-4xl font-bold text-slate-700 mb-4">How it Works</h2>
+                        <p className="text-xl text-slate-500">Start selling ScopeLens in three simple steps.</p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-12 relative max-w-5xl mx-auto">
                         {/* Connector Line (Desktop) */}
-                        <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-0.5 bg-gray-200 -z-10"></div>
+                        <div className="hidden md:block absolute top-12 left-[16%] right-[16%] h-0.5 bg-slate-200 -z-10"></div>
 
                         {/* Step 1 */}
                         <div className="text-center">
-                            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-md border border-gray-100 relative z-10">
+                            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-md border border-slate-100 relative z-10">
                                 <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
                                     <span className="material-symbols-outlined text-3xl">description</span>
                                 </div>
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">1. Apply</h3>
-                            <p className="text-gray-600 text-sm max-w-xs mx-auto">
+                            <h3 className="text-lg font-bold text-slate-700 mb-2">1. Apply</h3>
+                            <p className="text-slate-500 text-sm max-w-xs mx-auto">
                                 Fill out our simple application form to become an authorized reseller. Verification takes less than 24 hours.
                             </p>
                         </div>
 
                         {/* Step 2 */}
                         <div className="text-center">
-                            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-md border border-gray-100 relative z-10">
+                            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-md border border-slate-100 relative z-10">
                                 <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
                                     <span className="material-symbols-outlined text-3xl">shopping_cart</span>
                                 </div>
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">2. Buy in Bulk</h3>
-                            <p className="text-gray-600 text-sm max-w-xs mx-auto">
+                            <h3 className="text-lg font-bold text-slate-700 mb-2">2. Buy in Bulk</h3>
+                            <p className="text-slate-500 text-sm max-w-xs mx-auto">
                                 Purchase license keys at discounted rates through your dedicated dashboard. The more you buy, the more you save.
                             </p>
                         </div>
 
                         {/* Step 3 */}
                         <div className="text-center">
-                            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-md border border-gray-100 relative z-10">
+                            <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-md border border-slate-100 relative z-10">
                                 <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
                                     <span className="material-symbols-outlined text-3xl">storefront</span>
                                 </div>
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">3. Sell to Customers</h3>
-                            <p className="text-gray-600 text-sm max-w-xs mx-auto">
+                            <h3 className="text-lg font-bold text-slate-700 mb-2">3. Sell to Customers</h3>
+                            <p className="text-slate-500 text-sm max-w-xs mx-auto">
                                 Distribute keys to your clients and manage their subscriptions easily. Keep 100% of the markup you set.
                             </p>
                         </div>
@@ -193,7 +193,7 @@ export default function ResellerPage() {
                         Ready to become a partner?
                     </h2>
                     <p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto font-medium">
-                        Join the Scope Lens reseller network today and start growing your business with the world's most trusted AI detection tool.
+                        Join the ScopeLens reseller network today and start growing your business with the world's most trusted AI detection tool.
                     </p>
                     <Link href="http://localhost:3003/signup">
                         <button className="inline-flex items-center gap-2 px-10 py-4 bg-white text-blue-700 font-bold rounded-lg hover:bg-blue-50 transition-all shadow-xl text-lg transform hover:-translate-y-1">
@@ -204,14 +204,14 @@ export default function ResellerPage() {
             </section>
 
             {/* Footer */}
-            <footer className="bg-gray-50 py-12 border-t border-gray-200">
+            <footer className="bg-slate-50 py-12 border-t border-slate-200">
                 <div className="container mx-auto px-6">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                         <div className="flex items-center gap-3">
-                            <img src="/icon.svg" alt="Scope Lens" className="w-8 h-8 opacity-80" />
-                            <span className="text-lg font-bold text-gray-900">Scope Lens</span>
+                            <img src="/icon.svg" alt="ScopeLens" className="w-8 h-8 opacity-80" />
+                            <span className="text-lg font-bold text-slate-700">ScopeLens</span>
                         </div>
-                        <p className="text-sm text-gray-500">© 2026 Scope Lens Inc. All rights reserved.</p>
+                        <p className="text-sm text-slate-500">© 2026 ScopeLens Inc. All rights reserved.</p>
                     </div>
                 </div>
             </footer>

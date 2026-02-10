@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3B82F6"/>
+      <stop offset="50%" style="stop-color:#2563EB"/>
+      <stop offset="100%" style="stop-color:#1D4ED8"/>
+    </linearGradient>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="0.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="48" height="48" rx="12" fill="url(#grad)"/>
+  
+  <!-- Outer lens ring -->
+  <circle cx="22" cy="20" r="12" fill="none" stroke="white" stroke-width="2.5" opacity="0.95"/>
+  
+  <!-- Inner lens circle -->
+  <circle cx="22" cy="20" r="8" fill="none" stroke="white" stroke-width="1.5" opacity="0.7"/>
+  
+  <!-- Center lens highlight -->
+  <circle cx="22" cy="20" r="5" fill="white" opacity="0.15"/>
+  <circle cx="19" cy="17" r="2" fill="white" opacity="0.4"/>
+  
+  <!-- Scanning lines inside lens -->
+  <line x1="13" y1="17" x2="31" y2="17" stroke="white" stroke-width="1.2" opacity="0.6" stroke-linecap="round"/>
+  <line x1="14" y1="20" x2="30" y2="20" stroke="white" stroke-width="1.5" opacity="0.9" stroke-linecap="round" filter="url(#glow)"/>
+  <line x1="13" y1="23" x2="31" y2="23" stroke="white" stroke-width="1.2" opacity="0.6" stroke-linecap="round"/>
+  
+  <!-- Handle -->
+  <rect x="31" y="28" width="4" height="12" rx="2" fill="white" opacity="0.95" transform="rotate(45, 33, 34)"/>
+  
+  <!-- Data points / AI analysis dots -->
+  <circle cx="16" cy="14" r="1.5" fill="white" opacity="0.9"/>
+  <circle cx="28" cy="14" r="1.5" fill="white" opacity="0.9"/>
+  <circle cx="16" cy="26" r="1.5" fill="white" opacity="0.9"/>
+  <circle cx="28" cy="26" r="1.5" fill="white" opacity="0.9"/>
+</svg>

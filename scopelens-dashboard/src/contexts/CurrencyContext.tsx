@@ -16,6 +16,16 @@ const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined
 
 const PKR_RATE = 280; // 1 USD = 280 PKR (approximate rate)
 
+function getCookie(name: string): string | null {
+    const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
+    return match ? decodeURIComponent(match[2]) : null;
+}
+
+function setCookieValue(name: string, value: string, days: number) {
+    const expires = new Date(Date.now() + days * 864e5).toUTCString();
+    document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
 export function CurrencyProvider({ children }: { children: ReactNode }) {
     const [currency, setCurrency] = useState<"USD" | "PKR">("USD");
     const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +36,7 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
 
     const detectLocation = async () => {
         try {
-            // Check localStorage first for user preference
+            // 1. Check localStorage first for manual user preference
             const savedCurrency = localStorage.getItem("preferred_currency");
             if (savedCurrency === "PKR" || savedCurrency === "USD") {
                 setCurrency(savedCurrency);
@@ -34,20 +44,50 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
                 return;
             }
 
-            // Detect location via IP
-            const res = await fetch("https://ipapi.co/json/", {
+            // 2. Try to get country from user profile (stored during signup)
+            try {
+                const profileRes = await fetch("/api/profile");
+                if (profileRes.ok) {
+                    const profileData = await profileRes.json();
+                    const country = profileData.country;
+                    if (country === "PK") {
+                        setCurrency("PKR");
+                    }
+                    setIsLoading(false);
+                    return;
+                }
+            } catch {
+                // Profile fetch failed (user not logged in) — fall through to IP detection
+            }
+
+            // 3. Check cookie for cached country (fallback for non-authenticated pages)
+            const cachedCountry = getCookie("user_country");
+            if (cachedCountry) {
+                if (cachedCountry === "PK") {
+                    setCurrency("PKR");
+                }
+                setIsLoading(false);
+                return;
+            }
+
+            // 4. Detect location via IP (last resort fallback)
+            const res = await fetch("https://api.country.is/", {
                 signal: AbortSignal.timeout(5000),
             });
 
             if (res.ok) {
                 const data = await res.json();
-                if (data.country_code === "PK") {
+                const country = data.country || "US";
+
+                // Save country to cookie (7-day expiry)
+                setCookieValue("user_country", country, 7);
+
+                if (country === "PK") {
                     setCurrency("PKR");
-                    localStorage.setItem("preferred_currency", "PKR");
                 }
             }
         } catch {
-            // Silently default to USD — IP detection may fail on localhost or restricted networks
+            // Silently default to USD
         } finally {
             setIsLoading(false);
         }
@@ -105,12 +145,12 @@ export function CurrencySwitcher({ className = "" }: { className?: string }) {
     if (isLoading) return null;
 
     return (
-        <div className={`flex items-center gap-1 bg-gray-100 rounded-lg p-1 ${className}`}>
+        <div className={`flex items-center gap-1 bg-slate-100 rounded-lg p-1 ${className}`}>
             <button
                 onClick={() => setCurrency("USD")}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${currency === "USD"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
+                    ? "bg-white text-slate-700 shadow-sm"
+                    : "text-slate-500 hover:text-slate-600"
                     }`}
             >
                 USD $
@@ -118,8 +158,8 @@ export function CurrencySwitcher({ className = "" }: { className?: string }) {
             <button
                 onClick={() => setCurrency("PKR")}
                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${currency === "PKR"
-                    ? "bg-white text-gray-900 shadow-sm"
-                    : "text-gray-500 hover:text-gray-700"
+                    ? "bg-white text-slate-700 shadow-sm"
+                    : "text-slate-500 hover:text-slate-600"
                     }`}
             >
                 PKR Rs.

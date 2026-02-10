@@ -21,12 +21,13 @@ export default function RootLayout({
 
   // Don't show the main sidebar on login or auth pages
   const isAuthRoute = pathname === "/login" || pathname === "/signup" || pathname?.startsWith("/auth/");
-  const isStandalonePage = isAuthRoute;
+  const isCheckoutRoute = pathname === "/checkout" || pathname?.startsWith("/checkout/");
+  const isStandalonePage = isAuthRoute || isCheckoutRoute;
 
   return (
     <html lang="en">
       <head>
-        <title>Scope Lens Dashboard</title>
+        <title>ScopeLens Dashboard</title>
         <meta name="description" content="AI Content Detection Dashboard" />
         <link rel="icon" type="image/svg+xml" href="/logo.svg" />
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />

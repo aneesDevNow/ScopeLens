@@ -161,19 +161,17 @@ export async function POST(request: NextRequest) {
             } else {
                 // Subscription is valid
                 isFreeTier = false;
-                scansLimit = (subscription.plans as { scans_per_month: number }).scans_per_month || 1;
+                scansLimit = (subscription.plans as { scans_per_day: number }).scans_per_day || 1;
 
                 // --- LAZY RESET LOGIC ---
-                // Check if we need to start a new billing month
+                // Check if we need to start a new billing day
                 const currentPeriodStart = new Date(subscription.current_period_start);
                 const nextBillingDate = new Date(currentPeriodStart);
-                nextBillingDate.setMonth(nextBillingDate.getMonth() + 1);
-
-
+                nextBillingDate.setDate(nextBillingDate.getDate() + 1);
 
                 if (now >= nextBillingDate) {
-                    // It's a new month! Reset usage.
-                    console.log(`Resetting usage for subscription ${subscription.id}. New month starts.`);
+                    // It's a new day! Reset usage.
+                    console.log(`Resetting usage for subscription ${subscription.id}. New day starts.`);
 
                     const adminClient = getAdminClient();
                     const { error: resetError } = await adminClient
@@ -201,26 +199,25 @@ export async function POST(request: NextRequest) {
             // No valid subscription or expired — check free plan limit
             const { data: freePlan } = await supabase
                 .from("plans")
-                .select("scans_per_month")
+                .select("scans_per_day")
                 .eq("slug", "free")
                 .single();
-            scansLimit = freePlan?.scans_per_month || 1;
+            scansLimit = freePlan?.scans_per_day || 1;
 
-            // Count scans this month for free users (calendar month)
-            const startOfMonth = new Date();
-            startOfMonth.setDate(1);
-            startOfMonth.setHours(0, 0, 0, 0);
+            // Count scans today for free users (calendar day)
+            const startOfDay = new Date();
+            startOfDay.setHours(0, 0, 0, 0);
             const { count } = await supabase
                 .from("scans")
                 .select("*", { count: "exact", head: true })
                 .eq("user_id", user.id)
-                .gte("created_at", startOfMonth.toISOString());
+                .gte("created_at", startOfDay.toISOString());
             scansUsed = count || 0;
         }
 
         if (scansUsed >= scansLimit) {
             return NextResponse.json(
-                { error: `File limit reached. Your plan allows ${scansLimit} file${scansLimit === 1 ? '' : 's'} per month. Upgrade your plan to scan more.` },
+                { error: `File limit reached. Your plan allows ${scansLimit} file${scansLimit === 1 ? '' : 's'} per day. Upgrade your plan to scan more.` },
                 { status: 403 }
             );
         }

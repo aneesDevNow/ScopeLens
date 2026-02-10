@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     Sidebar,
     SidebarContent,
@@ -38,8 +38,10 @@ const navItems = [
 
 export function AppSidebar() {
     const pathname = usePathname();
+    const router = useRouter();
     const [profile, setProfile] = useState<Profile | null>(null);
     const [planName, setPlanName] = useState("Free");
+    const [loggingOut, setLoggingOut] = useState(false);
 
     useEffect(() => {
         async function fetchUserData() {
@@ -66,6 +68,17 @@ export function AppSidebar() {
         fetchUserData();
     }, []);
 
+    const handleLogout = async () => {
+        setLoggingOut(true);
+        try {
+            await fetch("/api/auth/logout", { method: "POST" });
+            router.push("/login");
+        } catch (err) {
+            console.error("Logout failed:", err);
+            setLoggingOut(false);
+        }
+    };
+
     const displayName = profile
         ? `${profile.first_name || ""} ${profile.last_name || ""}`.trim() || "User"
         : "Loading...";
@@ -78,8 +91,8 @@ export function AppSidebar() {
         <Sidebar>
             <SidebarHeader className="p-4 border-b">
                 <Link href="/" className="flex items-center gap-3">
-                    <img src="/icon.svg" alt="Scope Lens" className="w-10 h-10" />
-                    <span className="text-xl font-bold text-gray-900">Scope Lens</span>
+                    <img src="/icon.svg" alt="ScopeLens" className="w-10 h-10" />
+                    <span className="text-xl font-bold text-slate-700">ScopeLens</span>
                 </Link>
             </SidebarHeader>
             <SidebarContent>
@@ -102,17 +115,27 @@ export function AppSidebar() {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter className="p-4 border-t">
-                <div className="flex items-center gap-3">
-                    <Avatar className="h-9 w-9">
-                        <AvatarImage src={profile?.avatar_url || ""} />
-                        <AvatarFallback className="bg-primary text-primary-foreground">
-                            {initials}
-                        </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                        <span className="text-sm font-medium">{displayName}</span>
-                        <span className="text-xs text-muted-foreground">{planName} Plan</span>
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <Avatar className="h-9 w-9">
+                            <AvatarImage src={profile?.avatar_url || ""} />
+                            <AvatarFallback className="bg-primary text-primary-foreground">
+                                {initials}
+                            </AvatarFallback>
+                        </Avatar>
+                        <div className="flex flex-col">
+                            <span className="text-sm font-medium">{displayName}</span>
+                            <span className="text-xs text-muted-foreground">{planName} Plan</span>
+                        </div>
                     </div>
+                    <button
+                        onClick={handleLogout}
+                        disabled={loggingOut}
+                        title="Sign out"
+                        className="p-2 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
+                    >
+                        <span className="material-symbols-outlined text-[20px]">logout</span>
+                    </button>
                 </div>
             </SidebarFooter>
         </Sidebar>

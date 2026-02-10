@@ -33,9 +33,11 @@ function BillingContent() {
 
     useEffect(() => {
         const success = searchParams.get("success");
-        if (success) {
+        if (success === "pending_approval") {
+            setSuccessMsg("Payment proof submitted! Your request is under review. Credits will be added once approved.");
+            window.history.replaceState(null, "", "/billing");
+        } else if (success) {
             setSuccessMsg("Purchase successful! Your credits have been added.");
-            // Clean up URL
             window.history.replaceState(null, "", "/billing");
         }
     }, [searchParams]);
@@ -72,7 +74,7 @@ function BillingContent() {
             <div className="min-h-[60vh] flex items-center justify-center">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-text-secondary-light">Loading billing...</p>
+                    <p className="text-slate-500">Loading billing...</p>
                 </div>
             </div>
         );
@@ -82,10 +84,10 @@ function BillingContent() {
         <>
             {/* Header */}
             <div className="flex flex-col gap-1 mb-8">
-                <h1 className="text-text-light text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
+                <h1 className="text-slate-700 text-3xl md:text-4xl font-black leading-tight tracking-[-0.033em]">
                     Credit History
                 </h1>
-                <p className="text-text-secondary-light text-base font-normal">
+                <p className="text-slate-500 text-base font-normal">
                     Purchase credits to generate license keys for your clients
                 </p>
             </div>
@@ -127,15 +129,15 @@ function BillingContent() {
 
             {/* Credit Packages */}
             <div className="mb-8">
-                <h2 className="text-text-light text-xl font-bold mb-4">Select a Credit Package</h2>
+                <h2 className="text-slate-700 text-xl font-bold mb-4">Select a Credit Package</h2>
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {packages.map((pkg) => (
                         <button
                             key={pkg.id}
                             onClick={() => setSelectedPackage(pkg.id)}
-                            className={`p-6 rounded-xl border-2 transition-all text-left relative bg-surface-light ${selectedPackage === pkg.id
+                            className={`p-6 rounded-xl border-2 transition-all text-left relative bg-white ${selectedPackage === pkg.id
                                 ? "border-primary bg-primary/5"
-                                : "border-border-light hover:border-text-secondary-light"
+                                : "border-slate-100 hover:border-text-secondary-light"
                                 }`}
                         >
                             {pkg.is_popular && (
@@ -143,16 +145,16 @@ function BillingContent() {
                                     Popular
                                 </span>
                             )}
-                            <p className="text-sm font-medium text-text-secondary-light mb-1">{pkg.name}</p>
-                            <p className="text-3xl font-bold text-text-light">{formatPrice(pkg.price)}</p>
+                            <p className="text-sm font-medium text-slate-500 mb-1">{pkg.name}</p>
+                            <p className="text-3xl font-bold text-slate-700">{formatPrice(pkg.price)}</p>
                             {pkg.bonus_credits > 0 && (
                                 <div className="mt-2 flex items-center gap-1 text-green-600">
                                     <span className="material-symbols-outlined text-sm">add_circle</span>
-                                    <span className="text-sm font-medium">+{pkg.bonus_credits} bonus credits</span>
+                                    <span className="text-sm font-medium">+{formatPrice(pkg.bonus_credits)} bonus</span>
                                 </div>
                             )}
-                            <p className="text-xs text-text-secondary-light mt-2">
-                                Total: {pkg.credits + pkg.bonus_credits} credits
+                            <p className="text-xs text-slate-500 mt-2">
+                                Total: {formatPrice(pkg.credits + pkg.bonus_credits)}
                             </p>
                         </button>
                     ))}
@@ -161,7 +163,7 @@ function BillingContent() {
 
             {/* Purchase Summary */}
             {selectedPackage && (
-                <div className="bg-surface-light rounded-xl border border-border-light shadow-sm p-6 max-w-md">
+                <div className="bg-white rounded-2xl border border-slate-100 shadow-lg shadow-slate-200/50 p-6 max-w-md">
                     {(() => {
                         const pkg = packages.find(p => p.id === selectedPackage);
                         if (!pkg) return null;
@@ -170,27 +172,27 @@ function BillingContent() {
                             <>
                                 <div className="space-y-3 mb-6">
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-text-secondary-light">Package</span>
-                                        <span className="font-medium text-text-light">{pkg.name}</span>
+                                        <span className="text-slate-500">Package</span>
+                                        <span className="font-medium text-slate-700">{pkg.name}</span>
                                     </div>
                                     <div className="flex justify-between text-sm">
-                                        <span className="text-text-secondary-light">Credits</span>
-                                        <span className="font-medium text-text-light">{pkg.credits}</span>
+                                        <span className="text-slate-500">Credits</span>
+                                        <span className="font-medium text-slate-700">{formatPrice(pkg.credits)}</span>
                                     </div>
                                     {pkg.bonus_credits > 0 && (
                                         <div className="flex justify-between text-sm text-green-600">
                                             <span>Bonus</span>
-                                            <span className="font-medium">+{pkg.bonus_credits}</span>
+                                            <span className="font-medium">+{formatPrice(pkg.bonus_credits)}</span>
                                         </div>
                                     )}
                                     <div className="h-px bg-border-light"></div>
                                     <div className="flex justify-between">
-                                        <span className="font-semibold text-text-light">Total Credits</span>
-                                        <span className="font-bold text-primary">{totalCredits}</span>
+                                        <span className="font-semibold text-slate-700">Total Credits</span>
+                                        <span className="font-bold text-primary">{formatPrice(totalCredits)}</span>
                                     </div>
-                                    <div className="flex justify-between text-lg pt-2 mt-2 border-t border-border-light">
-                                        <span className="font-bold text-text-light">Price</span>
-                                        <span className="font-bold text-text-light">{formatPrice(pkg.price)}</span>
+                                    <div className="flex justify-between text-lg pt-2 mt-2 border-t border-slate-100">
+                                        <span className="font-bold text-slate-700">Price</span>
+                                        <span className="font-bold text-slate-700">{formatPrice(pkg.price)}</span>
                                     </div>
                                 </div>
                                 <Link

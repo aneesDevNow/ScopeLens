@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Scope Lens - AI Detection Platform",
+  title: "ScopeLens - AI Detection Platform",
   description: "Unmask AI with precision. Advanced AI content detection for academic integrity.",
 };
 

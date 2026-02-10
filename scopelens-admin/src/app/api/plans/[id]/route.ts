@@ -20,7 +20,7 @@ export async function PUT(
                 reseller_price_monthly: body.reseller_price_monthly,
                 reseller_price_yearly: body.reseller_price_yearly,
                 reseller_discount_percent: body.reseller_discount_percent,
-                scans_per_month: body.scans_per_month,
+                scans_per_day: body.scans_per_day,
                 features: body.features,
                 is_active: body.is_active,
                 updated_at: new Date().toISOString(),

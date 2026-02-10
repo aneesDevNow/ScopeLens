@@ -41,6 +41,7 @@ export async function GET() {
 
         return NextResponse.json({
             reseller,
+            country: user.user_metadata?.country || null,
             stats: {
                 credit_balance: reseller.credit_balance,
                 total_keys: totalKeys || 0,

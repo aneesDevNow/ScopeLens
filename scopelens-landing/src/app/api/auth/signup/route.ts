@@ -26,7 +26,7 @@ export async function POST(request: Request) {
             );
         }
 
-        const { email, password, firstName, lastName, institution } = await request.json()
+        const { email, password, firstName, lastName, institution, country } = await request.json()
 
         if (!email || !password) {
             return NextResponse.json(
@@ -45,6 +45,7 @@ export async function POST(request: Request) {
                     first_name: firstName,
                     last_name: lastName,
                     institution: institution,
+                    country: country || null,
                 },
             },
         })
