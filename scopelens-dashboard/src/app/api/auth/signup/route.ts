@@ -1,5 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
+
+const getAdminClient = () => {
+    return createAdminClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+};
 
 export async function POST(req: NextRequest) {
     try {
@@ -20,7 +28,7 @@ export async function POST(req: NextRequest) {
         }
 
         const supabase = await createClient()
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
@@ -36,6 +44,18 @@ export async function POST(req: NextRequest) {
                 { error: error.message },
                 { status: 400 }
             )
+        }
+
+        // Also save first_name/last_name to profiles table
+        if (signUpData?.user?.id && (firstName || lastName)) {
+            const admin = getAdminClient();
+            await admin
+                .from('profiles')
+                .upsert({
+                    id: signUpData.user.id,
+                    first_name: firstName || null,
+                    last_name: lastName || null,
+                }, { onConflict: 'id' });
         }
 
         return NextResponse.json({ success: true })

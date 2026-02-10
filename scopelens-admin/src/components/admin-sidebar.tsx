@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
     Sidebar,
     SidebarContent,
@@ -34,6 +34,7 @@ const managerAllowedUrls = ["/licenses", "/ai-detection"];
 
 export function AdminSidebar() {
     const pathname = usePathname();
+    const router = useRouter();
     const { role } = useRole();
 
     const navItems = role === "manager"
@@ -43,6 +44,15 @@ export function AdminSidebar() {
     const roleLabel = role === "manager" ? "Manager" : "Administrator";
     const avatarInitials = role === "manager" ? "MG" : "AD";
     const badgeText = role === "manager" ? "Manager" : "Admin";
+
+    const handleLogout = async () => {
+        try {
+            await fetch("/api/auth/logout", { method: "POST" });
+            router.push("/login");
+        } catch (err) {
+            console.error("Logout failed:", err);
+        }
+    };
 
     return (
         <Sidebar>
@@ -73,7 +83,7 @@ export function AdminSidebar() {
                 </SidebarGroup>
             </SidebarContent>
             <SidebarFooter className="p-4 border-t border-border">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 mb-3">
                     <Avatar className="h-9 w-9">
                         <AvatarFallback className="bg-destructive text-destructive-foreground">{avatarInitials}</AvatarFallback>
                     </Avatar>
@@ -82,7 +92,15 @@ export function AdminSidebar() {
                         <span className="text-xs text-muted-foreground">{roleLabel}</span>
                     </div>
                 </div>
+                <button
+                    onClick={handleLogout}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg h-9 px-4 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors cursor-pointer"
+                >
+                    <span className="material-symbols-outlined text-[18px]">logout</span>
+                    <span>Logout</span>
+                </button>
             </SidebarFooter>
         </Sidebar>
     );
 }
+
