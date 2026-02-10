@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-// Use service role to update profile after signup
-const supabaseAdmin = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
-
 export async function POST(request: Request) {
     try {
+        // Create admin client inside handler (env vars not available at build time)
+        const supabaseAdmin = createClient(
+            process.env.SUPABASE_URL!,
+            process.env.SUPABASE_SERVICE_ROLE_KEY!
+        );
+
         const { email, password, companyName, country } = await request.json();
 
         if (!email || !password || !companyName) {
