@@ -21,7 +21,7 @@ export default function RootLayout({
 
   // Don't show the main sidebar on landing, login, or auth pages
   const isLandingPage = pathname === "/";
-  const isAuthRoute = pathname === "/login" || pathname === "/signup" || pathname?.startsWith("/auth/");
+  const isAuthRoute = pathname === "/login" || pathname === "/signup" || pathname === "/forgot-password" || pathname === "/reset-password" || pathname?.startsWith("/auth/");
   const isCheckoutRoute = pathname === "/checkout" || pathname?.startsWith("/checkout/");
   const isStandalonePage = isLandingPage || isAuthRoute || isCheckoutRoute;
 
