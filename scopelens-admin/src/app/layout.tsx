@@ -22,7 +22,9 @@ export default function RootLayout({
   // Don't show the sidebar on login or auth pages
   const isLoginPage = pathname === "/login";
   const isAuthRoute = pathname?.startsWith("/auth/");
-  const isStandalonePage = isLoginPage || isAuthRoute;
+  const isForgotPassword = pathname === "/forgot-password";
+  const isResetPassword = pathname === "/reset-password";
+  const isStandalonePage = isLoginPage || isAuthRoute || isForgotPassword || isResetPassword;
 
   return (
     <html lang="en">

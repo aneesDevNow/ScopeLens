@@ -1,16 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
     const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
-    const router = useRouter();
-
+    const [sent, setSent] = useState(false);
+    const [error, setError] = useState("");
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -18,22 +15,20 @@ export default function LoginPage() {
         setLoading(true);
 
         try {
-            const res = await fetch("/api/auth/login", {
+            const res = await fetch("/api/auth/forgot-password", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email }),
             });
 
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.error || "Login failed");
+                setError(data.error || "Failed to send reset email");
                 return;
             }
 
-            // Redirect to dashboard — middleware enforces role=reseller
-            router.push("/dashboard");
-            router.refresh();
+            setSent(true);
         } catch {
             setError("An error occurred. Please try again.");
         } finally {
@@ -41,10 +36,32 @@ export default function LoginPage() {
         }
     }
 
+    if (sent) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
+                <div className="w-full max-w-md">
+                    <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8 text-center">
+                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <h2 className="text-xl font-bold text-slate-700 mb-2">Check Your Email</h2>
+                        <p className="text-slate-500 mb-6">
+                            We&apos;ve sent a password reset link to <strong className="text-slate-700">{email}</strong>
+                        </p>
+                        <Link href="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">
+                            ← Back to Login
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-                {/* Logo */}
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-3">
                         <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-blue-600 to-blue-800 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
@@ -62,11 +79,10 @@ export default function LoginPage() {
                     </div>
                 </div>
 
-                {/* Login Card */}
                 <div className="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-8">
                     <div className="text-center mb-8">
-                        <h1 className="text-2xl font-bold text-slate-700 mb-2">Welcome Back</h1>
-                        <p className="text-slate-500">Sign in to your reseller portal</p>
+                        <h1 className="text-2xl font-bold text-slate-700 mb-2">Forgot Password</h1>
+                        <p className="text-slate-500">Enter your email and we&apos;ll send you a reset link</p>
                     </div>
 
                     <form className="space-y-5" onSubmit={handleSubmit}>
@@ -92,24 +108,6 @@ export default function LoginPage() {
                             />
                         </div>
 
-                        <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                                <label htmlFor="password" className="text-sm font-medium text-slate-600">Password</label>
-                                <Link href="/forgot-password" className="text-xs text-blue-600 hover:text-blue-700 transition-colors">
-                                    Forgot password?
-                                </Link>
-                            </div>
-                            <input
-                                id="password"
-                                type="password"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                className="w-full px-4 py-3 bg-slate-50 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                            />
-                        </div>
-
                         <button
                             type="submit"
                             disabled={loading}
@@ -118,23 +116,21 @@ export default function LoginPage() {
                             {loading ? (
                                 <span className="flex items-center justify-center gap-2">
                                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                    Signing in...
+                                    Sending...
                                 </span>
                             ) : (
-                                "Sign In"
+                                "Send Reset Link"
                             )}
                         </button>
                     </form>
 
                     <p className="text-center text-sm text-slate-500 mt-6">
-                        Don&apos;t have an account?{" "}
-                        <Link href="/signup" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">
-                            Sign Up
+                        <Link href="/login" className="text-blue-600 font-semibold hover:text-blue-700 transition-colors">
+                            ← Back to Login
                         </Link>
                     </p>
                 </div>
 
-                {/* Reseller Badge */}
                 <div className="text-center mt-4">
                     <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-medium">
                         <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -143,11 +139,6 @@ export default function LoginPage() {
                         Reseller Portal
                     </span>
                 </div>
-
-                {/* Footer */}
-                <p className="text-center text-slate-400 text-sm mt-6">
-                    © {new Date().getFullYear()} ScopeLens. All rights reserved.
-                </p>
             </div>
         </div>
     );

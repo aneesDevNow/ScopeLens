@@ -56,15 +56,18 @@ export async function updateSession(request: NextRequest) {
 
     // Check if this is a public page BEFORE calling getUser() to avoid burning rate limits
     const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/callback')
+    const isAuthVerify = request.nextUrl.pathname.startsWith('/auth/v1/')
     const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
     const isLoginPage = request.nextUrl.pathname === '/login'
     const isSignupPage = request.nextUrl.pathname === '/signup'
+    const isForgotPassword = request.nextUrl.pathname === '/forgot-password'
+    const isResetPassword = request.nextUrl.pathname === '/reset-password'
     const isRootPage = request.nextUrl.pathname === '/'
 
-    console.log(`[MW] ${request.method} ${request.nextUrl.pathname} | public=${isLoginPage || isSignupPage || isRootPage || isAuthCallback}`)
+    console.log(`[MW] ${request.method} ${request.nextUrl.pathname} | public=${isLoginPage || isSignupPage || isRootPage || isAuthCallback || isForgotPassword || isResetPassword}`)
 
-    // Skip auth check for auth callback and landing page
-    if (isRootPage || isAuthCallback) {
+    // Skip auth check for auth callback, landing page, and password reset pages
+    if (isRootPage || isAuthCallback || isAuthVerify || isForgotPassword || isResetPassword) {
         return supabaseResponse
     }
 

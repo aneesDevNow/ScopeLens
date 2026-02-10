@@ -5,7 +5,7 @@ import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 
-const STANDALONE_ROUTES = ["/login", "/signup", "/", "/billing/checkout"];
+const STANDALONE_ROUTES = ["/login", "/signup", "/", "/billing/checkout", "/forgot-password", "/reset-password"];
 
 export default function LayoutInner({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
