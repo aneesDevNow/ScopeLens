@@ -5,7 +5,9 @@ import {
     decryptCookieValue,
     toCustomCookieName,
     toSupabaseCookieName,
-    getProjectRef
+    getProjectRef,
+    splitCookieValue,
+    reassembleChunkedCookies,
 } from '@/lib/cookie-utils'
 
 export async function createClient() {
@@ -18,26 +20,44 @@ export async function createClient() {
         {
             cookies: {
                 getAll() {
-                    // Read encrypted cookies, decrypt and remap names back to Supabase format
-                    return cookieStore.getAll().map(cookie => ({
+                    const raw = cookieStore.getAll().map(c => ({ name: c.name, value: c.value }));
+                    const reassembled = reassembleChunkedCookies(raw);
+                    return reassembled.map(cookie => ({
                         name: toSupabaseCookieName(cookie.name, projectRef),
                         value: decryptCookieValue(cookie.value),
                     }))
                 },
                 setAll(cookiesToSet) {
                     try {
-                        cookiesToSet.forEach(({ name, value, options }) => {
+                        const consolidated = reassembleChunkedCookies(
+                            cookiesToSet.map(({ name, value }) => ({ name, value }))
+                        );
+                        const options = cookiesToSet[0]?.options || {};
+
+                        for (const { name, value } of consolidated) {
                             const customName = toCustomCookieName(name)
-                            const encryptedValue = encryptCookieValue(value)
-                            cookieStore.set(customName, encryptedValue, {
-                                ...options,
-                                httpOnly: true,
-                                secure: process.env.NODE_ENV === 'production',
-                                sameSite: 'lax',
-                            })
-                        })
+                            const encrypted = encryptCookieValue(value)
+                            const chunks = splitCookieValue(customName, encrypted)
+
+                            if (chunks.length > 1) {
+                                try { cookieStore.delete(customName); } catch { }
+                            } else {
+                                for (let i = 0; i < 5; i++) {
+                                    try { cookieStore.delete(`${customName}.${i}`); } catch { }
+                                }
+                            }
+
+                            for (const chunk of chunks) {
+                                cookieStore.set(chunk.name, chunk.value, {
+                                    ...options,
+                                    httpOnly: true,
+                                    secure: process.env.NODE_ENV === 'production',
+                                    sameSite: 'lax',
+                                })
+                            }
+                        }
                     } catch {
-                        // The `setAll` method was called from a Server Component.
+                        // Called from a Server Component
                     }
                 },
             },

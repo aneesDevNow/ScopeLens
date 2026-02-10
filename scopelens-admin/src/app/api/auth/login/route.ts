@@ -5,7 +5,9 @@ import {
     decryptCookieValue,
     toCustomCookieName,
     toSupabaseCookieName,
-    getProjectRef
+    getProjectRef,
+    splitCookieValue,
+    reassembleChunkedCookies,
 } from '@/lib/cookie-crypto'
 
 export async function POST(req: NextRequest) {
@@ -20,9 +22,8 @@ export async function POST(req: NextRequest) {
         }
 
         const projectRef = getProjectRef()
-
-        // Capture cookies that Supabase wants to set
         const pendingCookies: Array<{ name: string; value: string; options: Record<string, unknown> }> = []
+        const cookiesToDelete: string[] = []
 
         const supabase = createServerClient(
             process.env.SUPABASE_URL!,
@@ -30,46 +31,55 @@ export async function POST(req: NextRequest) {
             {
                 cookies: {
                     getAll() {
-                        return req.cookies.getAll().map(cookie => ({
+                        const raw = req.cookies.getAll().map(c => ({ name: c.name, value: c.value }));
+                        const reassembled = reassembleChunkedCookies(raw);
+                        return reassembled.map(cookie => ({
                             name: toSupabaseCookieName(cookie.name, projectRef),
                             value: decryptCookieValue(cookie.value),
-                        }))
+                        }));
                     },
                     setAll(cookiesToSet) {
-                        cookiesToSet.forEach(({ name, value, options }) => {
-                            pendingCookies.push({
-                                name: toCustomCookieName(name),
-                                value: encryptCookieValue(value),
-                                options: {
-                                    ...options,
-                                    httpOnly: true,
-                                    secure: process.env.NODE_ENV === 'production',
-                                    sameSite: 'lax' as const,
-                                },
-                            })
-                        })
+                        const consolidated = reassembleChunkedCookies(
+                            cookiesToSet.map(({ name, value }) => ({ name, value }))
+                        );
+                        const opts = cookiesToSet[0]?.options || {};
+
+                        for (const { name, value } of consolidated) {
+                            const customName = toCustomCookieName(name);
+                            const encrypted = encryptCookieValue(value);
+                            const chunks = splitCookieValue(customName, encrypted);
+
+                            if (chunks.length > 1) {
+                                cookiesToDelete.push(customName);
+                            } else {
+                                for (let i = 0; i < 5; i++) cookiesToDelete.push(`${customName}.${i}`);
+                            }
+
+                            for (const chunk of chunks) {
+                                pendingCookies.push({
+                                    name: chunk.name,
+                                    value: chunk.value,
+                                    options: {
+                                        ...opts,
+                                        httpOnly: true,
+                                        secure: process.env.NODE_ENV === 'production',
+                                        sameSite: 'lax' as const,
+                                    },
+                                });
+                            }
+                        }
                     },
                 },
             }
         )
 
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
-        })
+        const { data, error } = await supabase.auth.signInWithPassword({ email, password })
 
         if (error) {
-            return NextResponse.json(
-                { error: error.message },
-                { status: 401 }
-            )
+            return NextResponse.json({ error: error.message }, { status: 401 })
         }
-
         if (!data.session) {
-            return NextResponse.json(
-                { error: 'No session created' },
-                { status: 401 }
-            )
+            return NextResponse.json({ error: 'No session created' }, { status: 401 })
         }
 
         // Check if user is an admin
@@ -81,10 +91,7 @@ export async function POST(req: NextRequest) {
 
         if (profileError || !profile) {
             await supabase.auth.signOut()
-            return NextResponse.json(
-                { error: 'Failed to verify admin status' },
-                { status: 403 }
-            )
+            return NextResponse.json({ error: 'Failed to verify admin status' }, { status: 403 })
         }
 
         const allowedRoles = ['admin', 'manager']
@@ -96,19 +103,20 @@ export async function POST(req: NextRequest) {
             )
         }
 
-        // Create response and explicitly set all cookies on it
         const response = NextResponse.json({ success: true, role: profile.role })
 
-        pendingCookies.forEach(({ name, value, options }) => {
+        // Delete stale cookies
+        for (const name of cookiesToDelete) {
+            response.cookies.delete(name)
+        }
+        // Set chunked cookies
+        for (const { name, value, options } of pendingCookies) {
             response.cookies.set(name, value, options as Record<string, string>)
-        })
+        }
 
         return response
     } catch (err) {
         console.error('Login error:', err)
-        return NextResponse.json(
-            { error: 'An error occurred. Please try again.' },
-            { status: 500 }
-        )
+        return NextResponse.json({ error: 'An error occurred. Please try again.' }, { status: 500 })
     }
 }

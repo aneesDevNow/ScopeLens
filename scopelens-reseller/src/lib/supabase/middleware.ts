@@ -5,14 +5,13 @@ import {
     decryptCookieValue,
     toCustomCookieName,
     toSupabaseCookieName,
-    getProjectRef
+    getProjectRef,
+    splitCookieValue,
+    reassembleChunkedCookies,
 } from '@/lib/cookie-utils'
 
 export async function updateSession(request: NextRequest) {
-    let supabaseResponse = NextResponse.next({
-        request,
-    })
-
+    let supabaseResponse = NextResponse.next({ request })
     const projectRef = getProjectRef()
 
     const supabase = createServerClient(
@@ -21,57 +20,73 @@ export async function updateSession(request: NextRequest) {
         {
             cookies: {
                 getAll() {
-                    // Read cookies from browser, decrypt and remap names back to Supabase format
-                    const allCookies = request.cookies.getAll()
-                    return allCookies.map(cookie => {
-                        const supabaseName = toSupabaseCookieName(cookie.name, projectRef)
-                        const decryptedValue = decryptCookieValue(cookie.value)
-                        return { name: supabaseName, value: decryptedValue }
-                    })
+                    const raw = request.cookies.getAll().map(c => ({ name: c.name, value: c.value }));
+                    const reassembled = reassembleChunkedCookies(raw);
+                    return reassembled.map(cookie => ({
+                        name: toSupabaseCookieName(cookie.name, projectRef),
+                        value: decryptCookieValue(cookie.value),
+                    }))
                 },
                 setAll(cookiesToSet) {
-                    // Encrypt and remap cookie names before setting
-                    cookiesToSet.forEach(({ name, value }) => {
+                    const consolidated = reassembleChunkedCookies(
+                        cookiesToSet.map(({ name, value }) => ({ name, value }))
+                    );
+                    const options = cookiesToSet[0]?.options || {};
+
+                    for (const { name, value } of consolidated) {
                         const customName = toCustomCookieName(name)
-                        const encryptedValue = encryptCookieValue(value)
-                        request.cookies.set(customName, encryptedValue)
-                    })
-                    supabaseResponse = NextResponse.next({
-                        request,
-                    })
-                    cookiesToSet.forEach(({ name, value, options }) => {
+                        const encrypted = encryptCookieValue(value)
+                        const chunks = splitCookieValue(customName, encrypted)
+                        for (const chunk of chunks) {
+                            request.cookies.set(chunk.name, chunk.value)
+                        }
+                    }
+
+                    supabaseResponse = NextResponse.next({ request })
+
+                    for (const { name, value } of consolidated) {
                         const customName = toCustomCookieName(name)
-                        const encryptedValue = encryptCookieValue(value)
-                        supabaseResponse.cookies.set(customName, encryptedValue, {
-                            ...options,
-                            httpOnly: true,
-                            secure: process.env.NODE_ENV === 'production',
-                            sameSite: 'lax',
-                        })
-                    })
+                        const encrypted = encryptCookieValue(value)
+                        const chunks = splitCookieValue(customName, encrypted)
+
+                        if (chunks.length > 1) {
+                            supabaseResponse.cookies.delete(customName)
+                        } else {
+                            for (let i = 0; i < 5; i++) {
+                                try { supabaseResponse.cookies.delete(`${customName}.${i}`); } catch { }
+                            }
+                        }
+
+                        for (const chunk of chunks) {
+                            supabaseResponse.cookies.set(chunk.name, chunk.value, {
+                                ...options,
+                                httpOnly: true,
+                                secure: process.env.NODE_ENV === 'production',
+                                sameSite: 'lax',
+                            })
+                        }
+                    }
                 },
             },
         }
     )
 
-    // Check if this is a public page BEFORE calling getUser() to avoid burning rate limits
-    const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/callback')
-    const isAuthVerify = request.nextUrl.pathname.startsWith('/auth/v1/')
-    const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
-    const isLoginPage = request.nextUrl.pathname === '/login'
-    const isSignupPage = request.nextUrl.pathname === '/signup'
-    const isForgotPassword = request.nextUrl.pathname === '/forgot-password'
-    const isResetPassword = request.nextUrl.pathname === '/reset-password'
-    const isRootPage = request.nextUrl.pathname === '/'
+    // Public pages
+    const { pathname } = request.nextUrl;
+    const isAuthCallback = pathname.startsWith('/auth/callback')
+    const isAuthVerify = pathname.startsWith('/auth/v1/')
+    const isApiRoute = pathname.startsWith('/api/')
+    const isLoginPage = pathname === '/login'
+    const isSignupPage = pathname === '/signup'
+    const isForgotPassword = pathname === '/forgot-password'
+    const isResetPassword = pathname === '/reset-password'
+    const isRootPage = pathname === '/'
 
-    console.log(`[MW] ${request.method} ${request.nextUrl.pathname} | public=${isLoginPage || isSignupPage || isRootPage || isAuthCallback || isForgotPassword || isResetPassword}`)
-
-    // Skip auth check for auth callback, landing page, and password reset pages
     if (isRootPage || isAuthCallback || isAuthVerify || isForgotPassword || isResetPassword) {
         return supabaseResponse
     }
 
-    // For login/signup pages: if user is already logged in, redirect to dashboard
+    // Redirect logged-in users away from login/signup
     if (isLoginPage || isSignupPage) {
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
@@ -82,8 +97,7 @@ export async function updateSession(request: NextRequest) {
         return supabaseResponse
     }
 
-    // Refresh session if expired - IMPORTANT: do not remove this
-    console.log(`[MW] >>> getUser() called for ${request.nextUrl.pathname}`)
+    // Refresh session
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user && !isApiRoute) {
@@ -92,19 +106,15 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.redirect(loginUrl)
     }
 
-    // Role isolation: only reseller users can access the reseller portal
+    // Role isolation: only reseller users
     if (user && !isApiRoute && !isLoginPage && !isAuthCallback && !isSignupPage && !isRootPage) {
-        console.log(`[MW] Checking role for user ${user.id}`)
-        const { data: profile, error: profileError } = await supabase
+        const { data: profile } = await supabase
             .from('profiles')
             .select('role')
             .eq('id', user.id)
             .single()
 
-        console.log(`[MW] Profile result:`, profile, `Error:`, profileError)
-
         if (profile?.role !== 'reseller' && profile?.role !== 'admin') {
-            // Non-reseller users cannot access the reseller portal — redirect to login with error
             const loginUrl = request.nextUrl.clone()
             loginUrl.pathname = '/login'
             loginUrl.searchParams.set('error', 'not_reseller')

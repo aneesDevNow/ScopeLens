@@ -53,11 +53,45 @@ export function toSupabaseCookieName(customName: string, projectRef: string): st
  */
 export function getProjectRef(): string {
     const url = process.env.SUPABASE_URL || "";
-    // Cloud Supabase: https://xxx.supabase.co
     const cloudMatch = url.match(/https?:\/\/([a-z0-9]+)\.supabase/);
     if (cloudMatch) return cloudMatch[1];
-    // Self-hosted: use first subdomain as project ref (matches what Supabase uses internally)
-    // e.g. https://scopelens-supabase.membercore.dev → scopelens-supabase
     const selfHostedMatch = url.match(/https?:\/\/([^./]+)/);
     return selfHostedMatch?.[1] || "";
 }
+
+// ── Cookie Chunking ──
+const CHUNK_SIZE = 3500;
+
+export function splitCookieValue(name: string, value: string): Array<{ name: string; value: string }> {
+    if (value.length <= CHUNK_SIZE) return [{ name, value }];
+    const chunks: Array<{ name: string; value: string }> = [];
+    for (let i = 0; i < value.length; i += CHUNK_SIZE) {
+        chunks.push({ name: `${name}.${chunks.length}`, value: value.substring(i, i + CHUNK_SIZE) });
+    }
+    return chunks;
+}
+
+export function reassembleChunkedCookies(
+    cookies: Array<{ name: string; value: string }>
+): Array<{ name: string; value: string }> {
+    const chunks = new Map<string, Map<number, string>>();
+    const singles: Array<{ name: string; value: string }> = [];
+    for (const cookie of cookies) {
+        const match = cookie.name.match(/^(.+)\.(\d+)$/);
+        if (match) {
+            const baseName = match[1];
+            const index = parseInt(match[2]);
+            if (!chunks.has(baseName)) chunks.set(baseName, new Map());
+            chunks.get(baseName)!.set(index, cookie.value);
+        } else {
+            singles.push(cookie);
+        }
+    }
+    const result = [...singles];
+    for (const [baseName, indexMap] of chunks) {
+        const indices = Array.from(indexMap.keys()).sort((a, b) => a - b);
+        result.push({ name: baseName, value: indices.map(i => indexMap.get(i)!).join('') });
+    }
+    return result;
+}
+
