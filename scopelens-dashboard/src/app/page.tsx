@@ -66,7 +66,7 @@ export default function LandingPage() {
               Pricing
             </button>
             <a
-              href={`${process.env.NEXT_PUBLIC_RESELLER_URL || 'http://localhost:3003'}/signup`}
+              href={`${process.env.NEXT_PUBLIC_RESELLER_URL || 'http://localhost:3003'}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm font-medium text-slate-500 hover:text-slate-700 transition-colors"
@@ -246,7 +246,7 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="flex-shrink-0">
-                <a href={`${process.env.NEXT_PUBLIC_RESELLER_URL || 'http://localhost:3003'}/signup`} target="_blank" rel="noopener noreferrer">
+                <a href={`${process.env.NEXT_PUBLIC_RESELLER_URL || 'http://localhost:3003'}`} target="_blank" rel="noopener noreferrer">
                   <button className="px-8 py-3.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl hover:from-blue-700 hover:to-indigo-700 transition-all shadow-lg shadow-blue-500/25 whitespace-nowrap">
                     Join as Reseller
                   </button>

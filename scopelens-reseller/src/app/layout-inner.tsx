@@ -12,7 +12,7 @@ export default function LayoutInner({ children }: { children: React.ReactNode })
     const isStandalone = STANDALONE_ROUTES.includes(pathname);
 
     if (isStandalone) {
-        return <CurrencyProvider><div className="w-full">{children}</div></CurrencyProvider>;
+        return <CurrencyProvider><div className="w-full overflow-y-auto h-screen">{children}</div></CurrencyProvider>;
     }
 
     return (
