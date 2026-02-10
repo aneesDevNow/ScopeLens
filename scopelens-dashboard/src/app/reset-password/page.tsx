@@ -60,12 +60,14 @@ function ResetPasswordContent() {
         try {
             const accessToken = sessionStorage.getItem("reset_access_token");
             const refreshToken = sessionStorage.getItem("reset_refresh_token");
+            const code = searchParams.get("code");
 
             const res = await fetch("/api/auth/reset-password", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     password,
+                    code,
                     access_token: accessToken,
                     refresh_token: refreshToken,
                 }),

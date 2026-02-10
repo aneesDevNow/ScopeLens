@@ -2,27 +2,44 @@
 
 import { Suspense } from "react";
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 
 function ResetPasswordContent() {
+    const searchParams = useSearchParams();
     const router = useRouter();
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [success, setSuccess] = useState(false);
-    const [accessToken, setAccessToken] = useState("");
-    const [refreshToken, setRefreshToken] = useState("");
+    const [tokenReady, setTokenReady] = useState(false);
 
     useEffect(() => {
-        const hash = window.location.hash.substring(1);
-        const params = new URLSearchParams(hash);
-        const at = params.get("access_token");
-        const rt = params.get("refresh_token");
-        if (at) setAccessToken(at);
-        if (rt) setRefreshToken(rt);
-    }, []);
+        // Check for PKCE code in query params
+        const code = searchParams.get("code");
+        if (code) {
+            setTokenReady(true);
+            return;
+        }
+
+        // Check for tokens in URL hash (implicit flow)
+        const hash = window.location.hash;
+        if (hash) {
+            const params = new URLSearchParams(hash.substring(1));
+            const accessToken = params.get("access_token");
+            const refreshToken = params.get("refresh_token");
+            if (accessToken && refreshToken) {
+                sessionStorage.setItem("reset_access_token", accessToken);
+                sessionStorage.setItem("reset_refresh_token", refreshToken);
+                setTokenReady(true);
+                window.history.replaceState(null, "", "/reset-password");
+            }
+        } else {
+            const stored = sessionStorage.getItem("reset_access_token");
+            if (stored) setTokenReady(true);
+        }
+    }, [searchParams]);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -41,11 +58,16 @@ function ResetPasswordContent() {
         setLoading(true);
 
         try {
+            const accessToken = sessionStorage.getItem("reset_access_token");
+            const refreshToken = sessionStorage.getItem("reset_refresh_token");
+            const code = searchParams.get("code");
+
             const res = await fetch("/api/auth/reset-password", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     password,
+                    code,
                     access_token: accessToken,
                     refresh_token: refreshToken,
                 }),
@@ -58,6 +80,8 @@ function ResetPasswordContent() {
                 return;
             }
 
+            sessionStorage.removeItem("reset_access_token");
+            sessionStorage.removeItem("reset_refresh_token");
             setSuccess(true);
             setTimeout(() => router.push("/login"), 3000);
         } catch {
@@ -80,6 +104,19 @@ function ResetPasswordContent() {
                     <p className="text-muted-foreground mb-4">Your password has been reset. Redirecting to login...</p>
                     <Link href="/login" className="text-primary font-semibold hover:underline">
                         Go to Login →
+                    </Link>
+                </div>
+            </div>
+        );
+    }
+
+    if (!tokenReady) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-background p-4">
+                <div className="w-full max-w-md bg-card rounded-lg border shadow-sm p-8 text-center">
+                    <p className="text-muted-foreground mb-4">Invalid or expired reset link. Please request a new one.</p>
+                    <Link href="/forgot-password" className="text-primary font-semibold hover:underline">
+                        Request new reset link
                     </Link>
                 </div>
             </div>
