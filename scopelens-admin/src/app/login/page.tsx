@@ -34,8 +34,8 @@ export default function AdminLoginPage() {
                 return;
             }
 
-            // Success - redirect based on role
-            router.push(data.role === "manager" ? "/licenses" : "/");
+            // Success - hard redirect to ensure cookies are picked up
+            window.location.href = data.role === "manager" ? "/licenses" : "/";
         } catch (err) {
             console.error("Login error:", err);
             setError("An error occurred. Please try again.");
