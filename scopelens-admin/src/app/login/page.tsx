@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { createClient } from "@/lib/supabase/client";
 
 export default function AdminLoginPage() {
     const router = useRouter();
@@ -21,50 +20,22 @@ export default function AdminLoginPage() {
         setLoading(true);
 
         try {
-            const supabase = createClient();
-
-            // Sign in with Supabase
-            const { data, error: authError } = await supabase.auth.signInWithPassword({
-                email,
-                password,
+            const res = await fetch("/api/auth/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password }),
             });
 
-            if (authError) {
-                setError(authError.message);
-                setLoading(false);
-                return;
-            }
+            const data = await res.json();
 
-            if (!data.session) {
-                setError("No session created");
-                setLoading(false);
-                return;
-            }
-
-            // Check if user is an admin
-            const { data: profile, error: profileError } = await supabase
-                .from("profiles")
-                .select("role")
-                .eq("id", data.user.id)
-                .single();
-
-            if (profileError || !profile) {
-                setError("Failed to verify admin status");
-                await supabase.auth.signOut();
-                setLoading(false);
-                return;
-            }
-
-            const allowedRoles = ["admin", "manager"];
-            if (!allowedRoles.includes(profile.role)) {
-                setError("Access denied. Administrator or manager privileges required.");
-                await supabase.auth.signOut();
+            if (!res.ok) {
+                setError(data.error || "Login failed");
                 setLoading(false);
                 return;
             }
 
             // Success - redirect based on role
-            router.push(profile.role === "manager" ? "/licenses" : "/");
+            router.push(data.role === "manager" ? "/licenses" : "/");
         } catch (err) {
             console.error("Login error:", err);
             setError("An error occurred. Please try again.");

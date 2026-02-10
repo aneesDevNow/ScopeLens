@@ -1,7 +1,6 @@
 "use client";
 
 import { usePathname, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -26,21 +25,23 @@ export default function ResellerSidebar() {
 
     useEffect(() => {
         async function fetchUser() {
-            const supabase = createClient();
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                setUser({
-                    email: user.email || "",
-                    name: user.user_metadata?.full_name || user.email?.split("@")[0] || "User",
-                });
+            try {
+                const res = await fetch("/api/auth/me");
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.user) {
+                        setUser(data.user);
+                    }
+                }
+            } catch (err) {
+                console.error("Error fetching user:", err);
             }
         }
         fetchUser();
     }, []);
 
     const handleLogout = async () => {
-        const supabase = createClient();
-        await supabase.auth.signOut();
+        await fetch("/api/auth/logout", { method: "POST" });
         router.push("/login");
     };
 

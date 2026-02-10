@@ -6,7 +6,7 @@ import crypto from "crypto";
 // Service role client for privileged operations (bypass RLS)
 function getAdminClient() {
     return createSupabaseClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 }

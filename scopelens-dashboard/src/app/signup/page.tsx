@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 
 function ScopeLensLogo() {
     return (
@@ -30,7 +28,6 @@ export default function SignupPage() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
-    const router = useRouter();
 
 
     async function handleSubmit(e: React.FormEvent) {
@@ -50,20 +47,16 @@ export default function SignupPage() {
         setLoading(true);
 
         try {
-            const supabase = createClient();
-            const { error } = await supabase.auth.signUp({
-                email,
-                password,
-                options: {
-                    data: {
-                        first_name: firstName,
-                        last_name: lastName,
-                    },
-                },
+            const res = await fetch("/api/auth/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email, password, firstName, lastName }),
             });
 
-            if (error) {
-                setError(error.message);
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.error || "Signup failed");
                 return;
             }
 

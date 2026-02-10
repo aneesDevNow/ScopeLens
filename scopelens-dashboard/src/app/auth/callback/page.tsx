@@ -3,7 +3,6 @@
 import { Suspense } from "react";
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 
 function AuthCallbackContent() {
     const searchParams = useSearchParams();
@@ -16,21 +15,28 @@ function AuthCallbackContent() {
         const plan = searchParams.get("plan");
 
         if (accessToken && refreshToken) {
-            const supabase = createClient();
-
-            supabase.auth.setSession({
-                access_token: accessToken,
-                refresh_token: refreshToken,
-            }).then(({ error }) => {
-                if (error) {
+            fetch("/api/auth/callback", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    access_token: accessToken,
+                    refresh_token: refreshToken,
+                }),
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    if (data.error) {
+                        setStatus("Authentication failed");
+                        console.error("Auth error:", data.error);
+                    } else {
+                        setStatus("Success! Redirecting...");
+                        router.push(plan ? `/checkout?plan=${plan}` : "/");
+                    }
+                })
+                .catch((err) => {
                     setStatus("Authentication failed");
-                    console.error("Auth error:", error);
-                } else {
-                    setStatus("Success! Redirecting...");
-                    // If a plan was selected, go straight to checkout
-                    router.push(plan ? `/checkout?plan=${plan}` : "/");
-                }
-            });
+                    console.error("Auth error:", err);
+                });
         } else {
             setStatus("Missing authentication tokens");
             setTimeout(() => {

@@ -15,8 +15,8 @@ const services = [
         composeId: 'kGZK7zE--bQvxZ0WBVgI_',
         env: [
             `NEXT_PUBLIC_SITE_URL=https://admin.scopelens.ai`,
-            `NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}`,
-            `NEXT_PUBLIC_SUPABASE_ANON_KEY=${ANON_KEY}`,
+            `SUPABASE_URL=${SUPABASE_URL}`,
+            `SUPABASE_ANON_KEY=${ANON_KEY}`,
             `SUPABASE_SERVICE_ROLE_KEY=${SERVICE_KEY}`,
             `COOKIE_ENCRYPTION_KEY=${COOKIE_KEY}`,
         ].join('\n')
@@ -26,8 +26,8 @@ const services = [
         composeId: '8vn7O8r800nOwlrXFRLii',
         env: [
             `NEXT_PUBLIC_SITE_URL=https://app.scopelens.ai`,
-            `NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}`,
-            `NEXT_PUBLIC_SUPABASE_ANON_KEY=${ANON_KEY}`,
+            `SUPABASE_URL=${SUPABASE_URL}`,
+            `SUPABASE_ANON_KEY=${ANON_KEY}`,
             `SUPABASE_SERVICE_ROLE_KEY=${SERVICE_KEY}`,
             `COOKIE_ENCRYPTION_KEY=${COOKIE_KEY}`,
             `S3_ENDPOINT=https://s3.eu-central-2.wasabisys.com`,
@@ -43,8 +43,8 @@ const services = [
         composeId: 'NfQnXnD_zKqa1Y6kCOr5l',
         env: [
             `NEXT_PUBLIC_SITE_URL=https://reseller.scopelens.ai`,
-            `NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}`,
-            `NEXT_PUBLIC_SUPABASE_ANON_KEY=${ANON_KEY}`,
+            `SUPABASE_URL=${SUPABASE_URL}`,
+            `SUPABASE_ANON_KEY=${ANON_KEY}`,
             `SUPABASE_SERVICE_ROLE_KEY=${SERVICE_KEY}`,
             `COOKIE_ENCRYPTION_KEY=${COOKIE_KEY}`,
         ].join('\n')
@@ -53,8 +53,8 @@ const services = [
         name: 'landing-page',
         composeId: 'DbaiUmH_6G5jwMD6c9cXy',
         env: [
-            `NEXT_PUBLIC_SUPABASE_URL=${SUPABASE_URL}`,
-            `NEXT_PUBLIC_SUPABASE_ANON_KEY=${ANON_KEY}`,
+            `SUPABASE_URL=${SUPABASE_URL}`,
+            `SUPABASE_ANON_KEY=${ANON_KEY}`,
             `RESELLER_DASHBOARD=https://reseller.scopelens.ai`,
         ].join('\n')
     },

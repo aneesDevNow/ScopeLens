@@ -5,7 +5,7 @@ import { createClient as createAdminClient } from "@supabase/supabase-js"; // fa
 // Helper to get admin client
 const getAdminClient = () => {
     return createAdminClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 };

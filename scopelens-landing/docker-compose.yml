@@ -4,13 +4,13 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        SUPABASE_URL: ${SUPABASE_URL}
+        SUPABASE_ANON_KEY: ${SUPABASE_ANON_KEY}
         RESELLER_DASHBOARD: ${RESELLER_DASHBOARD}
     expose:
       - "3000"
     environment:
-      - NEXT_PUBLIC_SUPABASE_URL
-      - NEXT_PUBLIC_SUPABASE_ANON_KEY
+      - SUPABASE_URL
+      - SUPABASE_ANON_KEY
       - RESELLER_DASHBOARD
     restart: unless-stopped

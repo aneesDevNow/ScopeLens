@@ -4,7 +4,6 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { createClient } from "@/lib/supabase/client";
 
 export default function AdminOverviewPage() {
   const router = useRouter();

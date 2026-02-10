@@ -7,7 +7,7 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 // Service role client for privileged operations
 function getAdminClient() {
     return createSupabaseClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 }
@@ -77,8 +77,8 @@ export async function POST(request: NextRequest) {
         const authHeader = request.headers.get("Authorization");
         if (authHeader) {
             supabase = createSupabaseClient(
-                process.env.NEXT_PUBLIC_SUPABASE_URL!,
-                process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+                process.env.SUPABASE_URL!,
+                process.env.SUPABASE_ANON_KEY!,
                 { global: { headers: { Authorization: authHeader } } }
             );
         } else {
