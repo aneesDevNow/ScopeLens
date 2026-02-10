@@ -23,7 +23,7 @@ interface LicenseKey {
     expires_at: string | null;
     created_at: string;
     plans: { name: string; slug: string } | null;
-    claimed_profile: { first_name: string; last_name: string } | null;
+    claimed_profile: { first_name: string; last_name: string; email: string } | null;
 }
 
 export default function LicensesPage() {
@@ -161,8 +161,10 @@ This work purchase key is valid for use with ScopeLens AI Detection Platform.
 
     const getClaimedByName = (key: LicenseKey) => {
         if (!key.claimed_profile) return null;
-        const { first_name, last_name } = key.claimed_profile;
-        return `${first_name || ""} ${last_name || ""}`.trim() || "Unknown";
+        const { first_name, last_name, email } = key.claimed_profile;
+        const name = `${first_name || ""} ${last_name || ""}`.trim();
+        if (email) return name ? `${name} (${email})` : email;
+        return name || "Unknown";
     };
 
     // Stats

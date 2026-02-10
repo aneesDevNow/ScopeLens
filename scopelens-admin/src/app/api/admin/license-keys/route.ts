@@ -170,15 +170,29 @@ export async function GET(request: Request) {
             planMap = new Map((plans || []).map(p => [p.id, { name: p.name, slug: p.slug }]));
         }
 
-        // Batch-fetch claimed-by profiles
+        // Batch-fetch claimed-by profiles + emails
         const claimedByIds = [...new Set(keysList.map(k => k.claimed_by).filter(Boolean))];
-        let profileMap = new Map<string, { first_name: string; last_name: string }>();
+        let profileMap = new Map<string, { first_name: string; last_name: string; email: string }>();
         if (claimedByIds.length > 0) {
             const { data: profiles } = await admin
                 .from("profiles")
                 .select("id, first_name, last_name")
                 .in("id", claimedByIds);
-            profileMap = new Map((profiles || []).map(p => [p.id, { first_name: p.first_name, last_name: p.last_name }]));
+
+            // Fetch emails from auth.users via admin API
+            const emailMap = new Map<string, string>();
+            for (const id of claimedByIds) {
+                const { data: authUser } = await admin.auth.admin.getUserById(id);
+                if (authUser?.user?.email) {
+                    emailMap.set(id, authUser.user.email);
+                }
+            }
+
+            profileMap = new Map((profiles || []).map(p => [p.id, {
+                first_name: p.first_name,
+                last_name: p.last_name,
+                email: emailMap.get(p.id) || "",
+            }]));
         }
 
         // Merge data
