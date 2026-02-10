@@ -59,10 +59,12 @@ export async function updateSession(request: NextRequest) {
     const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
     const isLoginPage = request.nextUrl.pathname === '/login'
     const isSignupPage = request.nextUrl.pathname === '/signup'
+    const isForgotPassword = request.nextUrl.pathname === '/forgot-password'
+    const isResetPassword = request.nextUrl.pathname === '/reset-password'
     const isRootPage = request.nextUrl.pathname === '/'
 
-    // Skip auth check for auth callback and landing page
-    if (isRootPage || isAuthCallback) {
+    // Skip auth check for auth callback, landing page, and password reset pages
+    if (isRootPage || isAuthCallback || isForgotPassword || isResetPassword) {
         return supabaseResponse
     }
 
