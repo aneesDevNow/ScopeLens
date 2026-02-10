@@ -12,6 +12,7 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError("");
@@ -29,7 +30,7 @@ export default function LoginPage() {
                 return;
             }
 
-            router.push("/");
+            router.push("/scan");
             router.refresh();
         } catch {
             setError("An error occurred. Please try again.");

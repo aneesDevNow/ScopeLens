@@ -51,8 +51,7 @@ function CheckoutContent() {
     const [cardNumber, setCardNumber] = useState("");
     const [expiry, setExpiry] = useState("");
     const [cvc, setCvc] = useState("");
-    const [country, setCountry] = useState("United States");
-    const [zip, setZip] = useState("");
+
 
     useEffect(() => {
         if (currency === "PKR") {
@@ -130,7 +129,7 @@ function CheckoutContent() {
         }
     }
 
-    const tax = plan ? plan.price_monthly * 0.1 : 0;
+    const tax = plan ? plan.price_monthly * 0.02 : 0;
     const total = plan ? plan.price_monthly + tax : 0;
 
     if (loading) {
@@ -161,6 +160,59 @@ function CheckoutContent() {
                     >
                         View Plans
                     </Link>
+                </div>
+            </div>
+        );
+    }
+
+    const directPaymentEnabled = process.env.NEXT_PUBLIC_DIRECT_PAYMENT === "true";
+
+    if (!directPaymentEnabled) {
+        return (
+            <div className="h-screen flex flex-col">
+                <nav className="bg-white border-b border-slate-200 px-6 py-3 flex-shrink-0">
+                    <div className="max-w-6xl mx-auto flex items-center justify-between">
+                        <Link href="/plans" className="flex items-center gap-2.5">
+                            <ScopeLensLogo />
+                            <span className="text-lg font-bold text-slate-700">Scope Lens</span>
+                        </Link>
+                    </div>
+                </nav>
+                <div className="flex-1 flex items-center justify-center p-6">
+                    <div className="text-center max-w-md">
+                        <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                            <svg className="w-8 h-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                            </svg>
+                        </div>
+                        <h1 className="text-2xl font-bold text-slate-700 mb-3">Direct Payment Unavailable</h1>
+                        <p className="text-slate-500 leading-relaxed mb-6">
+                            Direct payment is currently unavailable. Please contact your reseller to purchase a license key,
+                            or use a license key if you already have one.
+                        </p>
+                        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                            <a
+                                href={`${process.env.NEXT_PUBLIC_RESELLER_URL || 'http://localhost:3003'}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-blue-700 text-white text-sm font-semibold rounded-xl hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25"
+                            >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                                </svg>
+                                Find a Reseller
+                            </a>
+                            <Link
+                                href="/plans"
+                                className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-slate-600 border-2 border-slate-200 rounded-xl hover:bg-slate-50 transition-all"
+                            >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                                </svg>
+                                Use License Key
+                            </Link>
+                        </div>
+                    </div>
                 </div>
             </div>
         );
@@ -398,47 +450,6 @@ function CheckoutContent() {
                                     )}
                                 </div>
 
-                                {/* Billing Address */}
-                                <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm">
-                                    <h2 className="text-base font-bold text-slate-700 mb-4">Billing Address</h2>
-
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="space-y-1.5">
-                                            <label className="text-sm font-medium text-slate-600">Country or Region</label>
-                                            <div className="relative">
-                                                <select
-                                                    value={country}
-                                                    onChange={(e) => setCountry(e.target.value)}
-                                                    className="w-full appearance-none px-3 py-2.5 bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm text-slate-700 cursor-pointer"
-                                                >
-                                                    <option>United States</option>
-                                                    <option>United Kingdom</option>
-                                                    <option>Canada</option>
-                                                    <option>Australia</option>
-                                                    <option>Germany</option>
-                                                    <option>France</option>
-                                                    <option>India</option>
-                                                    <option>Pakistan</option>
-                                                    <option>Other</option>
-                                                </select>
-                                                <svg className="w-4 h-4 text-slate-400 absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                </svg>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-1.5">
-                                            <label className="text-sm font-medium text-slate-600">ZIP / Postal Code</label>
-                                            <input
-                                                type="text"
-                                                placeholder="12345"
-                                                value={zip}
-                                                onChange={(e) => setZip(e.target.value)}
-                                                className="w-full px-3 py-2.5 bg-white rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-sm text-slate-700 placeholder:text-slate-400"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
 
                                 {/* Security Badges + Button Row */}
                                 <div className="flex items-center justify-between gap-4">
@@ -523,7 +534,7 @@ function CheckoutContent() {
                                             <span className="text-slate-700">{formatPrice(plan.price_monthly)}</span>
                                         </div>
                                         <div className="flex justify-between text-xs">
-                                            <span className="text-slate-500">Tax (10%)</span>
+                                            <span className="text-slate-500">Tax (2%)</span>
                                             <span className="text-slate-700">{formatPrice(tax)}</span>
                                         </div>
                                         <div className="flex justify-between items-center pt-2 border-t border-slate-100">

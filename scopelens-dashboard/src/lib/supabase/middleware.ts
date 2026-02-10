@@ -59,9 +59,21 @@ export async function updateSession(request: NextRequest) {
     const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
     const isLoginPage = request.nextUrl.pathname === '/login'
     const isSignupPage = request.nextUrl.pathname === '/signup'
+    const isRootPage = request.nextUrl.pathname === '/'
 
-    // Skip auth check entirely for public pages
-    if (isLoginPage || isSignupPage || isAuthCallback) {
+    // Skip auth check for auth callback and landing page
+    if (isRootPage || isAuthCallback) {
+        return supabaseResponse
+    }
+
+    // For login/signup pages: if user is already logged in, redirect to dashboard
+    if (isLoginPage || isSignupPage) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+            const dashboardUrl = request.nextUrl.clone()
+            dashboardUrl.pathname = '/scan'
+            return NextResponse.redirect(dashboardUrl)
+        }
         return supabaseResponse
     }
 

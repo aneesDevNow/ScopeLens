@@ -63,8 +63,19 @@ export async function updateSession(request: NextRequest) {
 
     console.log(`[MW] ${request.method} ${request.nextUrl.pathname} | public=${isLoginPage || isSignupPage || isRootPage || isAuthCallback}`)
 
-    // Skip auth check entirely for public pages — no need to hit Supabase Auth API
-    if (isLoginPage || isSignupPage || isRootPage || isAuthCallback) {
+    // Skip auth check for auth callback and landing page
+    if (isRootPage || isAuthCallback) {
+        return supabaseResponse
+    }
+
+    // For login/signup pages: if user is already logged in, redirect to dashboard
+    if (isLoginPage || isSignupPage) {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (user) {
+            const dashboardUrl = request.nextUrl.clone()
+            dashboardUrl.pathname = '/dashboard'
+            return NextResponse.redirect(dashboardUrl)
+        }
         return supabaseResponse
     }
 

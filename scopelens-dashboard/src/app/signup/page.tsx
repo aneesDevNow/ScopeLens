@@ -32,6 +32,7 @@ export default function SignupPage() {
     const [success, setSuccess] = useState(false);
     const router = useRouter();
 
+
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         setError("");

@@ -30,7 +30,7 @@ interface Subscription {
 }
 
 const navItems = [
-    { title: "Upload Hub", url: "/", icon: "cloud_upload" },
+    { title: "Upload Hub", url: "/scan", icon: "cloud_upload" },
     { title: "File History", url: "/files", icon: "folder_open" },
     { title: "Plans & Usage", url: "/plans", icon: "credit_card" },
     { title: "Settings", url: "/settings", icon: "settings" },
@@ -90,7 +90,7 @@ export function AppSidebar() {
     return (
         <Sidebar>
             <SidebarHeader className="p-4 border-b">
-                <Link href="/" className="flex items-center gap-3">
+                <Link href="/scan" className="flex items-center gap-3">
                     <img src="/icon.svg" alt="ScopeLens" className="w-10 h-10" />
                     <span className="text-xl font-bold text-slate-700">ScopeLens</span>
                 </Link>
@@ -104,7 +104,7 @@ export function AppSidebar() {
                                 <SidebarMenuItem key={item.title}>
                                     <SidebarMenuButton asChild isActive={pathname === item.url}>
                                         <Link href={item.url}>
-                                            <span className="material-symbols-outlined">{item.icon}</span>
+                                            <span className="material-symbols-outlined text-slate-700">{item.icon}</span>
                                             <span>{item.title}</span>
                                         </Link>
                                     </SidebarMenuButton>

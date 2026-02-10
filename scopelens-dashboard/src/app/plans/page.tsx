@@ -302,10 +302,6 @@ export default function PlansPage() {
                                         >
                                             Active
                                         </button>
-                                    ) : plan.slug === "institution" ? (
-                                        <button className="w-full py-3 px-4 rounded-xl border-2 border-slate-300 text-slate-600 font-medium mb-6 hover:bg-slate-50 transition-colors">
-                                            Contact Sales
-                                        </button>
                                     ) : (
                                         <Link href={`/checkout?plan=${plan.slug}`} className="block mb-6">
                                             <button className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-700 hover:to-blue-800 transition-all shadow-lg shadow-blue-500/25">

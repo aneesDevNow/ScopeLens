@@ -19,18 +19,18 @@ export default function RootLayout({
 }>) {
   const pathname = usePathname();
 
-  // Don't show the main sidebar on login or auth pages
+  // Don't show the main sidebar on landing, login, or auth pages
+  const isLandingPage = pathname === "/";
   const isAuthRoute = pathname === "/login" || pathname === "/signup" || pathname?.startsWith("/auth/");
   const isCheckoutRoute = pathname === "/checkout" || pathname?.startsWith("/checkout/");
-  const isStandalonePage = isAuthRoute || isCheckoutRoute;
+  const isStandalonePage = isLandingPage || isAuthRoute || isCheckoutRoute;
 
   return (
     <html lang="en">
       <head>
         <title>ScopeLens Dashboard</title>
         <meta name="description" content="AI Content Detection Dashboard" />
-        <link rel="icon" type="image/svg+xml" href="/logo.svg" />
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="icon" type="image/svg+xml" href="/icon.svg" />
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0"
           rel="stylesheet"
