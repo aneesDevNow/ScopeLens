@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient } from '@supabase/supabase-js'
 
 export async function POST(req: NextRequest) {
     try {
@@ -12,11 +12,30 @@ export async function POST(req: NextRequest) {
             )
         }
 
-        const supabase = await createClient()
+        if (!access_token || !refresh_token) {
+            return NextResponse.json(
+                { error: 'Invalid or expired reset link. Please request a new one.' },
+                { status: 400 }
+            )
+        }
 
-        // If tokens are provided, set the session first (coming from email link)
-        if (access_token && refresh_token) {
-            await supabase.auth.setSession({ access_token, refresh_token })
+        // Use regular client (not SSR) so setSession works in-memory
+        const supabase = createClient(
+            process.env.SUPABASE_URL!,
+            process.env.SUPABASE_ANON_KEY!
+        )
+
+        const { error: sessionError } = await supabase.auth.setSession({
+            access_token,
+            refresh_token,
+        })
+
+        if (sessionError) {
+            console.error('Session error:', sessionError)
+            return NextResponse.json(
+                { error: 'Invalid or expired reset link. Please request a new one.' },
+                { status: 400 }
+            )
         }
 
         const { error } = await supabase.auth.updateUser({ password })
