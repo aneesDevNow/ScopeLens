@@ -52,12 +52,12 @@ export async function POST() {
             0
         );
 
-        // 4. FAIR QUEUE: Get waiting items joined with scans to get user_id
+        // 4. FAIR QUEUE: Get waiting items, then look up user_ids from scans
         //    Fetch more than we need so we can pick fairly across users
         const fetchLimit = Math.min(BATCH_SIZE * 3, 500);
         const { data: waitingItems, error: queueError } = await supabase
             .from("scan_queue")
-            .select("*, scans!inner(user_id)")
+            .select("*")
             .eq("status", "waiting")
             .order("created_at", { ascending: true })
             .limit(fetchLimit);
@@ -69,6 +69,18 @@ export async function POST() {
             });
         }
 
+        // Look up user_ids from scans table
+        const scanIds = [...new Set(waitingItems.map((item: { scan_id: string }) => item.scan_id))];
+        const { data: scansData } = await supabase
+            .from("scans")
+            .select("id, user_id")
+            .in("id", scanIds);
+
+        const scanUserMap: Record<string, string> = {};
+        (scansData || []).forEach((s: { id: string; user_id: string }) => {
+            scanUserMap[s.id] = s.user_id;
+        });
+
         // 5. ROUND-ROBIN: Group items by user, then pick one per user in rotation
         //    This ensures that if user A has 50 files and user B has 1 file,
         //    user B's file gets processed alongside user A's first file, not after all 50.
@@ -77,13 +89,19 @@ export async function POST() {
             scan_id: string;
             input_text: string;
             retry_count: number;
-            scans: { user_id: string };
+            user_id: string;
             [key: string]: unknown;
         }
 
+        // Enrich items with user_id
+        const enrichedItems: QueueItemWithScan[] = waitingItems.map((item: { scan_id: string;[key: string]: unknown }) => ({
+            ...item,
+            user_id: scanUserMap[item.scan_id] || "unknown",
+        })) as QueueItemWithScan[];
+
         const userQueues: Map<string, QueueItemWithScan[]> = new Map();
-        for (const item of waitingItems as QueueItemWithScan[]) {
-            const userId = item.scans?.user_id || "unknown";
+        for (const item of enrichedItems) {
+            const userId = item.user_id;
             if (!userQueues.has(userId)) {
                 userQueues.set(userId, []);
             }
