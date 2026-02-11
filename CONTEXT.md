@@ -157,7 +157,7 @@ cd scopelens-reseller && npm run dev
   - `PUT /api/profile/logo` — Report logo upload
   - `GET /api/reports` — List reports
   - `GET /api/report` — Download report PDF
-  - `GET /api/subscription` — Current subscription info
+  - `GET /api/subscription` — Current subscription info (uses `scans_per_day` from plans, counts today's scans for free users, lazy daily reset for paid users)
   - `GET /api/csrf` — CSRF token
 
 ### Reseller Portal (`scopelens-reseller/`)
