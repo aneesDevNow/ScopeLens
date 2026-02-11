@@ -85,25 +85,25 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Scan not found" }, { status: 404 });
         }
 
+        // TODO: Re-enable S3 caching after testing
         // Check if report already exists (cached in S3)
-        if (scan.report_path) {
-            const { data: cachedReport, error: downloadError } = await downloadFromS3(
-                getReportsFolder(),
-                scan.report_path
-            );
-
-            if (!downloadError && cachedReport) {
-                const fileName = `${scan.file_name?.replace(/\.[^/.]+$/, "") || "report"}_ai_report.pdf`;
-                return new NextResponse(new Uint8Array(cachedReport), {
-                    status: 200,
-                    headers: {
-                        "Content-Type": "application/pdf",
-                        "Content-Disposition": `attachment; filename="${fileName}"`,
-                        "Cache-Control": "private, max-age=3600",
-                    },
-                });
-            }
-        }
+        // if (scan.report_path) {
+        //     const { data: cachedReport, error: downloadError } = await downloadFromS3(
+        //         getReportsFolder(),
+        //         scan.report_path
+        //     );
+        //     if (!downloadError && cachedReport) {
+        //         const fileName = `${scan.file_name?.replace(/\.[^/.]+$/, "") || "report"}_ai_report.pdf`;
+        //         return new NextResponse(new Uint8Array(cachedReport), {
+        //             status: 200,
+        //             headers: {
+        //                 "Content-Type": "application/pdf",
+        //                 "Content-Disposition": `attachment; filename="${fileName}"`,
+        //                 "Cache-Control": "private, max-age=3600",
+        //             },
+        //         });
+        //     }
+        // }
 
         // Get profile data (for author name)
         const { data: profile } = await supabase
@@ -258,23 +258,11 @@ export async function POST(request: NextRequest) {
             }) as any
         );
 
-        // Upload to S3 (best-effort caching)
-        const reportPath = `${user.id}/${scan.id}_report.pdf`;
-        uploadToS3(
-            getReportsFolder(),
-            reportPath,
-            pdfBuffer,
-            "application/pdf"
-        )
-            .then(() => {
-                supabase
-                    .from("scans")
-                    .update({ report_path: reportPath })
-                    .eq("id", scanId);
-            })
-            .catch((uploadError) => {
-                console.error("Report cache error (non-blocking):", uploadError);
-            });
+        // TODO: Re-enable S3 upload after testing
+        // const reportPath = `${user.id}/${scan.id}_report.pdf`;
+        // uploadToS3(getReportsFolder(), reportPath, pdfBuffer, "application/pdf")
+        //     .then(() => supabase.from("scans").update({ report_path: reportPath }).eq("id", scanId))
+        //     .catch((err) => console.error("Report cache error:", err));
 
         // Return PDF directly as download
         const fileName = `${scan.file_name?.replace(/\.[^/.]+$/, "") || "report"}_ai_report.pdf`;
