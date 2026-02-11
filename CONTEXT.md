@@ -341,6 +341,7 @@ Assets extracted to `public/icons/`: `robot-teal.png`, `robot-purple.png`, `faq-
 - AI-paraphrased → purple (`#EDE9FE` bg, `#7C3AED` text)
 - Paragraphs have 6pt spacing to prevent highlight overlap
 - No line numbers / numbered circles on content pages
+- DOCX tables (`<w:tbl>`) are parsed into grid layout with bordered cells and bold header row
 
 ---
 
