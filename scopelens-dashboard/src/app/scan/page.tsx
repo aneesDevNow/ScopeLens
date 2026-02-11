@@ -32,6 +32,7 @@ export default function UploadHubPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
+  const [downloading, setDownloading] = useState<string | null>(null);
 
   const fetchScans = async () => {
     try {
@@ -163,6 +164,35 @@ export default function UploadHubPage() {
     const hours = Math.floor(mins / 60);
     if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
     return date.toLocaleDateString();
+  };
+
+  const handleDownloadReport = async (scan: Scan) => {
+    setDownloading(scan.id);
+    try {
+      const response = await fetch("/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ scanId: scan.id }),
+      });
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to generate report");
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${scan.file_name?.replace(/\.[^/.]+$/, "") || "report"}_ai_report.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Download error:", error);
+      alert(error instanceof Error ? error.message : "Failed to download report");
+    } finally {
+      setDownloading(null);
+    }
   };
 
   return (
@@ -304,21 +334,39 @@ export default function UploadHubPage() {
                         <p className="text-sm text-slate-400">{formatDate(scan.created_at)}</p>
                       </div>
                     </div>
-                    {scan.status === "completed" ? (
-                      <div className={`px-3 py-1.5 rounded-full text-sm font-semibold ${(scan.ai_score || 0) > 50
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-green-100 text-green-700'
-                        }`}>
-                        {scan.ai_score}% AI
-                      </div>
-                    ) : scan.status === "pending" || scan.status === "processing" ? (
-                      <div className="flex items-center gap-2 text-slate-400 text-sm">
-                        <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                        Processing...
-                      </div>
-                    ) : (
-                      <span className="text-slate-400 text-sm">{scan.status}</span>
-                    )}
+                    <div className="flex items-center gap-3">
+                      {scan.status === "completed" ? (
+                        <>
+                          <div className={`px-3 py-1.5 rounded-full text-sm font-semibold ${(scan.ai_score || 0) > 50
+                            ? 'bg-red-100 text-red-700'
+                            : 'bg-green-100 text-green-700'
+                            }`}>
+                            {scan.ai_score}% AI
+                          </div>
+                          <button
+                            onClick={() => handleDownloadReport(scan)}
+                            disabled={downloading === scan.id}
+                            className="p-2 hover:bg-slate-200 rounded-lg transition-colors"
+                            title="Download PDF Report"
+                          >
+                            {downloading === scan.id ? (
+                              <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                            ) : (
+                              <svg className="w-5 h-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                              </svg>
+                            )}
+                          </button>
+                        </>
+                      ) : scan.status === "pending" || scan.status === "processing" ? (
+                        <div className="flex items-center gap-2 text-slate-400 text-sm">
+                          <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                          Processing...
+                        </div>
+                      ) : (
+                        <span className="text-slate-400 text-sm">{scan.status}</span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
