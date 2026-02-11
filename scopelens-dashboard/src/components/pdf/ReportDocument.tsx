@@ -304,28 +304,37 @@ const ps3 = StyleSheet.create({
     titleText: { fontSize: 20, fontFamily: "Times-Bold", color: "#181818", marginTop: 8, marginBottom: 4 },
     h1Text: { fontSize: 17, fontFamily: "Times-Bold", color: "#181818", marginTop: 8, marginBottom: 3 },
     h2Text: { fontSize: 14, fontFamily: "Times-Bold", color: "#181818", marginTop: 6, marginBottom: 2 },
-    paraRow: { flexDirection: "row", marginBottom: 2 },
-    markerCol: { width: 18, alignItems: "center", paddingTop: 2 },
-    markerCircle: {
-        width: 14, height: 14, borderRadius: 7,
-        backgroundColor: C.teal500, alignItems: "center", justifyContent: "center",
-    },
-    markerNum: { fontSize: 6, fontFamily: "Helvetica-Bold", color: C.white },
-    textCol: { flex: 1 },
+    paraBlock: { marginBottom: 6 },
     normalText: { fontSize: 12, fontFamily: "Times-Roman", color: "#181818", lineHeight: 1.6, textAlign: "justify" },
-    hlText: { fontSize: 12, fontFamily: "Times-Roman", color: C.teal700, backgroundColor: C.teal100, lineHeight: 1.6, textAlign: "justify" },
+    hlText: { fontSize: 12, fontFamily: "Times-Roman", color: "#0D9488", backgroundColor: "#CCFBF1", lineHeight: 1.6, textAlign: "justify" },
+    hlTextPurple: { fontSize: 12, fontFamily: "Times-Roman", color: "#7C3AED", backgroundColor: "#EDE9FE", lineHeight: 1.6, textAlign: "justify" },
 });
 
-const ContentPage = ({ paragraphs, highlightedSentences, reportId, customLogoSrc }: {
+const ContentPage = ({ paragraphs, highlightedSentences, group1Percent, group2Percent, reportId, customLogoSrc }: {
     paragraphs: ReportProps["paragraphs"];
     highlightedSentences: string[];
+    group1Percent: number;
+    group2Percent: number;
     reportId: string;
     customLogoSrc?: string;
 }) => {
-    let highlightIndex = 1;
-
     const isHighlighted = (sentence: string) =>
         highlightedSentences.some((h) => sentence.includes(h) || h.includes(sentence));
+
+    // Split highlighted sentences proportionally: group1 (teal) vs group2 (purple)
+    const totalPct = group1Percent + group2Percent;
+    const group1Ratio = totalPct > 0 ? group1Percent / totalPct : 1;
+    // Count total highlighted sentences
+    let totalHl = 0;
+    for (const para of paragraphs) {
+        if (para.style === "Normal") {
+            for (const sent of para.text.split(/(?<=[.!?])\s+/)) {
+                if (isHighlighted(sent)) totalHl++;
+            }
+        }
+    }
+    const group1Count = Math.round(totalHl * group1Ratio);
+    let hlSeen = 0;
 
     return (
         <Page size="A4" style={s.page} wrap>
@@ -344,44 +353,25 @@ const ContentPage = ({ paragraphs, highlightedSentences, reportId, customLogoSrc
 
                 // Normal paragraph — split into sentences for highlighting
                 const sentences = para.text.split(/(?<=[.!?])\s+/);
-                let paraHasMarker = false;
-                let currentMarkerIndex = 0;
-
-                // Check if any sentence in this para is highlighted
-                for (const sent of sentences) {
-                    if (isHighlighted(sent) && !paraHasMarker) {
-                        paraHasMarker = true;
-                        currentMarkerIndex = highlightIndex;
-                        highlightIndex++;
-                    }
-                }
-                // Reset — we'll recount in render
-                if (paraHasMarker) highlightIndex = currentMarkerIndex;
 
                 return (
-                    <View key={pi} style={ps3.paraRow} wrap={false}>
-                        <View style={ps3.markerCol}>
-                            {paraHasMarker && (
-                                <View style={ps3.markerCircle}>
-                                    <Text style={ps3.markerNum}>{currentMarkerIndex}</Text>
-                                </View>
-                            )}
-                        </View>
-                        <View style={ps3.textCol}>
-                            <Text>
-                                {sentences.map((sent, si) => {
-                                    const hl = isHighlighted(sent);
-                                    if (hl && si === 0 && paraHasMarker) {
-                                        highlightIndex = currentMarkerIndex + 1;
-                                    }
-                                    return (
-                                        <Text key={si} style={hl ? ps3.hlText : ps3.normalText}>
-                                            {sent}{si < sentences.length - 1 ? " " : ""}
-                                        </Text>
-                                    );
-                                })}
-                            </Text>
-                        </View>
+                    <View key={pi} style={ps3.paraBlock} wrap={false}>
+                        <Text>
+                            {sentences.map((sent, si) => {
+                                const hl = isHighlighted(sent);
+                                let style = ps3.normalText;
+                                if (hl) {
+                                    hlSeen++;
+                                    // First N highlights = teal (group1), rest = purple (group2)
+                                    style = hlSeen <= group1Count ? ps3.hlText : ps3.hlTextPurple;
+                                }
+                                return (
+                                    <Text key={si} style={style}>
+                                        {sent}{si < sentences.length - 1 ? " " : ""}
+                                    </Text>
+                                );
+                            })}
+                        </Text>
                     </View>
                 );
             })}
@@ -407,6 +397,8 @@ const ReportDocument = (props: ReportProps) => (
             <ContentPage
                 paragraphs={props.paragraphs}
                 highlightedSentences={props.highlightedSentences}
+                group1Percent={props.group1Percent}
+                group2Percent={props.group2Percent}
                 reportId={props.reportId}
                 customLogoSrc={props.customLogoSrc}
             />
