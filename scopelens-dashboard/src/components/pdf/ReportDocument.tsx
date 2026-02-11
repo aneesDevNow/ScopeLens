@@ -308,6 +308,13 @@ const ps3 = StyleSheet.create({
     normalText: { fontSize: 12, fontFamily: "Times-Roman", color: "#181818", lineHeight: 1.6, textAlign: "justify" },
     hlText: { fontSize: 12, fontFamily: "Times-Roman", color: "#181818", backgroundColor: "#CCFBF1", lineHeight: 1.6, textAlign: "justify" },
     hlTextPurple: { fontSize: 12, fontFamily: "Times-Roman", color: "#181818", backgroundColor: "#EDE9FE", lineHeight: 1.6, textAlign: "justify" },
+    // Table styles
+    tblWrap: { marginVertical: 8, borderWidth: 0.5, borderColor: "#D1D5DB" },
+    tblRow: { flexDirection: "row", borderBottomWidth: 0.5, borderBottomColor: "#D1D5DB" },
+    tblHeaderCell: { flex: 1, padding: 5, backgroundColor: "#F3F4F6", borderRightWidth: 0.5, borderRightColor: "#D1D5DB" },
+    tblCell: { flex: 1, padding: 5, borderRightWidth: 0.5, borderRightColor: "#D1D5DB" },
+    tblHeaderText: { fontSize: 9, fontFamily: "Helvetica-Bold", color: "#181818" },
+    tblCellText: { fontSize: 9, fontFamily: "Times-Roman", color: "#181818" },
 });
 
 const ContentPage = ({ paragraphs, highlightedSentences, group1Percent, group2Percent, reportId, customLogoSrc }: {
@@ -349,6 +356,25 @@ const ContentPage = ({ paragraphs, highlightedSentences, group1Percent, group2Pe
                 }
                 if (para.style === "Heading2") {
                     return <Text key={pi} style={ps3.h2Text}>{para.text}</Text>;
+                }
+
+                // ─── Table rendering ───
+                if (para.style === "Table" && para.rows && para.rows.length > 0) {
+                    return (
+                        <View key={pi} style={ps3.tblWrap} wrap={false}>
+                            {para.rows.map((row, ri) => (
+                                <View key={ri} style={ps3.tblRow}>
+                                    {row.map((cell, ci) => (
+                                        <View key={ci} style={ri === 0 ? ps3.tblHeaderCell : ps3.tblCell}>
+                                            <Text style={ri === 0 ? ps3.tblHeaderText : ps3.tblCellText}>
+                                                {cell}
+                                            </Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            ))}
+                        </View>
+                    );
                 }
 
                 // Normal paragraph — split into sentences for highlighting

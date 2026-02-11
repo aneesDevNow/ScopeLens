@@ -2,8 +2,9 @@ import { StyleSheet } from "@react-pdf/renderer";
 
 // ─── Types ───
 export interface DocParagraph {
-    style: "Title" | "Heading1" | "Heading2" | "Normal";
+    style: "Title" | "Heading1" | "Heading2" | "Normal" | "Table";
     text: string;
+    rows?: string[][]; // For Table style: each row is an array of cell strings
 }
 
 export interface ReportProps {

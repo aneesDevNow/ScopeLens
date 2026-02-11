@@ -17,34 +17,63 @@ async function parseDocxStructure(buffer: ArrayBuffer): Promise<DocParagraph[]> 
 
     const paragraphs: DocParagraph[] = [];
 
-    // Simple XML regex parsing (no DOMParser in Node edge runtime)
-    // Match each <w:p> ... </w:p> block
-    const paraRegex = /<w:p[\s>][\s\S]*?<\/w:p>/g;
-    let paraMatch;
+    // Extract the body content
+    const bodyMatch = docXml.match(/<w:body[^>]*>([\s\S]*)<\/w:body>/);
+    const body = bodyMatch ? bodyMatch[1] : docXml;
 
-    while ((paraMatch = paraRegex.exec(docXml)) !== null) {
-        const paraXml = paraMatch[0];
-
-        // Extract paragraph style
-        let style: DocParagraph["style"] = "Normal";
-        const styleMatch = paraXml.match(/<w:pStyle\s+w:val="([^"]+)"/);
-        if (styleMatch) {
-            const rawStyle = styleMatch[1];
-            if (rawStyle === "Title") style = "Title";
-            else if (rawStyle === "Heading1" || rawStyle.match(/^heading\s*1$/i)) style = "Heading1";
-            else if (rawStyle === "Heading2" || rawStyle.match(/^heading\s*2$/i)) style = "Heading2";
-        }
-
-        // Extract all text runs (<w:t> content)
+    // Helper: extract all text from a chunk of XML
+    const extractText = (xml: string): string => {
         let text = "";
         const textRegex = /<w:t[^>]*>([^<]*)<\/w:t>/g;
-        let textMatch;
-        while ((textMatch = textRegex.exec(paraXml)) !== null) {
-            text += textMatch[1];
-        }
+        let m;
+        while ((m = textRegex.exec(xml)) !== null) text += m[1];
+        return text.trim();
+    };
 
-        if (text.trim()) {
-            paragraphs.push({ style, text: text.trim() });
+    // Helper: get paragraph style
+    const getStyle = (paraXml: string): DocParagraph["style"] => {
+        const sm = paraXml.match(/<w:pStyle\s+w:val="([^"]+)"/);
+        if (sm) {
+            const raw = sm[1];
+            if (raw === "Title") return "Title";
+            if (raw === "Heading1" || /^heading\s*1$/i.test(raw)) return "Heading1";
+            if (raw === "Heading2" || /^heading\s*2$/i.test(raw)) return "Heading2";
+        }
+        return "Normal";
+    };
+
+    // Process body sequentially — match tables and paragraphs in order
+    // Use a regex that matches either a table or a paragraph at the top level of body
+    const elementRegex = /<w:tbl[\s>][\s\S]*?<\/w:tbl>|<w:p[\s>][\s\S]*?<\/w:p>/g;
+    let match;
+
+    while ((match = elementRegex.exec(body)) !== null) {
+        const xml = match[0];
+
+        if (xml.startsWith("<w:tbl")) {
+            // ─── Table element ───
+            const rows: string[][] = [];
+            const rowRegex = /<w:tr[\s>][\s\S]*?<\/w:tr>/g;
+            let rowMatch;
+            while ((rowMatch = rowRegex.exec(xml)) !== null) {
+                const cells: string[] = [];
+                const cellRegex = /<w:tc[\s>][\s\S]*?<\/w:tc>/g;
+                let cellMatch;
+                while ((cellMatch = cellRegex.exec(rowMatch[0])) !== null) {
+                    cells.push(extractText(cellMatch[0]));
+                }
+                if (cells.length > 0) rows.push(cells);
+            }
+            if (rows.length > 0) {
+                paragraphs.push({ style: "Table", text: "", rows });
+            }
+        } else {
+            // ─── Paragraph element ───
+            const style = getStyle(xml);
+            const text = extractText(xml);
+            if (text) {
+                paragraphs.push({ style, text });
+            }
         }
     }
 
