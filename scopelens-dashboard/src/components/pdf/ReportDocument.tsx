@@ -103,8 +103,14 @@ const CoverPage = (p: ReportProps) => (
         <Text style={ps1.fileName}>{p.fileName}</Text>
 
         <View style={ps1.brandRow}>
-            <ScopeLensLogo size={16} />
-            <Text style={ps1.brandText}>ScopeLens</Text>
+            {p.customLogoSrc ? (
+                <Image src={p.customLogoSrc} style={{ maxWidth: 120, maxHeight: 20, objectFit: "contain" }} />
+            ) : (
+                <>
+                    <ScopeLensLogo size={16} />
+                    <Text style={ps1.brandText}>ScopeLens</Text>
+                </>
+            )}
         </View>
 
         <View style={s.sep} />
