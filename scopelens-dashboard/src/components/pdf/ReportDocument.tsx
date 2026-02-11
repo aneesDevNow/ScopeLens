@@ -364,13 +364,21 @@ const ContentPage = ({ paragraphs, highlightedSentences, group1Percent, group2Pe
                         <View key={pi} style={ps3.tblWrap} wrap={false}>
                             {para.rows.map((row, ri) => (
                                 <View key={ri} style={ps3.tblRow}>
-                                    {row.map((cell, ci) => (
-                                        <View key={ci} style={ri === 0 ? ps3.tblHeaderCell : ps3.tblCell}>
-                                            <Text style={ri === 0 ? ps3.tblHeaderText : ps3.tblCellText}>
-                                                {cell}
-                                            </Text>
-                                        </View>
-                                    ))}
+                                    {row.map((cell, ci) => {
+                                        const hl = ri > 0 && isHighlighted(cell);
+                                        let cellBg = ri === 0 ? ps3.tblHeaderCell : ps3.tblCell;
+                                        let textStyle = ri === 0 ? ps3.tblHeaderText : ps3.tblCellText;
+                                        if (hl) {
+                                            hlSeen++;
+                                            const hlBg = hlSeen <= group1Count ? "#CCFBF1" : "#EDE9FE";
+                                            cellBg = { ...cellBg, backgroundColor: hlBg } as typeof cellBg;
+                                        }
+                                        return (
+                                            <View key={ci} style={cellBg}>
+                                                <Text style={textStyle}>{cell}</Text>
+                                            </View>
+                                        );
+                                    })}
                                 </View>
                             ))}
                         </View>
