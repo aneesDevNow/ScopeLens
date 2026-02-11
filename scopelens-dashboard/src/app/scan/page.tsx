@@ -204,6 +204,51 @@ export default function UploadHubPage() {
           <p className="text-slate-500">Upload documents to scan for AI-generated content</p>
         </div>
 
+        {/* Stats Cards */}
+        <div className="grid md:grid-cols-3 gap-6 mb-8">
+          {/* Scans Completed */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg shadow-slate-200/50 border border-slate-100">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-slate-500 font-medium">Today</span>
+              <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+            </div>
+            <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : scansCompleted}</div>
+            <p className="text-slate-400 text-sm">Scans Completed</p>
+          </div>
+
+          {/* Scans Remaining */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg shadow-slate-200/50 border border-slate-100">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-slate-500 font-medium">Today</span>
+              <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+            <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : creditsRemaining}</div>
+            <p className="text-slate-400 text-sm">Scans Remaining</p>
+          </div>
+
+          {/* Current Plan */}
+          <div className="bg-white rounded-2xl p-6 shadow-lg shadow-slate-200/50 border border-slate-100">
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-slate-500 font-medium">Your Plan</span>
+              <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center">
+                <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+              </div>
+            </div>
+            <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : subscription?.plan?.name || "Free"}</div>
+            <p className="text-slate-400 text-sm">{scansLimit} scans/day</p>
+          </div>
+        </div>
+
         {/* Upload Area */}
         <div className="bg-white rounded-2xl shadow-lg shadow-slate-200/50 border border-slate-100 mb-8 overflow-hidden">
           <input
@@ -242,51 +287,6 @@ export default function UploadHubPage() {
                 <p className="text-sm text-slate-400">Supports DOCX, TXT up to 20MB • {creditsRemaining} scan{creditsRemaining !== 1 ? 's' : ''} remaining</p>
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Stats Cards */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          {/* Scans Completed */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg shadow-slate-200/50 border border-slate-100">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-slate-500 font-medium">Today</span>
-              <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-              </div>
-            </div>
-            <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : scansCompleted}</div>
-            <p className="text-slate-400 text-sm">Scans Completed</p>
-          </div>
-
-          {/* Credits Remaining */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg shadow-slate-200/50 border border-slate-100">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-slate-500 font-medium">Today</span>
-              <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-            <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : creditsRemaining}</div>
-            <p className="text-slate-400 text-sm">Scans Remaining</p>
-          </div>
-
-          {/* Current Plan */}
-          <div className="bg-white rounded-2xl p-6 shadow-lg shadow-slate-200/50 border border-slate-100">
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-slate-500 font-medium">Your Plan</span>
-              <div className="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center">
-                <svg className="w-5 h-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                </svg>
-              </div>
-            </div>
-            <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : subscription?.plan?.name || "Free"}</div>
-            <p className="text-slate-400 text-sm">{scansLimit} scans/day</p>
           </div>
         </div>
 
