@@ -41,7 +41,7 @@ const Header = ({ label, reportId, logoSrc }: { label: string; reportId: string;
     <View style={s.hdr} fixed>
         <View style={s.hdrLeft}>
             {logoSrc ? (
-                <Image src={logoSrc} style={{ width: 100, height: 22 }} />
+                <Image src={logoSrc} style={{ maxWidth: 120, maxHeight: 22, objectFit: "contain" }} />
             ) : (
                 <>
                     <ScopeLensLogo size={22} />
@@ -60,7 +60,7 @@ const Footer = ({ label, reportId, logoSrc }: { label: string; reportId: string;
     <View style={s.ftr} fixed>
         <View style={s.ftrLeft}>
             {logoSrc ? (
-                <Image src={logoSrc} style={{ width: 80, height: 18 }} />
+                <Image src={logoSrc} style={{ maxWidth: 100, maxHeight: 18, objectFit: "contain" }} />
             ) : (
                 <>
                     <ScopeLensLogo size={18} />
