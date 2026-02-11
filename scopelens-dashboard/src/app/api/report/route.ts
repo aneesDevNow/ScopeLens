@@ -297,6 +297,7 @@ export async function POST(request: NextRequest) {
                         faqImageSrc: loadImg("faq-illustration.png"),
                         robotTealSrc: loadImg("robot-teal.png"),
                         robotPurpleSrc: loadImg("robot-purple.png"),
+                        coverIconSrc: loadImg("cover-icon.png"),
                     };
                 })(),
             }) as any

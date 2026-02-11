@@ -26,6 +26,7 @@ export interface ReportProps {
     faqImageSrc?: string;
     robotTealSrc?: string;
     robotPurpleSrc?: string;
+    coverIconSrc?: string;
 }
 
 // ─── Colors ───

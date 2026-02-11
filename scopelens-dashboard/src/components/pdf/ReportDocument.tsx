@@ -102,6 +102,10 @@ const CoverPage = (p: ReportProps) => (
         <Text style={ps1.authorName}>{p.authorName}</Text>
         <Text style={ps1.fileName}>{p.fileName}</Text>
 
+        {p.coverIconSrc && (
+            <Image src={p.coverIconSrc} style={{ width: 40, height: 40, marginTop: 12, opacity: 0.6 }} />
+        )}
+
         <View style={ps1.brandRow}>
             {p.customLogoSrc ? (
                 <Image src={p.customLogoSrc} style={{ maxWidth: 120, maxHeight: 20, objectFit: "contain" }} />
