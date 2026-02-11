@@ -336,6 +336,12 @@ Exact fonts/sizes extracted from the original `AI_Final Report.docx` (Turnitin A
 
 Assets extracted to `public/icons/`: `robot-teal.png`, `robot-purple.png`, `faq-illustration.png`.
 
+**Content Page Highlights:**
+- AI-generated only → teal (`#CCFBF1` bg, `#0D9488` text)
+- AI-paraphrased → purple (`#EDE9FE` bg, `#7C3AED` text)
+- Paragraphs have 6pt spacing to prevent highlight overlap
+- No line numbers / numbered circles on content pages
+
 ---
 
 ## Supabase Connection
