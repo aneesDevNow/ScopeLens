@@ -106,17 +106,6 @@ const CoverPage = (p: ReportProps) => (
             <Image src={p.coverIconSrc} style={{ width: 40, height: 40, marginTop: 12, opacity: 0.6 }} />
         )}
 
-        <View style={ps1.brandRow}>
-            {p.customLogoSrc ? (
-                <Image src={p.customLogoSrc} style={{ maxWidth: 120, maxHeight: 20, objectFit: "contain" }} />
-            ) : (
-                <>
-                    <ScopeLensLogo size={16} />
-                    <Text style={ps1.brandText}>ScopeLens</Text>
-                </>
-            )}
-        </View>
-
         <View style={s.sep} />
 
         {/* Document Details (left) + Stats (right) — side by side */}
