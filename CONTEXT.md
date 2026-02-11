@@ -38,7 +38,7 @@ All portals require `.env.local`:
 
 | Variable | Landing | Dashboard | Admin | Reseller | Purpose |
 |---|:---:|:---:|:---:|:---:|---|
-| `NEXT_PUBLIC_SUPABASE_URL` | ✅ | ✅ | ✅ | ✅ | Supabase project URL |
+
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | ✅ | ✅ | ✅ | Public anon key (RLS-bound) |
 | `SUPABASE_URL` | — | ✅ | ✅ | ✅ | Server-side Supabase URL (used by `server.ts`, API routes) |
 | `SUPABASE_ANON_KEY` | — | ✅ | ✅ | ✅ | Server-side anon key (used by `server.ts`) |
@@ -377,12 +377,12 @@ Each portal has its own `Dockerfile` and `docker-compose.yml`. You can build and
 | Reseller | `scopelens-reseller/` | 3003 | `docker-compose.yml` |
 
 **Environment Variables:**
-The `docker-compose.yml` files use system environment variables (e.g., `${NEXT_PUBLIC_SUPABASE_URL}`). You must provide these variables in your deployment platform (Dokploy) or via a `.env` file in the root.
+The `docker-compose.yml` files use system environment variables (e.g., `${SUPABASE_URL}`). You must provide these variables in your deployment platform (Dokploy) or via a `.env` file in the root.
 
 **Build Configuration:**
 Public variables (`NEXT_PUBLIC_...`) have default values in the Dockerfile pointing to the production Supabase instance. You do **not** need to set Build Args in Dokploy unless you are overriding them for a different environment. Just set the **Environment Variables** for runtime.
 
-> **IMPORTANT:** Server-side code (API routes, `server.ts`, `middleware.ts`) must use `SUPABASE_URL`, **not** `NEXT_PUBLIC_SUPABASE_URL`. The `NEXT_PUBLIC_*` vars are only baked into the client bundle at build time and are **not** available at runtime in Docker containers.
+> **IMPORTANT:** All code must use `SUPABASE_URL` (not `NEXT_PUBLIC_SUPABASE_URL`). The project has been standardized to use `SUPABASE_URL` everywhere for consistency.
 
 ---
 
