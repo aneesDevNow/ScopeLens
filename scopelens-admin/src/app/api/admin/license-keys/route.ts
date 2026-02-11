@@ -245,7 +245,9 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: "Missing key ID" }, { status: 400 });
         }
 
-        const { error: updateError } = await supabase
+        // Use admin client (service role) to bypass RLS — auth check already done above
+        const admin = getAdminClient();
+        const { error: updateError } = await admin
             .from("license_keys")
             .update({ status: "revoked", updated_at: new Date().toISOString() })
             .eq("id", keyId);
