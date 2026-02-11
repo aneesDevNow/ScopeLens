@@ -95,7 +95,9 @@ export async function POST(request: Request) {
             });
         }
 
-        const { data: created, error: insertError } = await supabase
+        // Use admin client (service role) to bypass RLS — auth check already done above
+        const admin = getAdminClient();
+        const { data: created, error: insertError } = await admin
             .from("license_keys")
             .insert(keys)
             .select("id, key_code, status, duration_days, claim_hours, claim_deadline, created_at");
