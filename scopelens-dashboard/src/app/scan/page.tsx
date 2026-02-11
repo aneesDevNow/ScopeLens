@@ -264,7 +264,7 @@ export default function UploadHubPage() {
           {/* Credits Remaining */}
           <div className="bg-white rounded-2xl p-6 shadow-lg shadow-slate-200/50 border border-slate-100">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-slate-500 font-medium">Remaining</span>
+              <span className="text-slate-500 font-medium">Today</span>
               <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center">
                 <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -272,7 +272,7 @@ export default function UploadHubPage() {
               </div>
             </div>
             <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : creditsRemaining}</div>
-            <p className="text-slate-400 text-sm">Credits Available</p>
+            <p className="text-slate-400 text-sm">Scans Remaining</p>
           </div>
 
           {/* Current Plan */}
