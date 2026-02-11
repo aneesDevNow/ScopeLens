@@ -22,6 +22,7 @@ export interface ReportProps {
     totalChars: number;
     totalPagesEst: number;
     customLogoSrc?: string;
+    faqImageSrc?: string;
 }
 
 // ─── Colors ───

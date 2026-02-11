@@ -6,6 +6,8 @@ import { createElement } from "react";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { ReportDocument } from "@/components/pdf/ReportDocument";
 import type { DocParagraph } from "@/components/pdf/reportStyles";
+import fs from "fs";
+import path from "path";
 
 // ─── Parse DOCX file to extract paragraphs with styles ───
 async function parseDocxStructure(buffer: ArrayBuffer): Promise<DocParagraph[]> {
@@ -255,6 +257,13 @@ export async function POST(request: NextRequest) {
                 totalChars,
                 totalPagesEst,
                 customLogoSrc: customLogoData,
+                faqImageSrc: (() => {
+                    try {
+                        const imgPath = path.join(process.cwd(), "public", "icons", "faq-illustration.png");
+                        const buf = fs.readFileSync(imgPath);
+                        return `data:image/png;base64,${buf.toString("base64")}`;
+                    } catch { return undefined; }
+                })(),
             }) as any
         );
 

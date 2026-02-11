@@ -148,23 +148,26 @@ const CoverPage = (p: ReportProps) => (
 
 const ps2 = StyleSheet.create({
     topRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
-    pctText: { fontSize: 22, fontFamily: "Helvetica-Bold", color: C.slate800 },
-    pctDesc: { fontSize: 9, color: C.slate500, marginTop: 6, maxWidth: 260 },
+    pctText: { fontSize: 28, fontFamily: "Helvetica-Bold", color: C.slate800 },
+    pctDesc: { fontSize: 10, color: C.slate500, marginTop: 6, maxWidth: 280 },
     cautionBox: {
         backgroundColor: C.blue100, borderWidth: 0.5, borderColor: C.blue200,
-        borderRadius: 3, padding: 10, width: 200,
+        borderRadius: 3, padding: 10, width: 210,
     },
-    cautionTitle: { fontSize: 8, fontFamily: "Helvetica-Bold", color: C.blue700, marginBottom: 4 },
-    cautionText: { fontSize: 7, color: C.blue500, lineHeight: 1.4 },
-    sectionTitle: { fontSize: 13, fontFamily: "Helvetica-Bold", color: C.slate800, marginBottom: 10 },
+    cautionTitle: { fontSize: 9, fontFamily: "Helvetica-Bold", color: C.blue700, marginBottom: 4 },
+    cautionText: { fontSize: 8, color: C.blue500, lineHeight: 1.4 },
+    sectionTitle: { fontSize: 16, fontFamily: "Helvetica-Bold", color: C.slate800, marginBottom: 10 },
     groupRow: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
-    groupLabel: { fontSize: 10, fontFamily: "Helvetica-Bold", color: C.slate800, marginLeft: 8 },
-    groupDesc: { fontSize: 8, color: C.slate500, marginLeft: 28, marginBottom: 10 },
-    disclaimerTitle: { fontSize: 9, fontFamily: "Helvetica-Oblique", color: C.slate800, marginBottom: 4 },
-    disclaimerText: { fontSize: 7, fontFamily: "Helvetica-Oblique", color: C.slate500, lineHeight: 1.4 },
-    faqTitle: { fontSize: 13, fontFamily: "Helvetica-Bold", color: C.slate800, marginBottom: 10 },
-    faqQ: { fontSize: 9, fontFamily: "Helvetica-Bold", color: C.slate800, marginBottom: 4 },
-    faqA: { fontSize: 8, color: C.slate500, lineHeight: 1.5, marginBottom: 6 },
+    groupLabel: { fontSize: 12, fontFamily: "Helvetica-Bold", color: C.slate800, marginLeft: 8 },
+    groupDesc: { fontSize: 9, color: C.slate500, marginLeft: 28, marginBottom: 10 },
+    disclaimerTitle: { fontSize: 10, fontFamily: "Helvetica-Oblique", color: C.slate800, marginBottom: 4 },
+    disclaimerText: { fontSize: 8, fontFamily: "Helvetica-Oblique", color: C.slate500, lineHeight: 1.4 },
+    faqTitle: { fontSize: 18, fontFamily: "Helvetica-Bold", color: C.slate800, marginBottom: 10 },
+    faqQ: { fontSize: 11, fontFamily: "Helvetica-Bold", color: C.slate800, marginBottom: 4 },
+    faqA: { fontSize: 10, color: C.slate500, lineHeight: 1.5, marginBottom: 6 },
+    faqRow: { flexDirection: "row" },
+    faqLeft: { flex: 1 },
+    faqImage: { width: 100, height: 120, marginLeft: 10, marginTop: 10 },
 });
 
 const AIOverviewPage = (p: ReportProps) => {
@@ -230,45 +233,54 @@ const AIOverviewPage = (p: ReportProps) => {
 
             <View style={[s.sep, { marginTop: 10 }]} />
 
-            {/* ── FAQ ── */}
-            <Text style={ps2.faqTitle}>Frequently Asked Questions</Text>
+            {/* ── FAQ with illustration ── */}
+            <View style={ps2.faqRow}>
+                <View style={ps2.faqLeft}>
+                    <Text style={ps2.faqTitle}>Frequently Asked Questions</Text>
 
-            <Text style={ps2.faqQ}>
-                How should I interpret ScopeLens&apos;s AI writing percentage and false positives?
-            </Text>
-            <Text style={ps2.faqA}>
-                The percentage shown in the AI writing report is the amount of qualifying text within
-                the submission that ScopeLens&apos;s AI writing detection model determines was either likely
-                AI-generated text from a large-language model or likely AI-generated text that was likely
-                revised using an AI paraphrase tool or word spinner.
-            </Text>
-            <Text style={ps2.faqA}>
-                False positives (incorrectly flagging human-written text as AI-generated) are a possibility in AI models.
-            </Text>
-            <Text style={ps2.faqA}>
-                AI detection scores under 20%, which we do not surface in new reports, have a higher
-                likelihood of false positives. To reduce the likelihood of misinterpretation, no score or
-                highlights are attributed and are indicated with an asterisk in the report (*%).
-            </Text>
-            <Text style={ps2.faqA}>
-                The AI writing percentage should not be the sole basis to determine whether misconduct has
-                occurred. The reviewer/instructor should use the percentage as a means to start a formative
-                conversation with their student and/or use it to examine the submitted assignment in
-                accordance with their school&apos;s policies.
-            </Text>
+                    <Text style={ps2.faqQ}>
+                        How should I interpret ScopeLens&apos;s AI writing percentage and false positives?
+                    </Text>
+                    <Text style={ps2.faqA}>
+                        The percentage shown in the AI writing report is the amount of qualifying text within
+                        the submission that ScopeLens&apos;s AI writing detection model determines was either likely
+                        AI-generated text from a large-language model or likely AI-generated text that was likely
+                        revised using an AI paraphrase tool or word spinner.
+                    </Text>
+                    <Text style={ps2.faqA}>
+                        False positives (incorrectly flagging human-written text as AI-generated) are a possibility in AI models.
+                    </Text>
+                    <Text style={ps2.faqA}>
+                        AI detection scores under 20%, which we do not surface in new reports, have a higher
+                        likelihood of false positives. To reduce the likelihood of misinterpretation, no score or
+                        highlights are attributed and are indicated with an asterisk in the report (*%).
+                    </Text>
+                    <Text style={ps2.faqA}>
+                        The AI writing percentage should not be the sole basis to determine whether misconduct has
+                        occurred. The reviewer/instructor should use the percentage as a means to start a formative
+                        conversation with their student and/or use it to examine the submitted assignment in
+                        accordance with their school&apos;s policies.
+                    </Text>
 
-            <Text style={[ps2.faqQ, { marginTop: 6 }]}>What does &apos;qualifying text&apos; mean?</Text>
-            <Text style={ps2.faqA}>
-                Our model only processes qualifying text in the form of long-form writing. Long-form writing
-                means individual sentences contained in paragraphs that make up a longer piece of written
-                work, such as an essay, a dissertation, or an article, etc. Qualifying text that has been
-                determined to be likely AI-generated will be highlighted in cyan in the submission, and
-                likely AI-generated and then likely AI-paraphrased will be highlighted purple.
-            </Text>
-            <Text style={ps2.faqA}>
-                Non-qualifying text, such as bullet points, annotated bibliographies, etc., will not be
-                processed and can create disparity between the submission highlights and the percentage shown.
-            </Text>
+                    <Text style={[ps2.faqQ, { marginTop: 6 }]}>What does &apos;qualifying text&apos; mean?</Text>
+                    <Text style={ps2.faqA}>
+                        Our model only processes qualifying text in the form of long-form writing. Long-form writing
+                        means individual sentences contained in paragraphs that make up a longer piece of written
+                        work, such as an essay, a dissertation, or an article, etc. Qualifying text that has been
+                        determined to be likely AI-generated will be highlighted in cyan in the submission, and
+                        likely AI-generated and then likely AI-paraphrased will be highlighted purple.
+                    </Text>
+                    <Text style={ps2.faqA}>
+                        Non-qualifying text, such as bullet points, annotated bibliographies, etc., will not be
+                        processed and can create disparity between the submission highlights and the percentage shown.
+                    </Text>
+                </View>
+
+                {/* FAQ Illustration (right side) */}
+                {p.faqImageSrc && (
+                    <Image src={p.faqImageSrc} style={ps2.faqImage} />
+                )}
+            </View>
 
             <Footer label="AI Writing Overview" reportId={p.reportId} logoSrc={p.customLogoSrc} />
         </Page>
