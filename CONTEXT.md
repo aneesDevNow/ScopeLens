@@ -382,6 +382,8 @@ The `docker-compose.yml` files use system environment variables (e.g., `${NEXT_P
 **Build Configuration:**
 Public variables (`NEXT_PUBLIC_...`) have default values in the Dockerfile pointing to the production Supabase instance. You do **not** need to set Build Args in Dokploy unless you are overriding them for a different environment. Just set the **Environment Variables** for runtime.
 
+> **IMPORTANT:** Server-side code (API routes, `server.ts`, `middleware.ts`) must use `SUPABASE_URL`, **not** `NEXT_PUBLIC_SUPABASE_URL`. The `NEXT_PUBLIC_*` vars are only baked into the client bundle at build time and are **not** available at runtime in Docker containers.
+
 ---
 
 ## Deployment & CI/CD
