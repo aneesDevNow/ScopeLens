@@ -19,45 +19,24 @@ export async function GET() {
             .select('*')
             .eq('user_id', user.id)
             .eq('status', 'active')
-            .maybeSingle()
+            .single()
 
-        // Helper: return free plan response
-        const returnFreePlan = async () => {
+        if (error || !subscription) {
+            // Return free plan if no active subscription
             const { data: freePlan } = await supabase
                 .from('plans')
                 .select('*')
                 .eq('slug', 'free')
                 .single()
 
-            // Count today's scans for this user
-            const todayStart = new Date()
-            todayStart.setHours(0, 0, 0, 0)
-            const { count: todayScans } = await supabase
-                .from('scans')
-                .select('*', { count: 'exact', head: true })
-                .eq('user_id', user.id)
-                .gte('created_at', todayStart.toISOString())
-
             return NextResponse.json({
                 subscription: null,
                 plan: freePlan,
                 usage: {
-                    scans_used: todayScans || 0,
-                    scans_limit: freePlan?.scans_per_day || 1,
+                    scans_used: 0,
+                    scans_limit: freePlan?.scans_per_month || 5, // Default backup value
                 },
             })
-        }
-
-        if (error || !subscription) {
-            return returnFreePlan()
-        }
-
-        // Check if subscription period has expired
-        const now = new Date()
-        const periodEnd = new Date(subscription.current_period_end)
-        if (periodEnd < now) {
-            // Subscription expired — fall back to free tier
-            return returnFreePlan()
         }
 
         // Fetch plan details separately
@@ -72,7 +51,7 @@ export async function GET() {
             plan: plan,
             usage: {
                 scans_used: subscription.scans_used,
-                scans_limit: plan?.scans_per_day || 0,
+                scans_limit: plan?.scans_per_month || 0,
             },
         })
     } catch (err) {

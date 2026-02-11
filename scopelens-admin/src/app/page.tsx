@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AdminOverviewPage() {
   const router = useRouter();
@@ -157,7 +158,7 @@ This report was auto-generated from the ScopeLens Admin Dashboard.
                 <div className="flex items-center gap-3">
                   <span className="material-symbols-outlined text-blue-500">key</span>
                   <div>
-                    <p className="font-medium text-sm">Work Purchase Keys Claimed</p>
+                    <p className="font-medium text-sm">License Keys Claimed</p>
                     <p className="text-xs text-muted-foreground">Total keys activated by users</p>
                   </div>
                 </div>
@@ -181,7 +182,7 @@ This report was auto-generated from the ScopeLens Admin Dashboard.
               </Button>
               <Button variant="outline" className="h-auto py-4 flex-col" onClick={handleGenerateLicense}>
                 <span className="material-symbols-outlined mb-2">key</span>
-                Generate Work Purchase Key
+                Generate License
               </Button>
               <Button variant="outline" className="h-auto py-4 flex-col" onClick={() => setShowAnnouncementModal(true)}>
                 <span className="material-symbols-outlined mb-2">campaign</span>

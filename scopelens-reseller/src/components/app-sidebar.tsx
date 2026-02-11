@@ -16,7 +16,6 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useCurrency } from "@/contexts/CurrencyContext";
 
 interface Profile {
     first_name: string | null;
@@ -36,7 +35,6 @@ const navItems = [
 export function AppSidebar() {
     const pathname = usePathname();
     const [profile, setProfile] = useState<Profile | null>(null);
-    const { formatPrice } = useCurrency();
 
     useEffect(() => {
         async function fetchUserData() {
@@ -65,14 +63,18 @@ export function AppSidebar() {
         ? `${(profile.first_name || "R")[0]}${(profile.last_name || "")[0] || ""}`.toUpperCase()
         : "...";
 
-    const formattedBalance = formatPrice(profile?.credit_balance || 0);
+    // Format currency (assuming USD for now, can use context if needed but keeping it simple for sidebar)
+    const formattedBalance = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+    }).format(profile?.credit_balance || 0);
 
     return (
         <Sidebar>
             <SidebarHeader className="p-4 border-b">
                 <Link href="/" className="flex items-center gap-3">
-                    <img src="/icon.svg" alt="ScopeLens" className="w-10 h-10" />
-                    <span className="text-xl font-bold text-slate-700">ScopeLens</span>
+                    <img src="/icon.svg" alt="Scope Lens" className="w-10 h-10" />
+                    <span className="text-xl font-bold text-gray-900">Scope Lens</span>
                 </Link>
             </SidebarHeader>
             <SidebarContent>

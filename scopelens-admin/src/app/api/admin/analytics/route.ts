@@ -5,7 +5,7 @@ import { createClient as createAdminClient } from "@supabase/supabase-js"; // fa
 // Helper to get admin client
 const getAdminClient = () => {
     return createAdminClient(
-        process.env.SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 };
@@ -32,9 +32,7 @@ export async function GET() {
             return NextResponse.json({ error: "Forbidden" }, { status: 403 });
         }
 
-        // Use admin client for all counts to bypass RLS
-        const admin = getAdminClient();
-
+        // Get various counts
         const [
             usersResult,
             scansResult,
@@ -44,22 +42,23 @@ export async function GET() {
             revenueResult,
             claimedKeysResult
         ] = await Promise.all([
-            admin.from("profiles").select("id", { count: "exact", head: true }),
-            admin.from("scans").select("id", { count: "exact", head: true }),
-            admin
+            supabase.from("profiles").select("id", { count: "exact", head: true }),
+            supabase.from("scans").select("id", { count: "exact", head: true }),
+            supabase
                 .from("subscriptions")
                 .select("id", { count: "exact", head: true })
                 .eq("status", "active"),
-            admin
+            supabase
                 .from("scans")
                 .select("id, file_name, ai_score, created_at, user_id")
                 .order("created_at", { ascending: false })
                 .limit(10),
-            admin.from("resellers").select("id", { count: "exact", head: true }),
-            admin.from("reseller_transactions")
+            supabase.from("resellers").select("id", { count: "exact", head: true }),
+            supabase.from("reseller_transactions")
                 .select("amount, created_at")
                 .eq("type", "credit_purchase"),
-            admin.from("license_keys")
+            // Use admin client for keys to bypass RLS
+            getAdminClient().from("license_keys")
                 .select("id", { count: "exact", head: true })
                 .eq("status", "claimed")
         ]);
@@ -67,14 +66,14 @@ export async function GET() {
         // Get today's new users
         const today = new Date();
         today.setHours(0, 0, 0, 0);
-        const { count: todayUsers } = await admin
+        const { count: todayUsers } = await supabase
             .from("profiles")
             .select("id", { count: "exact", head: true })
             .gte("created_at", today.toISOString());
 
         // Get this month's scans
         const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
-        const { count: monthScans } = await admin
+        const { count: monthScans } = await supabase
             .from("scans")
             .select("id", { count: "exact", head: true })
             .gte("created_at", monthStart.toISOString());
@@ -84,8 +83,12 @@ export async function GET() {
             .filter(tx => new Date(tx.created_at) >= monthStart)
             .reduce((sum, tx) => sum + (tx.amount || 0), 0);
 
+        // Assuming 1 credit = $1 for simplicity in this view, 
+        // or apply a conversion factor if needed.
+        // For now, displaying Credits Sold as Revenue.
+
         // Calculate average AI score
-        const { data: scoresData } = await admin
+        const { data: scoresData } = await supabase
             .from("scans")
             .select("ai_score")
             .not("ai_score", "is", null)

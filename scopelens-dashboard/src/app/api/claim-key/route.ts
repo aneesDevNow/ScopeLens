@@ -1,17 +1,16 @@
 import { NextResponse } from "next/server";
-import { encryptCookieValue } from '@/lib/cookie-utils';
 import { createClient } from "@/lib/supabase/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 
 // Service role client for privileged operations (bypass RLS)
 function getAdminClient() {
     return createSupabaseClient(
-        process.env.SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
         process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 }
 
-// POST /api/claim-key — User claims a work purchase key to activate a plan
+// POST /api/claim-key — User claims a license key to activate a plan
 export async function POST(request: Request) {
     try {
         const supabase = await createClient();
@@ -24,7 +23,7 @@ export async function POST(request: Request) {
         const { key_code } = body;
 
         if (!key_code || typeof key_code !== "string") {
-            return NextResponse.json({ error: "Work purchase key is required" }, { status: 400 });
+            return NextResponse.json({ error: "License key is required" }, { status: 400 });
         }
 
         // Normalize key: trim, uppercase
@@ -36,12 +35,12 @@ export async function POST(request: Request) {
         // Find the key
         const { data: licenseKey, error: findError } = await adminClient
             .from("license_keys")
-            .select("id, plan_id, duration_days, status, claim_deadline")
+            .select("id, plan_id, duration_days, status")
             .eq("key_code", normalizedKey)
             .single();
 
         if (findError || !licenseKey) {
-            return NextResponse.json({ error: "Invalid work purchase key" }, { status: 404 });
+            return NextResponse.json({ error: "Invalid license key" }, { status: 404 });
         }
 
         if (licenseKey.status !== "available") {
@@ -53,23 +52,6 @@ export async function POST(request: Request) {
             return NextResponse.json({
                 error: messages[licenseKey.status] || "Key is not available"
             }, { status: 400 });
-        }
-
-        // Check claim deadline — if claim window has passed, mark key as expired
-        if (licenseKey.claim_deadline) {
-            const deadline = new Date(licenseKey.claim_deadline);
-            const now = new Date();
-            if (now > deadline) {
-                // Auto-expire the key
-                await adminClient
-                    .from("license_keys")
-                    .update({ status: "expired", updated_at: now.toISOString() })
-                    .eq("id", licenseKey.id);
-
-                return NextResponse.json({
-                    error: "This key has expired — the claim window has closed"
-                }, { status: 400 });
-            }
         }
 
         // Claim the key: update status and set claimed_by
@@ -91,6 +73,9 @@ export async function POST(request: Request) {
         if (claimError) {
             return NextResponse.json({ error: "Failed to claim key. It may have been claimed by someone else." }, { status: 409 });
         }
+
+        // Use service role client for subscription operations (bypasses RLS)
+        // adminClient is already defined above
 
         // Activate subscription: upsert subscription for this user
         const { data: existingSub } = await adminClient
@@ -128,7 +113,7 @@ export async function POST(request: Request) {
         // Fetch plan details separately to avoid PostgREST relationship issues
         const { data: plan } = await adminClient
             .from("plans")
-            .select("name, slug, scans_per_day")
+            .select("name, slug, scans_per_month")
             .eq("id", licenseKey.plan_id)
             .single();
 
@@ -136,7 +121,7 @@ export async function POST(request: Request) {
             message: `Plan "${plan?.name || "Premium"}" activated successfully!`,
             plan_name: plan?.name,
             expires_at: expiresAt.toISOString(),
-            scans_per_day: plan?.scans_per_day,
+            scans_per_month: plan?.scans_per_month,
         });
     } catch {
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });

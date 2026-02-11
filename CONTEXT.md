@@ -27,6 +27,7 @@ All four portals are **independent Next.js 16.1.6** apps with their own `node_mo
 | Storage (Dashboard) | External S3 (documents & reports via `@aws-sdk/client-s3`) |
 | Storage (Admin/Reseller) | Supabase Storage (logos, other assets) |
 | AI Detection | ZeroGPT API (via `zerogpt_accounts` rotation) |
+| PDF Generation | `@react-pdf/renderer` (React components → PDF) |
 | Containerization | Docker (multi-stage, standalone output) |
 
 ---
@@ -276,6 +277,7 @@ ScopeLens/
 │       │   ├── plans/          # Plans & Usage + license key claim
 │       │   └── settings/       # User settings
 │       ├── components/         # Shared UI components
+│       │   └── pdf/            # React PDF report components (ReportDocument.tsx, reportStyles.ts)
 │       └── lib/                # Supabase client, utils
 │
 ├── scopelens-reseller/         # Reseller partner portal (port 3003)
