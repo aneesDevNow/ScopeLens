@@ -315,6 +315,29 @@ ScopeLens/
 
 ---
 
+## PDF Report Font Specification
+
+Exact fonts/sizes extracted from the original `AI_Final Report.docx` (Turnitin AI Writing report) using `python-docx`:
+
+| Element | DOCX Font | Size | Color | PDF Mapped Font |
+|---|---|---|---|---|
+| Author (Title) | Tahoma Bold | 20pt | #181818 | Helvetica-Bold |
+| Filename (H1) | Verdana | 17pt | #181818 | Helvetica |
+| Brand text | Lucida Sans Unicode | 8pt | #626262 | Helvetica |
+| Document Details title | Arial Black | 10pt | #181818 | Helvetica-Bold |
+| Labels/Values | Arial Black | 7pt | #626262/#181818 | Helvetica-Bold |
+| Detection Groups | Arial Black | 10pt | #181818 | Helvetica-Bold |
+| Group labels/desc | Tahoma | 7pt | varied | Helvetica |
+| Disclaimer | Tahoma/Arial Black | 6pt | #626262 | Helvetica |
+| FAQ title | Arial Black | 10pt | #181818 | Helvetica-Bold |
+| FAQ Q/A | Tahoma | 7pt | #181818 | Helvetica |
+| Content headings | Times New Roman | 14pt Bold | #181818 | Times-Bold |
+| Content body | Times New Roman | 12pt | #181818 | Times-Roman |
+
+Assets extracted to `public/icons/`: `robot-teal.png`, `robot-purple.png`, `faq-illustration.png`.
+
+---
+
 ## Supabase Connection
 
 - **Instance:** Self-hosted at `https://scopelens-supabase.membercore.dev`

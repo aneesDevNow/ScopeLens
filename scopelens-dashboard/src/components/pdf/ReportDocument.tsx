@@ -76,19 +76,19 @@ const Footer = ({ label, reportId, logoSrc }: { label: string; reportId: string;
    ═══════════════════════════════════════════ */
 
 const ps1 = StyleSheet.create({
-    authorName: { fontSize: 26, fontFamily: "Helvetica-Bold", color: C.slate800, marginTop: 150 },
-    fileName: { fontSize: 13, fontFamily: "Helvetica-Bold", color: C.slate700, marginTop: 10 },
+    authorName: { fontSize: 20, fontFamily: "Helvetica-Bold", color: "#181818", marginTop: 150 },
+    fileName: { fontSize: 17, fontFamily: "Helvetica", color: "#181818", marginTop: 10 },
     brandRow: { flexDirection: "row", alignItems: "center", marginTop: 14 },
-    brandText: { fontSize: 9, color: C.slate500, marginLeft: 6 },
-    detailsTitle: { fontSize: 12, fontFamily: "Helvetica-Bold", color: C.slate800, marginTop: 8, marginBottom: 10 },
+    brandText: { fontSize: 8, color: "#626262", marginLeft: 6 },
+    detailsTitle: { fontSize: 10, fontFamily: "Helvetica-Bold", color: "#181818", marginTop: 8, marginBottom: 10 },
     detailsRow: { flexDirection: "row", justifyContent: "space-between" },
     detailsLeft: { flex: 1 },
     detailRow: { marginBottom: 12 },
-    detailLabel: { fontSize: 8, color: C.slate400, marginBottom: 2 },
-    detailValue: { fontSize: 9, fontFamily: "Helvetica-Bold", color: C.slate800 },
+    detailLabel: { fontSize: 7, fontFamily: "Helvetica-Bold", color: "#626262", marginBottom: 2 },
+    detailValue: { fontSize: 7, fontFamily: "Helvetica-Bold", color: "#181818" },
     statsCol: { width: 110, alignItems: "flex-end", paddingTop: 0 },
     statBox: { borderWidth: 0.3, borderColor: C.slate200, paddingVertical: 6, paddingHorizontal: 12, alignItems: "center", width: 110 },
-    statText: { fontSize: 8, color: C.slate700 },
+    statText: { fontSize: 7, fontFamily: "Helvetica-Bold", color: "#181818" },
 });
 
 const CoverPage = (p: ReportProps) => (
@@ -148,24 +148,24 @@ const CoverPage = (p: ReportProps) => (
 
 const ps2 = StyleSheet.create({
     topRow: { flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" },
-    pctText: { fontSize: 28, fontFamily: "Helvetica-Bold", color: C.slate800 },
-    pctDesc: { fontSize: 10, color: C.slate500, marginTop: 6, maxWidth: 280 },
+    pctText: { fontSize: 17, fontFamily: "Helvetica", color: "#181818" },
+    pctDesc: { fontSize: 7, color: "#181818", marginTop: 6, maxWidth: 280 },
     cautionBox: {
         backgroundColor: C.blue100, borderWidth: 0.5, borderColor: C.blue200,
         borderRadius: 3, padding: 10, width: 210,
     },
-    cautionTitle: { fontSize: 9, fontFamily: "Helvetica-Bold", color: C.blue700, marginBottom: 4 },
-    cautionText: { fontSize: 8, color: C.blue500, lineHeight: 1.4 },
-    sectionTitle: { fontSize: 16, fontFamily: "Helvetica-Bold", color: C.slate800, marginBottom: 10 },
+    cautionTitle: { fontSize: 7, fontFamily: "Helvetica-Bold", color: C.blue700, marginBottom: 4 },
+    cautionText: { fontSize: 6, color: C.blue500, lineHeight: 1.4 },
+    sectionTitle: { fontSize: 10, fontFamily: "Helvetica-Bold", color: "#181818", marginBottom: 10 },
     groupRow: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
     groupIcon: { width: 20, height: 20 },
-    groupLabel: { fontSize: 12, fontFamily: "Helvetica-Bold", color: C.slate800, marginLeft: 8 },
-    groupDesc: { fontSize: 9, color: C.slate500, marginLeft: 28, marginBottom: 10 },
-    disclaimerTitle: { fontSize: 10, fontFamily: "Helvetica-Oblique", color: C.slate800, marginBottom: 4 },
-    disclaimerText: { fontSize: 8, fontFamily: "Helvetica-Oblique", color: C.slate500, lineHeight: 1.4 },
-    faqTitle: { fontSize: 18, fontFamily: "Helvetica-Bold", color: C.slate800, marginBottom: 10 },
-    faqQ: { fontSize: 11, fontFamily: "Helvetica-Bold", color: C.slate800, marginBottom: 4 },
-    faqA: { fontSize: 10, color: C.slate500, lineHeight: 1.5, marginBottom: 6 },
+    groupLabel: { fontSize: 7, fontFamily: "Helvetica-Bold", color: "#181818", marginLeft: 8 },
+    groupDesc: { fontSize: 7, color: "#626262", marginLeft: 28, marginBottom: 10 },
+    disclaimerTitle: { fontSize: 6, fontFamily: "Helvetica-Bold", color: "#626262", marginBottom: 4 },
+    disclaimerText: { fontSize: 6, color: "#626262", lineHeight: 1.1 },
+    faqTitle: { fontSize: 10, fontFamily: "Helvetica-Bold", color: "#181818", marginBottom: 10 },
+    faqQ: { fontSize: 7, fontFamily: "Helvetica-Bold", color: "#181818", marginBottom: 4 },
+    faqA: { fontSize: 7, color: "#181818", lineHeight: 1.5, marginBottom: 6 },
     faqRow: { flexDirection: "row" },
     faqLeft: { flex: 1 },
     faqImage: { width: 100, height: 120, marginLeft: 10, marginTop: 10 },
@@ -301,9 +301,9 @@ const AIOverviewPage = (p: ReportProps) => {
    ═══════════════════════════════════════════ */
 
 const ps3 = StyleSheet.create({
-    titleText: { fontSize: 18, fontFamily: "Times-Bold", color: C.slate900, marginTop: 8, marginBottom: 4 },
-    h1Text: { fontSize: 14, fontFamily: "Times-Bold", color: C.slate800, marginTop: 8, marginBottom: 3 },
-    h2Text: { fontSize: 12, fontFamily: "Times-Bold", color: C.slate700, marginTop: 6, marginBottom: 2 },
+    titleText: { fontSize: 20, fontFamily: "Times-Bold", color: "#181818", marginTop: 8, marginBottom: 4 },
+    h1Text: { fontSize: 17, fontFamily: "Times-Bold", color: "#181818", marginTop: 8, marginBottom: 3 },
+    h2Text: { fontSize: 14, fontFamily: "Times-Bold", color: "#181818", marginTop: 6, marginBottom: 2 },
     paraRow: { flexDirection: "row", marginBottom: 2 },
     markerCol: { width: 18, alignItems: "center", paddingTop: 2 },
     markerCircle: {
@@ -312,8 +312,8 @@ const ps3 = StyleSheet.create({
     },
     markerNum: { fontSize: 6, fontFamily: "Helvetica-Bold", color: C.white },
     textCol: { flex: 1 },
-    normalText: { fontSize: 9, fontFamily: "Times-Roman", color: C.slate700, lineHeight: 1.6, textAlign: "justify" },
-    hlText: { fontSize: 9, fontFamily: "Times-Roman", color: C.teal700, backgroundColor: C.teal100, lineHeight: 1.6, textAlign: "justify" },
+    normalText: { fontSize: 12, fontFamily: "Times-Roman", color: "#181818", lineHeight: 1.6, textAlign: "justify" },
+    hlText: { fontSize: 12, fontFamily: "Times-Roman", color: C.teal700, backgroundColor: C.teal100, lineHeight: 1.6, textAlign: "justify" },
 });
 
 const ContentPage = ({ paragraphs, highlightedSentences, reportId, customLogoSrc }: {
