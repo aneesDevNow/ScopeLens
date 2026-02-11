@@ -40,6 +40,8 @@ All portals require `.env.local`:
 |---|:---:|:---:|:---:|:---:|---|
 | `NEXT_PUBLIC_SUPABASE_URL` | ✅ | ✅ | ✅ | ✅ | Supabase project URL |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | ✅ | ✅ | ✅ | ✅ | Public anon key (RLS-bound) |
+| `SUPABASE_URL` | — | ✅ | ✅ | ✅ | Server-side Supabase URL (used by `server.ts`, API routes) |
+| `SUPABASE_ANON_KEY` | — | ✅ | ✅ | ✅ | Server-side anon key (used by `server.ts`) |
 | `SUPABASE_SERVICE_ROLE_KEY` | — | ✅ | ✅ | ✅ | Bypass RLS for privileged ops |
 | `COOKIE_ENCRYPTION_KEY` | — | ✅ | ✅ | ✅ | Cross-portal auth handoff |
 | `S3_ENDPOINT` | — | ✅ | — | — | S3-compatible storage endpoint |
