@@ -306,8 +306,8 @@ const ps3 = StyleSheet.create({
     h2Text: { fontSize: 14, fontFamily: "Times-Bold", color: "#181818", marginTop: 6, marginBottom: 2 },
     paraBlock: { marginBottom: 6 },
     normalText: { fontSize: 12, fontFamily: "Times-Roman", color: "#181818", lineHeight: 1.6, textAlign: "justify" },
-    hlText: { fontSize: 12, fontFamily: "Times-Roman", color: "#0D9488", backgroundColor: "#CCFBF1", lineHeight: 1.6, textAlign: "justify" },
-    hlTextPurple: { fontSize: 12, fontFamily: "Times-Roman", color: "#7C3AED", backgroundColor: "#EDE9FE", lineHeight: 1.6, textAlign: "justify" },
+    hlText: { fontSize: 12, fontFamily: "Times-Roman", color: "#181818", backgroundColor: "#CCFBF1", lineHeight: 1.6, textAlign: "justify" },
+    hlTextPurple: { fontSize: 12, fontFamily: "Times-Roman", color: "#181818", backgroundColor: "#EDE9FE", lineHeight: 1.6, textAlign: "justify" },
 });
 
 const ContentPage = ({ paragraphs, highlightedSentences, group1Percent, group2Percent, reportId, customLogoSrc }: {
