@@ -158,6 +158,7 @@ const ps2 = StyleSheet.create({
     cautionText: { fontSize: 8, color: C.blue500, lineHeight: 1.4 },
     sectionTitle: { fontSize: 16, fontFamily: "Helvetica-Bold", color: C.slate800, marginBottom: 10 },
     groupRow: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
+    groupIcon: { width: 20, height: 20 },
     groupLabel: { fontSize: 12, fontFamily: "Helvetica-Bold", color: C.slate800, marginLeft: 8 },
     groupDesc: { fontSize: 9, color: C.slate500, marginLeft: 28, marginBottom: 10 },
     disclaimerTitle: { fontSize: 10, fontFamily: "Helvetica-Oblique", color: C.slate800, marginBottom: 4 },
@@ -203,14 +204,22 @@ const AIOverviewPage = (p: ReportProps) => {
 
             {/* Group 1: AI-generated */}
             <View style={ps2.groupRow}>
-                <RobotIcon bg={C.tealBg} size={20} />
+                {p.robotTealSrc ? (
+                    <Image src={p.robotTealSrc} style={ps2.groupIcon} />
+                ) : (
+                    <RobotIcon bg={C.tealBg} size={20} />
+                )}
                 <Text style={ps2.groupLabel}>AI-generated only  {p.group1Percent}%</Text>
             </View>
             <Text style={ps2.groupDesc}>Likely AI-generated text from a large-language model.</Text>
 
             {/* Group 2: AI-paraphrased */}
             <View style={ps2.groupRow}>
-                <RobotIcon bg={C.purpleBg} size={20} />
+                {p.robotPurpleSrc ? (
+                    <Image src={p.robotPurpleSrc} style={ps2.groupIcon} />
+                ) : (
+                    <RobotIcon bg={C.purpleBg} size={20} />
+                )}
                 <Text style={ps2.groupLabel}>AI-generated text that was AI-paraphrased  {p.group2Percent}%</Text>
             </View>
             <Text style={ps2.groupDesc}>

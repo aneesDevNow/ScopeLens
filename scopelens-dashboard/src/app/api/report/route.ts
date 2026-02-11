@@ -257,12 +257,18 @@ export async function POST(request: NextRequest) {
                 totalChars,
                 totalPagesEst,
                 customLogoSrc: customLogoData,
-                faqImageSrc: (() => {
-                    try {
-                        const imgPath = path.join(process.cwd(), "public", "icons", "faq-illustration.png");
-                        const buf = fs.readFileSync(imgPath);
-                        return `data:image/png;base64,${buf.toString("base64")}`;
-                    } catch { return undefined; }
+                ...(() => {
+                    const loadImg = (name: string) => {
+                        try {
+                            const buf = fs.readFileSync(path.join(process.cwd(), "public", "icons", name));
+                            return `data:image/png;base64,${buf.toString("base64")}`;
+                        } catch { return undefined; }
+                    };
+                    return {
+                        faqImageSrc: loadImg("faq-illustration.png"),
+                        robotTealSrc: loadImg("robot-teal.png"),
+                        robotPurpleSrc: loadImg("robot-purple.png"),
+                    };
                 })(),
             }) as any
         );

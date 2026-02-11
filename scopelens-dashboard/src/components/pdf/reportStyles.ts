@@ -23,6 +23,8 @@ export interface ReportProps {
     totalPagesEst: number;
     customLogoSrc?: string;
     faqImageSrc?: string;
+    robotTealSrc?: string;
+    robotPurpleSrc?: string;
 }
 
 // ─── Colors ───
