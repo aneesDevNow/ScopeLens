@@ -275,9 +275,9 @@ const AIOverviewPage = (p: ReportProps) => {
    ═══════════════════════════════════════════ */
 
 const ps3 = StyleSheet.create({
-    titleText: { fontSize: 18, fontFamily: "Helvetica-Bold", color: C.slate900, marginTop: 8, marginBottom: 4 },
-    h1Text: { fontSize: 14, fontFamily: "Helvetica-Bold", color: C.slate800, marginTop: 8, marginBottom: 3 },
-    h2Text: { fontSize: 12, fontFamily: "Helvetica-Bold", color: C.slate700, marginTop: 6, marginBottom: 2 },
+    titleText: { fontSize: 18, fontFamily: "Times-Bold", color: C.slate900, marginTop: 8, marginBottom: 4 },
+    h1Text: { fontSize: 14, fontFamily: "Times-Bold", color: C.slate800, marginTop: 8, marginBottom: 3 },
+    h2Text: { fontSize: 12, fontFamily: "Times-Bold", color: C.slate700, marginTop: 6, marginBottom: 2 },
     paraRow: { flexDirection: "row", marginBottom: 2 },
     markerCol: { width: 18, alignItems: "center", paddingTop: 2 },
     markerCircle: {
@@ -286,8 +286,8 @@ const ps3 = StyleSheet.create({
     },
     markerNum: { fontSize: 6, fontFamily: "Helvetica-Bold", color: C.white },
     textCol: { flex: 1 },
-    normalText: { fontSize: 9, color: C.slate700, lineHeight: 1.6 },
-    hlText: { fontSize: 9, color: C.teal700, backgroundColor: C.teal100, lineHeight: 1.6 },
+    normalText: { fontSize: 9, fontFamily: "Times-Roman", color: C.slate700, lineHeight: 1.6, textAlign: "justify" },
+    hlText: { fontSize: 9, fontFamily: "Times-Roman", color: C.teal700, backgroundColor: C.teal100, lineHeight: 1.6, textAlign: "justify" },
 });
 
 const ContentPage = ({ paragraphs, highlightedSentences, reportId, customLogoSrc }: {
