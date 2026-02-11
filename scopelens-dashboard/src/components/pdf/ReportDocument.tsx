@@ -76,16 +76,18 @@ const Footer = ({ label, reportId, logoSrc }: { label: string; reportId: string;
    ═══════════════════════════════════════════ */
 
 const ps1 = StyleSheet.create({
-    authorName: { fontSize: 26, fontFamily: "Helvetica-Bold", color: C.slate800, marginTop: 45 },
+    authorName: { fontSize: 26, fontFamily: "Helvetica-Bold", color: C.slate800, marginTop: 150 },
     fileName: { fontSize: 13, fontFamily: "Helvetica-Bold", color: C.slate700, marginTop: 10 },
     brandRow: { flexDirection: "row", alignItems: "center", marginTop: 14 },
     brandText: { fontSize: 9, color: C.slate500, marginLeft: 6 },
     detailsTitle: { fontSize: 12, fontFamily: "Helvetica-Bold", color: C.slate800, marginTop: 8, marginBottom: 10 },
+    detailsRow: { flexDirection: "row", justifyContent: "space-between" },
+    detailsLeft: { flex: 1 },
     detailRow: { marginBottom: 12 },
     detailLabel: { fontSize: 8, color: C.slate400, marginBottom: 2 },
     detailValue: { fontSize: 9, fontFamily: "Helvetica-Bold", color: C.slate800 },
-    statsCol: { position: "absolute", right: 0, top: 160 },
-    statBox: { borderWidth: 0.3, borderColor: C.slate200, paddingVertical: 6, paddingHorizontal: 12, alignItems: "center" },
+    statsCol: { width: 110, alignItems: "flex-end", paddingTop: 0 },
+    statBox: { borderWidth: 0.3, borderColor: C.slate200, paddingVertical: 6, paddingHorizontal: 12, alignItems: "center", width: 110 },
     statText: { fontSize: 8, color: C.slate700 },
 });
 
@@ -103,34 +105,37 @@ const CoverPage = (p: ReportProps) => (
 
         <View style={s.sep} />
 
-        <View>
-            <Text style={ps1.detailsTitle}>Document Details</Text>
+        {/* Document Details (left) + Stats (right) — side by side */}
+        <View style={ps1.detailsRow}>
+            <View style={ps1.detailsLeft}>
+                <Text style={ps1.detailsTitle}>Document Details</Text>
 
-            {([
-                ["Report ID", p.reportId],
-                ["Submission Date", p.submissionDate],
-                ["Download Date", p.downloadDate],
-                ["File Name", p.fileName],
-                ["File Size", p.fileSize],
-            ] as [string, string][]).map(([label, value]) => (
-                <View key={label} style={ps1.detailRow}>
-                    <Text style={ps1.detailLabel}>{label}</Text>
-                    <Text style={ps1.detailValue}>{value}</Text>
-                </View>
-            ))}
-        </View>
+                {([
+                    ["Report ID", p.reportId],
+                    ["Submission Date", p.submissionDate],
+                    ["Download Date", p.downloadDate],
+                    ["File Name", p.fileName],
+                    ["File Size", p.fileSize],
+                ] as [string, string][]).map(([label, value]) => (
+                    <View key={label} style={ps1.detailRow}>
+                        <Text style={ps1.detailLabel}>{label}</Text>
+                        <Text style={ps1.detailValue}>{value}</Text>
+                    </View>
+                ))}
+            </View>
 
-        {/* Stats boxes (right side) */}
-        <View style={ps1.statsCol}>
-            {[
-                `${p.totalPagesEst} Pages`,
-                `${p.totalWords.toLocaleString()} Words`,
-                `${p.totalChars.toLocaleString()} Characters`,
-            ].map((txt) => (
-                <View key={txt} style={ps1.statBox}>
-                    <Text style={ps1.statText}>{txt}</Text>
-                </View>
-            ))}
+            {/* Stats boxes (right side, aligned with details top) */}
+            <View style={ps1.statsCol}>
+                {[
+                    `${p.totalPagesEst} Pages`,
+                    `${p.totalWords.toLocaleString()} Words`,
+                    `${p.totalChars.toLocaleString()} Characters`,
+                ].map((txt) => (
+                    <View key={txt} style={ps1.statBox}>
+                        <Text style={ps1.statText}>{txt}</Text>
+                    </View>
+                ))}
+            </View>
         </View>
 
         <Footer label="Cover Page" reportId={p.reportId} logoSrc={p.customLogoSrc} />
