@@ -41,11 +41,13 @@ const Header = ({ label, reportId, logoSrc }: { label: string; reportId: string;
     <View style={s.hdr} fixed>
         <View style={s.hdrLeft}>
             {logoSrc ? (
-                <Image src={logoSrc} style={{ width: 22, height: 22 }} />
+                <Image src={logoSrc} style={{ width: 100, height: 22 }} />
             ) : (
-                <ScopeLensLogo size={22} />
+                <>
+                    <ScopeLensLogo size={22} />
+                    <Text style={s.hdrBrand}>ScopeLens</Text>
+                </>
             )}
-            <Text style={s.hdrBrand}>ScopeLens</Text>
             <Text style={s.hdrInfo} render={({ pageNumber, totalPages }) =>
                 `Page ${pageNumber} of ${totalPages} · ${label}`
             } />
@@ -58,11 +60,13 @@ const Footer = ({ label, reportId, logoSrc }: { label: string; reportId: string;
     <View style={s.ftr} fixed>
         <View style={s.ftrLeft}>
             {logoSrc ? (
-                <Image src={logoSrc} style={{ width: 18, height: 18 }} />
+                <Image src={logoSrc} style={{ width: 80, height: 18 }} />
             ) : (
-                <ScopeLensLogo size={18} />
+                <>
+                    <ScopeLensLogo size={18} />
+                    <Text style={s.ftrBrand}>ScopeLens</Text>
+                </>
             )}
-            <Text style={s.ftrBrand}>ScopeLens</Text>
             <Text style={s.ftrInfo} render={({ pageNumber, totalPages }) =>
                 `Page ${pageNumber} of ${totalPages} · ${label}`
             } />
