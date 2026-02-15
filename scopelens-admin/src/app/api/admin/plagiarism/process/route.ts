@@ -1,27 +1,52 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
-// Split text into sentences
+// Split text into sentences — filter out URLs, references, and noise
 function splitSentences(text: string): string[] {
-    // Split on sentence-ending punctuation followed by space or newline
     const raw = text
         .replace(/\n\n+/g, ". ")
         .replace(/\n/g, " ")
         .split(/(?<=[.!?])\s+/)
         .map(s => s.trim())
-        .filter(s => s.length > 20); // Filter out very short fragments
+        .filter(s => s.length > 20)
+        // Filter out pure URLs, DOI lines, and reference-only lines
+        .filter(s => !s.match(/^https?:\/\//i))
+        .filter(s => !s.match(/^doi:/i))
+        .filter(s => !s.match(/^\d+\.\s*$/))
+        // Filter out lines that are mostly numbers/special chars
+        .filter(s => {
+            const letters = s.replace(/[^a-zA-Z]/g, "").length;
+            return letters > s.length * 0.4;
+        });
 
     return raw;
 }
 
+// Clean a sentence for use as a search query — remove noise
+function cleanForQuery(text: string): string {
+    return text
+        .replace(/https?:\/\/\S+/g, "")           // Remove URLs
+        .replace(/\b\d{4}[a-z]?\b/g, "")           // Remove years like 2020, 2021a
+        .replace(/\([^)]*\)/g, "")                  // Remove parenthetical citations
+        .replace(/\[[^\]]*\]/g, "")                 // Remove bracket references [1], [2,3]
+        .replace(/\b(fig|table|section|chapter)\s*\.?\s*\d+/gi, "") // Remove Fig. 1, Table 2
+        .replace(/\d+\.\d+/g, "")                   // Remove section numbers like 3.1
+        .replace(/[^a-zA-Z\s,]/g, " ")              // Keep only letters and commas
+        .replace(/\s+/g, " ")
+        .trim();
+}
+
 // Build search queries from sentence groups, evenly sampled across the document
-function buildSearchQueries(sentences: string[], groupSize: number = 3, maxQueries: number = 15): string[] {
-    // Build all possible groups
+function buildSearchQueries(sentences: string[], groupSize: number = 2, maxQueries: number = 20): string[] {
+    // Build all possible groups with cleaned text
     const allGroups: string[] = [];
     for (let i = 0; i < sentences.length; i += groupSize) {
         const group = sentences.slice(i, i + groupSize);
-        const query = group.map(s => s.substring(0, 200)).join(" ");
-        allGroups.push(query.substring(0, 500));
+        const cleaned = group.map(s => cleanForQuery(s).substring(0, 150)).join(" ").trim();
+        // Only use queries that have meaningful content after cleaning
+        if (cleaned.length > 30) {
+            allGroups.push(cleaned.substring(0, 400));
+        }
     }
 
     // If within cap, return all
@@ -36,7 +61,7 @@ function buildSearchQueries(sentences: string[], groupSize: number = 3, maxQueri
     return queries;
 }
 
-// N-gram overlap similarity between two texts (word-level bigrams)
+// N-gram overlap + word containment similarity between two texts
 function calculateSimilarity(text1: string, text2: string): number {
     const normalize = (t: string) =>
         t.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter(w => w.length > 2);
@@ -46,36 +71,43 @@ function calculateSimilarity(text1: string, text2: string): number {
 
     if (words1.length < 3 || words2.length < 3) return 0;
 
-    // Create bigrams
+    // Method 1: Bigram Dice coefficient
     const bigrams1 = new Set<string>();
     for (let i = 0; i < words1.length - 1; i++) {
         bigrams1.add(`${words1[i]}_${words1[i + 1]}`);
     }
-
     const bigrams2 = new Set<string>();
     for (let i = 0; i < words2.length - 1; i++) {
         bigrams2.add(`${words2[i]}_${words2[i + 1]}`);
     }
-
-    // Calculate Dice coefficient
     let intersection = 0;
     for (const bg of bigrams1) {
         if (bigrams2.has(bg)) intersection++;
     }
+    const diceSim = (bigrams1.size + bigrams2.size === 0) ? 0 :
+        (2.0 * intersection) / (bigrams1.size + bigrams2.size);
 
-    if (bigrams1.size + bigrams2.size === 0) return 0;
-    return (2.0 * intersection) / (bigrams1.size + bigrams2.size);
+    // Method 2: Word containment — what fraction of sentence words appear in source?
+    const sourceWordSet = new Set(words2);
+    let contained = 0;
+    for (const w of words1) {
+        if (sourceWordSet.has(w)) contained++;
+    }
+    const containment = contained / words1.length;
+
+    // Use the higher of the two signals (containment scaled to 0.7x to avoid false positives from common words)
+    return Math.max(diceSim, containment * 0.7);
 }
 
 // Find which sentences match a source using sliding-window comparison
 function findMatchingSentences(
     sentences: string[],
     sourceText: string,
-    threshold: number = 0.25
+    threshold: number = 0.18
 ): { index: number; sentence: string; similarity: number }[] {
     const matches: { index: number; sentence: string; similarity: number }[] = [];
-    // Cap source text to first 50,000 chars to prevent huge sliding window operations
-    const cappedSource = sourceText.length > 50000 ? sourceText.substring(0, 50000) : sourceText;
+    // Cap source text to first 100,000 chars for performance
+    const cappedSource = sourceText.length > 100000 ? sourceText.substring(0, 100000) : sourceText;
     const sourceWords = cappedSource.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter(w => w.length > 2);
 
     for (let i = 0; i < sentences.length; i++) {
@@ -314,9 +346,9 @@ export async function POST() {
                     continue;
                 }
 
-                // Build search queries — evenly sampled across document, max 15
-                const searchQueries = buildSearchQueries(sentences, 3, 15);
-                console.log(`[PLAG]   Search queries: ${searchQueries.length} (from ${Math.ceil(sentences.length / 3)} possible groups, evenly sampled)`);
+                // Build search queries — evenly sampled across document, max 20, group size 2
+                const searchQueries = buildSearchQueries(sentences, 2, 20);
+                console.log(`[PLAG]   Search queries: ${searchQueries.length} (from ${Math.ceil(sentences.length / 2)} possible groups, evenly sampled)`);
                 for (let qi = 0; qi < Math.min(searchQueries.length, 3); qi++) {
                     console.log(`[PLAG]   Query ${qi + 1}: "${searchQueries[qi].substring(0, 120)}..."`);
                 }
@@ -377,7 +409,7 @@ export async function POST() {
 
                 for (const [, { work, compareText }] of sourceMap) {
                     sourceIdx++;
-                    const matches = findMatchingSentences(sentences, compareText, 0.25);
+                    const matches = findMatchingSentences(sentences, compareText, 0.18);
 
                     if (matches.length > 0) {
                         const matchPercentage = Math.round((matches.length / sentences.length) * 100);
