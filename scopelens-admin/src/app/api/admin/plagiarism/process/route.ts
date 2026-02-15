@@ -58,18 +58,39 @@ function calculateSimilarity(text1: string, text2: string): number {
     return (2.0 * intersection) / (bigrams1.size + bigrams2.size);
 }
 
-// Find which sentences match a source
+// Find which sentences match a source using sliding-window comparison
 function findMatchingSentences(
     sentences: string[],
     sourceText: string,
-    threshold: number = 0.15
+    threshold: number = 0.25
 ): { index: number; sentence: string; similarity: number }[] {
     const matches: { index: number; sentence: string; similarity: number }[] = [];
+    const sourceWords = sourceText.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter(w => w.length > 2);
 
     for (let i = 0; i < sentences.length; i++) {
-        const sim = calculateSimilarity(sentences[i], sourceText);
-        if (sim >= threshold) {
-            matches.push({ index: i, sentence: sentences[i], similarity: sim });
+        const sentWords = sentences[i].toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter(w => w.length > 2);
+        if (sentWords.length < 3) continue;
+
+        let bestSim = 0;
+
+        if (sourceWords.length <= 80) {
+            // Short source (abstract-only): compare directly
+            bestSim = calculateSimilarity(sentences[i], sourceText);
+        } else {
+            // Long source (full text): use sliding window
+            const windowSize = Math.max(sentWords.length * 3, 40);
+            const step = Math.max(Math.floor(windowSize / 3), 5);
+
+            for (let w = 0; w <= sourceWords.length - windowSize; w += step) {
+                const windowText = sourceWords.slice(w, w + windowSize).join(" ");
+                const sim = calculateSimilarity(sentences[i], windowText);
+                if (sim > bestSim) bestSim = sim;
+                if (bestSim >= 0.6) break; // High confidence, no need to keep searching
+            }
+        }
+
+        if (bestSim >= threshold) {
+            matches.push({ index: i, sentence: sentences[i], similarity: bestSim });
         }
     }
 
@@ -138,7 +159,7 @@ function classifySourceType(work: Record<string, unknown>): string {
 async function searchCoreAPI(
     apiKey: string,
     query: string,
-    limit: number = 5
+    limit: number = 10
 ): Promise<unknown[]> {
     try {
         const encodedQuery = encodeURIComponent(query);
@@ -266,11 +287,14 @@ export async function POST() {
                         const workId = (work.id as string) || (work.doi as string) || (work.title as string) || "";
                         if (!workId || sourceMap.has(workId)) continue;
 
-                        // Use abstract + title for comparison
-                        const compareText = [
-                            (work.title as string) || "",
-                            (work.abstract as string) || "",
-                        ].join(" ").trim();
+                        // Use fullText if available, otherwise title + abstract
+                        const fullTextField = (work.fullText as string) || "";
+                        const compareText = fullTextField.length > 100
+                            ? fullTextField
+                            : [
+                                (work.title as string) || "",
+                                (work.abstract as string) || "",
+                            ].join(" ").trim();
 
                         if (compareText.length > 30) {
                             sourceMap.set(workId, { work, compareText });
@@ -292,7 +316,7 @@ export async function POST() {
                 const matchedSources: MatchedSource[] = [];
 
                 for (const [, { work, compareText }] of sourceMap) {
-                    const matches = findMatchingSentences(sentences, compareText, 0.15);
+                    const matches = findMatchingSentences(sentences, compareText, 0.25);
 
                     if (matches.length > 0) {
                         const matchPercentage = Math.round((matches.length / sentences.length) * 100);
