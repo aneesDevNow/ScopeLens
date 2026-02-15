@@ -218,8 +218,8 @@ export async function POST() {
             .from("plagiarism_queue")
             .update({ status: "waiting", started_at: null })
             .eq("status", "processing")
-            .lt("started_at", fiveMinAgo)
-            .select("id");
+            .or(`started_at.lt.${fiveMinAgo},started_at.is.null`)
+            .select("id, scan_id");
 
         if (staleItems && staleItems.length > 0) {
             console.log(`[PLAG] ♻️ Recovered ${staleItems.length} stale processing items: ${staleItems.map(s => s.id).join(", ")}`);
@@ -228,7 +228,7 @@ export async function POST() {
                 await supabase
                     .from("scans")
                     .update({ status: "pending" })
-                    .eq("id", stale.id);
+                    .eq("id", stale.scan_id);
             }
         }
 
