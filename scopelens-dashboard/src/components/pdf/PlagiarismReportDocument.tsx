@@ -1,25 +1,25 @@
 import React from "react";
 import {
-    Document, Page, View, Text, StyleSheet,
+    Document, Page, View, Text, Image, StyleSheet,
     Svg, Circle, Path, Line,
 } from "@react-pdf/renderer";
 import { C, M, s, shortId } from "./reportStyles";
 import type { DocParagraph } from "./reportStyles";
 
 /* ═══════════════════════════════════════════
-   Constants — Source Colors (Turnitin-style)
+   Constants — Source Colors (Turnitin Palette)
    ═══════════════════════════════════════════ */
 const SOURCE_COLORS = [
-    "#EF4444", // 1  red
-    "#F97316", // 2  orange
-    "#3B82F6", // 3  blue
-    "#22C55E", // 4  green
+    "#E4473A", // 1  red
+    "#3B82F6", // 2  blue
+    "#22A85D", // 3  green
+    "#8B5CF6", // 4  purple
     "#EC4899", // 5  pink
-    "#8B5CF6", // 6  purple
-    "#14B8A6", // 7  teal
-    "#F59E0B", // 8  amber
-    "#6366F1", // 9  indigo
-    "#06B6D4", // 10 cyan
+    "#1E3A5F", // 6  navy
+    "#2D8354", // 7  dark green
+    "#6366F1", // 8  indigo
+    "#F97316", // 9  orange
+    "#14B8A6", // 10 teal
     "#D946EF", // 11 fuchsia
     "#84CC16", // 12 lime
     "#E11D48", // 13 rose
@@ -32,29 +32,13 @@ const SOURCE_COLORS = [
     "#F87171", // 20 red-light
 ];
 
-/** Map a source color to a light background tint for text highlighting */
+/** Map source index to a light background tint for text highlighting */
 function sourceHighlightBg(colorIdx: number): string {
     const lightBgs = [
-        "#FEE2E2", // red
-        "#FFEDD5", // orange
-        "#DBEAFE", // blue
-        "#DCFCE7", // green
-        "#FCE7F3", // pink
-        "#EDE9FE", // purple
-        "#CCFBF1", // teal
-        "#FEF3C7", // amber
-        "#E0E7FF", // indigo
-        "#CFFAFE", // cyan
-        "#FAE8FF", // fuchsia
-        "#ECFCCB", // lime
-        "#FFE4E6", // rose
-        "#E0F2FE", // sky
-        "#F3E8FF", // violet
-        "#FED7AA", // orange-light
-        "#BBF7D0", // green-light
-        "#BAE6FD", // sky-light
-        "#E9D5FF", // purple-light
-        "#FECACA", // red-light
+        "#FEE2E2", "#DBEAFE", "#DCFCE7", "#EDE9FE", "#FCE7F3",
+        "#D1DCE8", "#D0EAD9", "#E0E7FF", "#FFEDD5", "#CCFBF1",
+        "#FAE8FF", "#ECFCCB", "#FFE4E6", "#E0F2FE", "#F3E8FF",
+        "#FED7AA", "#BBF7D0", "#BAE6FD", "#E9D5FF", "#FECACA",
     ];
     return lightBgs[colorIdx % lightBgs.length];
 }
@@ -94,6 +78,19 @@ export interface PlagiarismReportProps {
     sources: MatchedSource[];
     totalWords: number;
     customLogoSrc?: string;
+    /** Real match group data from citation/quotation analysis */
+    matchGroups?: {
+        notCitedOrQuoted: { count: number; percent: number };
+        missingQuotations: { count: number; percent: number };
+        missingCitation: { count: number; percent: number };
+        citedAndQuoted: { count: number; percent: number };
+    };
+    /** Real source type breakdown percentages */
+    sourceTypeBreakdown?: {
+        internet: number;
+        publications: number;
+        studentPapers: number;
+    };
 }
 
 /* ═══════════════════════════════════════════
@@ -111,44 +108,48 @@ function ScopeLensLogo({ size = 22 }: { size?: number }) {
 }
 
 /* ═══════════════════════════════════════════
-   Header / Footer
+   Header / Footer — same pattern as AI report
    ═══════════════════════════════════════════ */
-function Header({ reportId, label, logoSrc }: { reportId: string; label: string; logoSrc?: string }) {
-    return (
-        <View style={s.hdr} fixed>
-            <View style={s.hdrLeft}>
-                <ScopeLensLogo size={22} />
-                <Text style={s.hdrBrand}>ScopeLens</Text>
-                <Text style={s.hdrInfo} render={({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
-                    `Page ${pageNumber} of ${totalPages} · ${label}`
-                } />
-            </View>
-            <Text style={s.hdrId}>Report ID   {shortId(reportId)}</Text>
+const Header = ({ label, reportId, logoSrc }: { label: string; reportId: string; logoSrc?: string }) => (
+    <View style={s.hdr} fixed>
+        <View style={s.hdrLeft}>
+            {logoSrc ? (
+                <Image src={logoSrc} style={{ maxWidth: 120, maxHeight: 22, objectFit: "contain" }} />
+            ) : (
+                <>
+                    <ScopeLensLogo size={22} />
+                    <Text style={s.hdrBrand}>ScopeLens</Text>
+                </>
+            )}
+            <Text style={s.hdrInfo} render={({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
+                `Page ${pageNumber} of ${totalPages} · ${label}`
+            } />
         </View>
-    );
-}
+        <Text style={s.hdrId}>Submission ID   {shortId(reportId)}</Text>
+    </View>
+);
 
-function Footer({ reportId, label }: { reportId: string; label: string; logoSrc?: string }) {
-    return (
-        <View style={{
-            position: "absolute", bottom: 20, left: 50, right: 50,
-            flexDirection: "row", justifyContent: "space-between", alignItems: "center",
-            borderTopWidth: 0.5, borderTopColor: "#E2E8F0", paddingTop: 8,
-        }} fixed>
-            <View style={s.hdrLeft}>
-                <ScopeLensLogo size={14} />
-                <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", color: C.blue500, marginLeft: 4 }}>ScopeLens</Text>
-                <Text style={{ fontSize: 7, color: C.slate500, marginLeft: 12 }} render={({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
-                    `Page ${pageNumber} of ${totalPages} · ${label}`
-                } />
-            </View>
-            <Text style={{ fontSize: 7, color: C.slate500 }}>Report ID   {shortId(reportId)}</Text>
+const Footer = ({ label, reportId, logoSrc }: { label: string; reportId: string; logoSrc?: string }) => (
+    <View style={s.ftr} fixed>
+        <View style={s.ftrLeft}>
+            {logoSrc ? (
+                <Image src={logoSrc} style={{ maxWidth: 100, maxHeight: 18, objectFit: "contain" }} />
+            ) : (
+                <>
+                    <ScopeLensLogo size={18} />
+                    <Text style={s.ftrBrand}>ScopeLens</Text>
+                </>
+            )}
+            <Text style={s.ftrInfo} render={({ pageNumber, totalPages }: { pageNumber: number; totalPages: number }) =>
+                `Page ${pageNumber} of ${totalPages} · ${label}`
+            } />
         </View>
-    );
-}
+        <Text style={s.ftrId}>Submission ID   {shortId(reportId)}</Text>
+    </View>
+);
 
 /* ═══════════════════════════════════════════
-   Numbered Source Badge
+   Numbered Source Badge (circle)
    ═══════════════════════════════════════════ */
 function SourceBadge({ num, size = 18 }: { num: number; size?: number }) {
     const color = getSourceColor(num - 1);
@@ -165,195 +166,302 @@ function SourceBadge({ num, size = 18 }: { num: number; size?: number }) {
 }
 
 /* ═══════════════════════════════════════════
-   Styles
+   Source type helpers
    ═══════════════════════════════════════════ */
-const ps = StyleSheet.create({
-    // Cover
-    coverBg: { backgroundColor: "#1a1a2e", flex: 1, padding: 50, justifyContent: "center" },
-    coverTitle: { fontSize: 32, fontFamily: "Helvetica-Bold", color: "#FFFFFF", marginBottom: 8 },
-    coverSubtitle: { fontSize: 14, color: "#94A3B8", marginBottom: 40 },
-    coverBoxRow: { flexDirection: "row", gap: 15, marginBottom: 20 },
-    coverBox: { flex: 1, backgroundColor: "rgba(255,255,255,0.08)", borderRadius: 8, padding: 16 },
-    coverBoxLabel: { fontSize: 8, color: "#94A3B8", marginBottom: 4 },
-    coverBoxValue: { fontSize: 14, fontFamily: "Helvetica-Bold", color: "#FFFFFF" },
-    scoreCircleBg: { alignItems: "center", marginBottom: 30 },
-    // Overview
-    sectionTitle: { fontSize: 16, fontFamily: "Helvetica-Bold", color: "#181818", marginBottom: 12 },
-    overviewRow: { flexDirection: "row", gap: 10, marginBottom: 10 },
-    overviewCard: { flex: 1, backgroundColor: "#F8FAFC", borderRadius: 6, padding: 12, borderWidth: 0.5, borderColor: "#E2E8F0" },
-    overviewLabel: { fontSize: 7, color: "#64748B", marginBottom: 3 },
-    overviewValue: { fontSize: 14, fontFamily: "Helvetica-Bold", color: "#181818" },
-    // Sources page
-    sourceRow: { flexDirection: "row", alignItems: "center", marginBottom: 4, paddingBottom: 8, borderBottomWidth: 0.5, borderBottomColor: "#F1F5F9" },
-    sourceInfo: { flex: 1, marginLeft: 8 },
-    sourceTitle: { fontSize: 9, fontFamily: "Helvetica-Bold", color: "#181818" },
-    sourceDetail: { fontSize: 7, color: "#64748B", marginTop: 1 },
-    sourceTypeBadge: { paddingHorizontal: 6, paddingVertical: 2, borderRadius: 3, marginLeft: 6 },
-    sourceTypeBadgeText: { fontSize: 7, fontFamily: "Helvetica-Bold", color: "#FFFFFF" },
-    sourcePercent: { fontSize: 9, fontFamily: "Helvetica-Bold", color: "#64748B", width: 40, textAlign: "right" },
-    noSources: { fontSize: 10, color: "#64748B", textAlign: "center", paddingVertical: 40 },
-    // Content page
-    paraBlock: { marginBottom: 6 },
-    normalText: { fontSize: 12, fontFamily: "Times-Roman", color: "#181818", lineHeight: 1.6, textAlign: "justify" as const },
-    titleText: { fontSize: 20, fontFamily: "Times-Bold", color: "#181818", marginTop: 8, marginBottom: 4 },
-    h1Text: { fontSize: 17, fontFamily: "Times-Bold", color: "#181818", marginTop: 8, marginBottom: 3 },
-    h2Text: { fontSize: 14, fontFamily: "Times-Bold", color: "#181818", marginTop: 6, marginBottom: 2 },
-    tblWrap: { marginVertical: 8, borderWidth: 0.5, borderColor: "#D1D5DB" },
-    tblRow: { flexDirection: "row" as const, borderBottomWidth: 0.5, borderBottomColor: "#D1D5DB" },
-    tblHeaderCell: { flex: 1, padding: 5, backgroundColor: "#F3F4F6", borderRightWidth: 0.5, borderRightColor: "#D1D5DB" },
-    tblCell: { flex: 1, padding: 5, borderRightWidth: 0.5, borderRightColor: "#D1D5DB" },
-    tblHeaderText: { fontSize: 9, fontFamily: "Helvetica-Bold", color: "#181818" },
-    tblCellText: { fontSize: 9, fontFamily: "Times-Roman", color: "#181818" },
-    // Margin badge
-    marginBadgeWrap: { flexDirection: "row" as const, alignItems: "flex-start" as const, marginBottom: 6 },
-    marginBadgeCol: { width: 36, flexDirection: "row" as const, flexWrap: "wrap" as const, gap: 1, marginRight: 4, paddingTop: 2 },
-    contentCol: { flex: 1 },
-});
-
-/* ═══════════════════════════════════════════
-   Source type label color
-   ═══════════════════════════════════════════ */
-function sourceTypeBgColor(type: string): string {
+function getSourceTypeLabel(type: string): string {
     const t = type.toLowerCase();
-    if (t.includes("internet")) return "#3B82F6";
-    if (t.includes("publication") || t.includes("journal")) return "#8B5CF6";
-    if (t.includes("student")) return "#22C55E";
+    if (t.includes("internet")) return "Internet";
+    if (t.includes("publication") || t.includes("journal")) return "Publication";
+    if (t.includes("student")) return "Student papers";
+    return "Publication";
+}
+
+function sourceTypeBgColor(type: string): string {
+    const label = getSourceTypeLabel(type);
+    if (label === "Internet") return "#3B82F6";
+    if (label === "Publication") return "#22C55E";
+    if (label === "Student papers") return "#8B5CF6";
     return "#64748B";
 }
 
 /* ═══════════════════════════════════════════
    PAGE 1: Cover Page
+   (Turnitin style — white bg, Document Details)
    ═══════════════════════════════════════════ */
+const ps1 = StyleSheet.create({
+    fileName: { fontSize: 20, fontFamily: "Helvetica-Bold", color: "#181818", marginTop: 150 },
+    docLabel: { fontSize: 14, fontFamily: "Helvetica", color: "#181818", marginTop: 6 },
+    brandRow: { flexDirection: "row", alignItems: "center", marginTop: 10 },
+    brandText: { fontSize: 8, color: "#626262", marginLeft: 6 },
+    detailsTitle: { fontSize: 10, fontFamily: "Helvetica-Bold", color: "#181818", marginTop: 8, marginBottom: 10, textDecoration: "underline" },
+    detailsRow: { flexDirection: "row", justifyContent: "space-between" },
+    detailsLeft: { flex: 1 },
+    detailRow: { marginBottom: 12 },
+    detailLabel: { fontSize: 7, fontFamily: "Helvetica-Bold", color: "#626262", marginBottom: 2 },
+    detailValue: { fontSize: 7, fontFamily: "Helvetica-Bold", color: "#181818" },
+    statsCol: { width: 110, alignItems: "flex-end", paddingTop: 0 },
+    statBox: { borderWidth: 0.3, borderColor: C.slate200, paddingVertical: 6, paddingHorizontal: 12, alignItems: "center", width: 110 },
+    statText: { fontSize: 7, fontFamily: "Helvetica-Bold", color: "#181818" },
+});
+
 function CoverPage(p: PlagiarismReportProps) {
-    const scoreColor = p.plagiarismPercent > 30 ? "#EF4444" : p.plagiarismPercent > 15 ? "#F59E0B" : "#22C55E";
-    return (
-        <Page size="A4" style={{ padding: 0 }}>
-            <View style={ps.coverBg}>
-                <Text style={ps.coverTitle}>Plagiarism Report</Text>
-                <Text style={ps.coverSubtitle}>ScopeLens Document Analysis</Text>
-
-                <View style={ps.scoreCircleBg}>
-                    <View style={{ width: 120, height: 120, alignItems: "center", justifyContent: "center", borderWidth: 4, borderColor: scoreColor, borderRadius: 60, marginBottom: 8 }}>
-                        <Text style={{ fontSize: 28, fontFamily: "Helvetica-Bold", color: scoreColor }}>{p.plagiarismPercent}%</Text>
-                        <Text style={{ fontSize: 8, color: "#94A3B8" }}>Similarity</Text>
-                    </View>
-                </View>
-
-                <View style={ps.coverBoxRow}>
-                    <View style={ps.coverBox}>
-                        <Text style={ps.coverBoxLabel}>Document</Text>
-                        <Text style={ps.coverBoxValue}>{p.fileName}</Text>
-                    </View>
-                    <View style={ps.coverBox}>
-                        <Text style={ps.coverBoxLabel}>Author</Text>
-                        <Text style={ps.coverBoxValue}>{p.authorName}</Text>
-                    </View>
-                </View>
-                <View style={ps.coverBoxRow}>
-                    <View style={ps.coverBox}>
-                        <Text style={ps.coverBoxLabel}>Submitted</Text>
-                        <Text style={ps.coverBoxValue}>{p.submissionDate}</Text>
-                    </View>
-                    <View style={ps.coverBox}>
-                        <Text style={ps.coverBoxLabel}>File Size</Text>
-                        <Text style={ps.coverBoxValue}>{p.fileSize}</Text>
-                    </View>
-                </View>
-                <View style={ps.coverBoxRow}>
-                    <View style={ps.coverBox}>
-                        <Text style={ps.coverBoxLabel}>Words</Text>
-                        <Text style={ps.coverBoxValue}>{p.totalWords.toLocaleString()}</Text>
-                    </View>
-                    <View style={ps.coverBox}>
-                        <Text style={ps.coverBoxLabel}>Sources Found</Text>
-                        <Text style={ps.coverBoxValue}>{p.sources.length}</Text>
-                    </View>
-                </View>
-
-                <View style={{ marginTop: 20 }}>
-                    <Text style={{ fontSize: 7, color: "#64748B" }}>Report ID: {p.reportId}</Text>
-                    <Text style={{ fontSize: 7, color: "#64748B" }}>Downloaded: {p.downloadDate}</Text>
-                </View>
-            </View>
-        </Page>
-    );
-}
-
-/* ═══════════════════════════════════════════
-   PAGE 2: Integrity Overview (stat cards)
-   ═══════════════════════════════════════════ */
-function OverviewPage(p: PlagiarismReportProps) {
-    const scoreColor = p.plagiarismPercent > 30 ? "#EF4444" : p.plagiarismPercent > 15 ? "#F59E0B" : "#22C55E";
-    const originalPercent = 100 - p.plagiarismPercent;
+    const totalPagesEst = Math.ceil(p.paragraphs.length / 15) + 4;
+    const totalChars = p.paragraphs.reduce((sum, para) => sum + para.text.length, 0);
     return (
         <Page size="A4" style={s.page}>
-            <Header reportId={p.reportId} label="Integrity Overview" logoSrc={p.customLogoSrc} />
+            <Header label="Cover Page" reportId={p.reportId} logoSrc={p.customLogoSrc} />
 
-            <Text style={ps.sectionTitle}>Plagiarism Overview</Text>
+            <Text style={ps1.fileName}>{p.fileName}</Text>
+            <Text style={ps1.docLabel}>Document</Text>
 
-            <View style={ps.overviewRow}>
-                <View style={ps.overviewCard}>
-                    <Text style={ps.overviewLabel}>Overall Similarity</Text>
-                    <Text style={[ps.overviewValue, { color: scoreColor }]}>{p.plagiarismPercent}%</Text>
+            {p.customLogoSrc ? (
+                <View style={{ flexDirection: "row", alignItems: "center", marginTop: 8 }}>
+                    <Image src={p.customLogoSrc} style={{ maxWidth: 80, maxHeight: 14, objectFit: "contain" }} />
                 </View>
-                <View style={ps.overviewCard}>
-                    <Text style={ps.overviewLabel}>Original Content</Text>
-                    <Text style={[ps.overviewValue, { color: "#22C55E" }]}>{originalPercent}%</Text>
+            ) : (
+                <View style={ps1.brandRow}>
+                    <ScopeLensLogo size={14} />
+                    <Text style={ps1.brandText}>ScopeLens</Text>
                 </View>
-                <View style={ps.overviewCard}>
-                    <Text style={ps.overviewLabel}>Sources Found</Text>
-                    <Text style={ps.overviewValue}>{p.sources.length}</Text>
-                </View>
-            </View>
-
-            <View style={ps.overviewRow}>
-                <View style={ps.overviewCard}>
-                    <Text style={ps.overviewLabel}>Total Sentences</Text>
-                    <Text style={ps.overviewValue}>{p.totalSentences}</Text>
-                </View>
-                <View style={ps.overviewCard}>
-                    <Text style={ps.overviewLabel}>Matched Sentences</Text>
-                    <Text style={[ps.overviewValue, { color: "#F59E0B" }]}>{p.matchedSentenceCount}</Text>
-                </View>
-                <View style={ps.overviewCard}>
-                    <Text style={ps.overviewLabel}>Total Words</Text>
-                    <Text style={ps.overviewValue}>{p.totalWords.toLocaleString()}</Text>
-                </View>
-            </View>
+            )}
 
             <View style={s.sep} />
 
-            {/* Similarity bar */}
-            <View style={{ marginBottom: 20 }}>
-                <Text style={{ fontSize: 9, fontFamily: "Helvetica-Bold", color: "#181818", marginBottom: 8 }}>Similarity Breakdown</Text>
-                <View style={{ height: 14, backgroundColor: "#E2E8F0", borderRadius: 7, overflow: "hidden", flexDirection: "row" }}>
-                    {p.plagiarismPercent > 0 && (
-                        <View style={{ width: `${p.plagiarismPercent}%`, backgroundColor: scoreColor, borderRadius: 7 }} />
-                    )}
+            {/* Document Details (left) + Stats (right) */}
+            <View style={ps1.detailsRow}>
+                <View style={ps1.detailsLeft}>
+                    <Text style={ps1.detailsTitle}>Document Details</Text>
+                    {([
+                        ["Submission ID", shortId(p.reportId)],
+                        ["Submission Date", p.submissionDate],
+                        ["Download Date", p.downloadDate],
+                        ["File Name", p.fileName],
+                        ["File Size", p.fileSize],
+                    ] as [string, string][]).map(([label, value]) => (
+                        <View key={label} style={ps1.detailRow}>
+                            <Text style={ps1.detailLabel}>{label}</Text>
+                            <Text style={ps1.detailValue}>{value}</Text>
+                        </View>
+                    ))}
                 </View>
-                <View style={{ flexDirection: "row", justifyContent: "space-between", marginTop: 4 }}>
-                    <Text style={{ fontSize: 7, color: scoreColor }}>Matched ({p.plagiarismPercent}%)</Text>
-                    <Text style={{ fontSize: 7, color: "#22C55E" }}>Original ({originalPercent}%)</Text>
+                <View style={ps1.statsCol}>
+                    {[
+                        `${totalPagesEst} Pages`,
+                        `${p.totalWords.toLocaleString()} Words`,
+                        `${totalChars.toLocaleString()} Characters`,
+                    ].map((txt) => (
+                        <View key={txt} style={ps1.statBox}>
+                            <Text style={ps1.statText}>{txt}</Text>
+                        </View>
+                    ))}
                 </View>
             </View>
 
-            <View style={s.sep} />
-
-            <Text style={{ fontSize: 8, color: "#64748B", lineHeight: 1.6 }}>
-                This report compares your document against academic publications indexed by CORE (core.ac.uk).
-                The similarity percentage represents the proportion of sentences in your document that show
-                significant textual overlap with published sources. Each matched source is assigned a unique
-                color and number for easy identification throughout the document.
-            </Text>
-
-            <Footer reportId={p.reportId} label="Integrity Overview" logoSrc={p.customLogoSrc} />
+            <Footer label="Cover Page" reportId={p.reportId} logoSrc={p.customLogoSrc} />
         </Page>
     );
 }
 
 /* ═══════════════════════════════════════════
-   PAGE 3: Top Sources (Turnitin-style list)
+   PAGE 2: Integrity Overview
+   (Turnitin style — Overall Similarity,
+    Filtered, Match Groups, Top Sources,
+    Integrity Flags)
    ═══════════════════════════════════════════ */
+const ps2 = StyleSheet.create({
+    bigPercent: { fontSize: 26, fontFamily: "Helvetica-Bold", color: "#181818" },
+    bigLabel: { fontSize: 16, fontFamily: "Helvetica", color: "#181818", marginLeft: 10 },
+    desc: { fontSize: 7, color: "#626262", marginTop: 4, marginBottom: 16 },
+    sectionTitle: { fontSize: 11, fontFamily: "Helvetica-Bold", color: "#181818", marginBottom: 8 },
+    filterItem: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
+    filterText: { fontSize: 8, color: "#181818", marginLeft: 6 },
+    matchRow: { flexDirection: "row", alignItems: "center", marginBottom: 8 },
+    matchBadge: { width: 18, height: 18, borderRadius: 9, alignItems: "center", justifyContent: "center", marginRight: 8 },
+    matchCount: { fontSize: 9, fontFamily: "Helvetica-Bold", color: "#181818" },
+    matchLabel: { fontSize: 9, color: "#181818", marginLeft: 6 },
+    matchPercent: { fontSize: 9, fontFamily: "Helvetica-Bold", color: "#626262", marginLeft: 4 },
+    matchDesc: { fontSize: 7, color: "#626262", marginLeft: 32, marginTop: -4, marginBottom: 4 },
+    topSourceRow: { flexDirection: "row", alignItems: "center", marginBottom: 4 },
+    topSourcePercent: { fontSize: 9, fontFamily: "Helvetica-Bold", color: "#181818", width: 28 },
+    topSourceIcon: { width: 14, height: 14, marginRight: 6 },
+    topSourceLabel: { fontSize: 8, color: "#181818" },
+    flagTitle: { fontSize: 9, fontFamily: "Helvetica-Bold", color: "#181818", marginBottom: 4 },
+    flagText: { fontSize: 7, color: "#626262" },
+    infoBox: { backgroundColor: "#EBF5FB", borderRadius: 4, padding: 10, marginTop: 12, flex: 1, marginLeft: 20 },
+    infoText: { fontSize: 7, color: "#4A5568", lineHeight: 1.5 },
+    columnsRow: { flexDirection: "row", gap: 30 },
+    leftCol: { flex: 1 },
+    rightCol: { width: 200 },
+});
+
+function IntegrityOverviewPage(p: PlagiarismReportProps) {
+    // Use real match group data if available, otherwise compute fallbacks
+    const mg = p.matchGroups || {
+        notCitedOrQuoted: { count: p.matchedSentenceCount, percent: p.plagiarismPercent },
+        missingQuotations: { count: 0, percent: 0 },
+        missingCitation: { count: 0, percent: 0 },
+        citedAndQuoted: { count: 0, percent: 0 },
+    };
+
+    // Use real source type breakdown if available, otherwise compute from sources
+    const stb = p.sourceTypeBreakdown || {
+        internet: p.sources.filter(src => getSourceTypeLabel(src.sourceType) === "Internet").reduce((s, src) => s + src.matchPercentage, 0),
+        publications: p.sources.filter(src => getSourceTypeLabel(src.sourceType) === "Publication").reduce((s, src) => s + src.matchPercentage, 0),
+        studentPapers: p.sources.filter(src => getSourceTypeLabel(src.sourceType) === "Student papers").reduce((s, src) => s + src.matchPercentage, 0),
+    };
+
+    return (
+        <Page size="A4" style={s.page}>
+            <Header label="Integrity Overview" reportId={p.reportId} logoSrc={p.customLogoSrc} />
+
+            {/* Overall Similarity */}
+            <View style={{ flexDirection: "row", alignItems: "baseline", marginBottom: 4 }}>
+                <Text style={ps2.bigPercent}>{p.plagiarismPercent}%</Text>
+                <Text style={ps2.bigLabel}>Overall Similarity</Text>
+            </View>
+            <Text style={ps2.desc}>
+                The combined total of all matches, including overlapping sources, for each database.
+            </Text>
+
+            <View style={s.sep} />
+
+            {/* Filtered from the Report */}
+            <Text style={ps2.sectionTitle}>Filtered from the Report</Text>
+            <View style={ps2.filterItem}>
+                <Text style={{ fontSize: 8, color: "#181818" }}>▸</Text>
+                <Text style={ps2.filterText}>Bibliography</Text>
+            </View>
+            <View style={ps2.filterItem}>
+                <Text style={{ fontSize: 8, color: "#181818" }}>▸</Text>
+                <Text style={ps2.filterText}>Quoted Text</Text>
+            </View>
+
+            <View style={s.sep} />
+
+            {/* Match Groups + Top Sources in columns */}
+            <View style={ps2.columnsRow}>
+                <View style={ps2.leftCol}>
+                    <Text style={ps2.sectionTitle}>Match Groups</Text>
+
+                    {/* Not Cited or Quoted */}
+                    <View style={ps2.matchRow}>
+                        <View style={[ps2.matchBadge, { backgroundColor: "#E4473A" }]}>
+                            <Text style={{ fontSize: 7, fontFamily: "Helvetica-Bold", color: "#FFFFFF" }}>!</Text>
+                        </View>
+                        <Text style={ps2.matchCount}>{mg.notCitedOrQuoted.count}</Text>
+                        <Text style={ps2.matchLabel}>Not Cited or Quoted</Text>
+                        <Text style={ps2.matchPercent}>{mg.notCitedOrQuoted.percent}%</Text>
+                    </View>
+                    <Text style={ps2.matchDesc}>Matches with neither in-text citation nor quotation marks</Text>
+
+                    {/* Missing Quotations */}
+                    <View style={ps2.matchRow}>
+                        <View style={[ps2.matchBadge, { backgroundColor: "#F59E0B" }]}>
+                            <Text style={{ fontSize: 7, fontFamily: "Helvetica-Bold", color: "#FFFFFF" }}>!</Text>
+                        </View>
+                        <Text style={ps2.matchCount}>{mg.missingQuotations.count}</Text>
+                        <Text style={ps2.matchLabel}>Missing Quotations</Text>
+                        <Text style={ps2.matchPercent}>{mg.missingQuotations.percent}%</Text>
+                    </View>
+                    <Text style={ps2.matchDesc}>Matches that are still very similar to source material</Text>
+
+                    {/* Missing Citation */}
+                    <View style={ps2.matchRow}>
+                        <View style={[ps2.matchBadge, { backgroundColor: "#EAB308" }]}>
+                            <Text style={{ fontSize: 7, fontFamily: "Helvetica-Bold", color: "#FFFFFF" }}>=</Text>
+                        </View>
+                        <Text style={ps2.matchCount}>{mg.missingCitation.count}</Text>
+                        <Text style={ps2.matchLabel}>Missing Citation</Text>
+                        <Text style={ps2.matchPercent}>{mg.missingCitation.percent}%</Text>
+                    </View>
+                    <Text style={ps2.matchDesc}>Matches that have quotation marks, but no in-text citation</Text>
+
+                    {/* Cited and Quoted */}
+                    <View style={ps2.matchRow}>
+                        <View style={[ps2.matchBadge, { backgroundColor: "#22C55E" }]}>
+                            <Text style={{ fontSize: 7, fontFamily: "Helvetica-Bold", color: "#FFFFFF" }}>✓</Text>
+                        </View>
+                        <Text style={ps2.matchCount}>{mg.citedAndQuoted.count}</Text>
+                        <Text style={ps2.matchLabel}>Cited and Quoted</Text>
+                        <Text style={ps2.matchPercent}>{mg.citedAndQuoted.percent}%</Text>
+                    </View>
+                    <Text style={ps2.matchDesc}>Matches with in-text citation present, but no quotation marks</Text>
+                </View>
+
+                {/* Top Sources summary */}
+                <View style={ps2.rightCol}>
+                    <Text style={ps2.sectionTitle}>Top Sources</Text>
+                    {stb.internet > 0 && (
+                        <View style={ps2.topSourceRow}>
+                            <Text style={ps2.topSourcePercent}>{stb.internet < 1 ? "<1" : Math.round(stb.internet)}%</Text>
+                            <Text style={ps2.topSourceLabel}>Internet sources</Text>
+                        </View>
+                    )}
+                    {stb.publications > 0 && (
+                        <View style={ps2.topSourceRow}>
+                            <Text style={ps2.topSourcePercent}>{stb.publications < 1 ? "<1" : Math.round(stb.publications)}%</Text>
+                            <Text style={ps2.topSourceLabel}>Publications</Text>
+                        </View>
+                    )}
+                    {stb.studentPapers > 0 && (
+                        <View style={ps2.topSourceRow}>
+                            <Text style={ps2.topSourcePercent}>{stb.studentPapers < 1 ? "<1" : Math.round(stb.studentPapers)}%</Text>
+                            <Text style={ps2.topSourceLabel}>Submitted works (Student Papers)</Text>
+                        </View>
+                    )}
+                    {stb.internet === 0 && stb.publications === 0 && stb.studentPapers === 0 && p.sources.length > 0 && (
+                        <View style={ps2.topSourceRow}>
+                            <Text style={ps2.topSourcePercent}>{p.plagiarismPercent}%</Text>
+                            <Text style={ps2.topSourceLabel}>Publications</Text>
+                        </View>
+                    )}
+                </View>
+            </View>
+
+            <View style={s.sep} />
+
+            {/* Integrity Flags */}
+            <View style={{ flexDirection: "row" }}>
+                <View style={{ flex: 1 }}>
+                    <Text style={ps2.sectionTitle}>Integrity Flags</Text>
+                    <Text style={ps2.flagTitle}>0 Integrity Flags for Review</Text>
+                    <Text style={ps2.flagText}>No suspicious text manipulations found.</Text>
+                </View>
+                <View style={ps2.infoBox}>
+                    <Text style={ps2.infoText}>
+                        Our system&apos;s algorithms look deeply at a document for any inconsistencies that
+                        would set it apart from a normal submission. If we notice something strange, we flag
+                        it for you to review.
+                    </Text>
+                    <Text style={[ps2.infoText, { marginTop: 6 }]}>
+                        A Flag is not necessarily an indicator of a problem. However, we&apos;d recommend you
+                        focus your attention there for further review.
+                    </Text>
+                </View>
+            </View>
+
+            <Footer label="Integrity Overview" reportId={p.reportId} logoSrc={p.customLogoSrc} />
+        </Page>
+    );
+}
+
+/* ═══════════════════════════════════════════
+   PAGES 3+: Top Sources
+   (Turnitin style — numbered badge, type tag,
+    source name/URL, percentage)
+   ═══════════════════════════════════════════ */
+const ps3 = StyleSheet.create({
+    sectionTitle: { fontSize: 14, fontFamily: "Helvetica-Bold", color: "#181818", marginBottom: 4 },
+    subtitle: { fontSize: 7, color: "#94A3B8", marginBottom: 14 },
+    sourceBlock: { marginBottom: 12 },
+    badgeRow: { flexDirection: "row", alignItems: "center", marginBottom: 3 },
+    typeBadge: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 10, marginLeft: 8 },
+    typeBadgeText: { fontSize: 7, fontFamily: "Helvetica-Bold", color: "#FFFFFF" },
+    percentText: { fontSize: 9, color: "#626262", marginLeft: "auto" as any },
+    sourceTitle: { fontSize: 9, color: "#181818", marginLeft: 0, marginTop: 1 },
+    noSources: { fontSize: 10, color: "#64748B", textAlign: "center", paddingVertical: 40 },
+});
+
 function TopSourcesPage({ sources, reportId, customLogoSrc }: {
     sources: MatchedSource[];
     reportId: string;
@@ -362,54 +470,51 @@ function TopSourcesPage({ sources, reportId, customLogoSrc }: {
     if (sources.length === 0) {
         return (
             <Page size="A4" style={s.page}>
-                <Header reportId={reportId} label="Integrity Overview" logoSrc={customLogoSrc} />
-                <Text style={ps.sectionTitle}>Top Sources</Text>
-                <Text style={ps.noSources}>No matching sources were found. Your document appears to be original.</Text>
-                <Footer reportId={reportId} label="Integrity Overview" logoSrc={customLogoSrc} />
+                <Header label="Integrity Overview" reportId={reportId} logoSrc={customLogoSrc} />
+                <Text style={ps3.sectionTitle}>Top Sources</Text>
+                <Text style={ps3.noSources}>No matching sources were found. Your document appears to be original.</Text>
+                <Footer label="Integrity Overview" reportId={reportId} logoSrc={customLogoSrc} />
             </Page>
         );
     }
 
     return (
         <Page size="A4" style={s.page} wrap>
-            <Header reportId={reportId} label="Integrity Overview" logoSrc={customLogoSrc} />
+            <Header label="Integrity Overview" reportId={reportId} logoSrc={customLogoSrc} />
 
-            <Text style={ps.sectionTitle}>Top Sources</Text>
-            <Text style={{ fontSize: 7, color: "#94A3B8", marginBottom: 14 }}>
+            <Text style={ps3.sectionTitle}>Top Sources</Text>
+            <Text style={ps3.subtitle}>
                 The sources with the highest number of matches within the submission. Overlapping sources will not be displayed.
             </Text>
 
             {sources.map((source, idx) => {
+                const typeLabel = getSourceTypeLabel(source.sourceType);
                 const typeColor = sourceTypeBgColor(source.sourceType);
                 const displayPercent = source.matchPercentage < 1 ? "<1%" : `${source.matchPercentage}%`;
-                // Derive a display title/url
-                const displayTitle = source.url || source.title;
+                // Display: URL for internet, authors for publications, title for student papers
+                let displayTitle = source.url || source.title || "Unknown source";
+                if (typeLabel === "Publication" && source.authors.length > 0) {
+                    displayTitle = `${source.authors.slice(0, 4).join(", ")}${source.authors.length > 4 ? ", M..." : ""}`;
+                }
+                if (typeLabel === "Student papers") {
+                    displayTitle = source.title || "Student submission";
+                }
 
                 return (
-                    <View key={idx} style={ps.sourceRow} wrap={false}>
-                        <SourceBadge num={idx + 1} size={20} />
-                        <View style={[ps.sourceTypeBadge, { backgroundColor: typeColor }]}>
-                            <Text style={ps.sourceTypeBadgeText}>{source.sourceType || "Publication"}</Text>
+                    <View key={idx} style={ps3.sourceBlock} wrap={false}>
+                        <View style={ps3.badgeRow}>
+                            <SourceBadge num={idx + 1} size={22} />
+                            <View style={[ps3.typeBadge, { backgroundColor: typeColor }]}>
+                                <Text style={ps3.typeBadgeText}>{typeLabel}</Text>
+                            </View>
+                            <Text style={ps3.percentText}>{displayPercent}</Text>
                         </View>
-                        <View style={ps.sourceInfo}>
-                            <Text style={ps.sourceTitle} wrap={false}>
-                                {source.authors.length > 0
-                                    ? `${source.authors.slice(0, 3).join(", ")}${source.authors.length > 3 ? ` et al.` : ""} ${source.title ? `"${source.title.substring(0, 60)}${source.title.length > 60 ? "..." : ""}"` : ""}`
-                                    : displayTitle
-                                }
-                            </Text>
-                            {source.year && (
-                                <Text style={ps.sourceDetail}>
-                                    {source.year}{source.doi ? ` · DOI: ${source.doi}` : ""}
-                                </Text>
-                            )}
-                        </View>
-                        <Text style={ps.sourcePercent}>{displayPercent}</Text>
+                        <Text style={ps3.sourceTitle}>{displayTitle}</Text>
                     </View>
                 );
             })}
 
-            <Footer reportId={reportId} label="Integrity Overview" logoSrc={customLogoSrc} />
+            <Footer label="Integrity Overview" reportId={reportId} logoSrc={customLogoSrc} />
         </Page>
     );
 }
@@ -418,6 +523,23 @@ function TopSourcesPage({ sources, reportId, customLogoSrc }: {
    PAGES: Document Content with Color-Coded
           Per-Source Highlights & Margin Badges
    ═══════════════════════════════════════════ */
+const ps4 = StyleSheet.create({
+    paraBlock: { marginBottom: 6 },
+    normalText: { fontSize: 12, fontFamily: "Times-Roman", color: "#181818", lineHeight: 1.6, textAlign: "justify" as const },
+    titleText: { fontSize: 20, fontFamily: "Times-Bold", color: "#181818", marginTop: 8, marginBottom: 4, textAlign: "center" as const },
+    h1Text: { fontSize: 17, fontFamily: "Times-Bold", color: "#181818", marginTop: 8, marginBottom: 3 },
+    h2Text: { fontSize: 14, fontFamily: "Times-Bold", color: "#181818", marginTop: 6, marginBottom: 2 },
+    tblWrap: { marginVertical: 8, borderWidth: 0.5, borderColor: "#D1D5DB" },
+    tblRow: { flexDirection: "row" as const, borderBottomWidth: 0.5, borderBottomColor: "#D1D5DB" },
+    tblHeaderCell: { flex: 1, padding: 5, backgroundColor: "#F3F4F6", borderRightWidth: 0.5, borderRightColor: "#D1D5DB" },
+    tblCell: { flex: 1, padding: 5, borderRightWidth: 0.5, borderRightColor: "#D1D5DB" },
+    tblHeaderText: { fontSize: 9, fontFamily: "Helvetica-Bold", color: "#181818" },
+    tblCellText: { fontSize: 9, fontFamily: "Times-Roman", color: "#181818" },
+    marginBadgeWrap: { flexDirection: "row" as const, alignItems: "flex-start" as const, marginBottom: 6 },
+    marginBadgeCol: { width: 36, flexDirection: "row" as const, flexWrap: "wrap" as const, gap: 1, marginRight: 4, paddingTop: 2 },
+    contentCol: { flex: 1 },
+});
+
 function PlagiarismContentPage({ paragraphs, highlightedSentences, sentenceSourceMap, reportId, customLogoSrc }: {
     paragraphs: DocParagraph[];
     highlightedSentences: string[];
@@ -425,74 +547,71 @@ function PlagiarismContentPage({ paragraphs, highlightedSentences, sentenceSourc
     reportId: string;
     customLogoSrc?: string;
 }) {
-    /** Check if a sentence is highlighted and return its source indices (1-based for display) */
+    /** Check if a sentence is highlighted and return its source indices */
     const getMatchInfo = (sentence: string): number[] => {
-        // Direct match
         if (sentenceSourceMap[sentence]) return sentenceSourceMap[sentence];
-        // Substring match
         for (const key of Object.keys(sentenceSourceMap)) {
             if (sentence.includes(key) || key.includes(sentence)) {
                 return sentenceSourceMap[key];
             }
         }
-        // Fallback: check highlighted list
         if (highlightedSentences.some((h) => sentence.includes(h) || h.includes(sentence))) {
-            return [0]; // unknown source
+            return [0];
         }
         return [];
     };
 
     return (
         <Page size="A4" style={s.page} wrap>
-            <Header reportId={reportId} label="Integrity Submission" logoSrc={customLogoSrc} />
+            <Header label="Integrity Submission" reportId={reportId} logoSrc={customLogoSrc} />
 
             {paragraphs.map((para, pi) => {
                 if (para.style === "Title") {
-                    return <Text key={pi} style={ps.titleText}>{para.text}</Text>;
+                    return <Text key={pi} style={ps4.titleText}>{para.text}</Text>;
                 }
                 if (para.style === "Heading1") {
                     const hlSources = getMatchInfo(para.text);
                     if (hlSources.length > 0) {
                         const bgColor = sourceHighlightBg(hlSources[0]);
                         return (
-                            <View key={pi} style={ps.marginBadgeWrap} wrap={false}>
-                                <View style={ps.marginBadgeCol}>
+                            <View key={pi} style={ps4.marginBadgeWrap} wrap={false}>
+                                <View style={ps4.marginBadgeCol}>
                                     {hlSources.map((si, i) => <SourceBadge key={i} num={si + 1} size={14} />)}
                                 </View>
-                                <Text style={[ps.h1Text, { backgroundColor: bgColor, flex: 1 }]}>{para.text}</Text>
+                                <Text style={[ps4.h1Text, { backgroundColor: bgColor, flex: 1 }]}>{para.text}</Text>
                             </View>
                         );
                     }
-                    return <Text key={pi} style={ps.h1Text}>{para.text}</Text>;
+                    return <Text key={pi} style={ps4.h1Text}>{para.text}</Text>;
                 }
                 if (para.style === "Heading2") {
                     const hlSources = getMatchInfo(para.text);
                     if (hlSources.length > 0) {
                         const bgColor = sourceHighlightBg(hlSources[0]);
                         return (
-                            <View key={pi} style={ps.marginBadgeWrap} wrap={false}>
-                                <View style={ps.marginBadgeCol}>
+                            <View key={pi} style={ps4.marginBadgeWrap} wrap={false}>
+                                <View style={ps4.marginBadgeCol}>
                                     {hlSources.map((si, i) => <SourceBadge key={i} num={si + 1} size={14} />)}
                                 </View>
-                                <Text style={[ps.h2Text, { backgroundColor: bgColor, flex: 1 }]}>{para.text}</Text>
+                                <Text style={[ps4.h2Text, { backgroundColor: bgColor, flex: 1 }]}>{para.text}</Text>
                             </View>
                         );
                     }
-                    return <Text key={pi} style={ps.h2Text}>{para.text}</Text>;
+                    return <Text key={pi} style={ps4.h2Text}>{para.text}</Text>;
                 }
 
                 // Table rendering
                 if (para.style === "Table" && para.rows && para.rows.length > 0) {
                     return (
-                        <View key={pi} style={ps.tblWrap} wrap={false}>
+                        <View key={pi} style={ps4.tblWrap} wrap={false}>
                             {para.rows.map((row, ri) => (
-                                <View key={ri} style={ps.tblRow}>
+                                <View key={ri} style={ps4.tblRow}>
                                     {row.map((cell, ci) => {
                                         const hlS = ri > 0 ? getMatchInfo(cell) : [];
-                                        const cellStyle = ri === 0 ? ps.tblHeaderCell
-                                            : hlS.length > 0 ? { ...ps.tblCell, backgroundColor: sourceHighlightBg(hlS[0]) }
-                                                : ps.tblCell;
-                                        const textStyle = ri === 0 ? ps.tblHeaderText : ps.tblCellText;
+                                        const cellStyle = ri === 0 ? ps4.tblHeaderCell
+                                            : hlS.length > 0 ? { ...ps4.tblCell, backgroundColor: sourceHighlightBg(hlS[0]) }
+                                                : ps4.tblCell;
+                                        const textStyle = ri === 0 ? ps4.tblHeaderText : ps4.tblCellText;
                                         return (
                                             <View key={ci} style={cellStyle}>
                                                 <Text style={textStyle}>{cell}</Text>
@@ -518,24 +637,24 @@ function PlagiarismContentPage({ paragraphs, highlightedSentences, sentenceSourc
 
                 if (paraBadges.length > 0) {
                     return (
-                        <View key={pi} style={ps.marginBadgeWrap} wrap={false}>
-                            <View style={ps.marginBadgeCol}>
+                        <View key={pi} style={ps4.marginBadgeWrap} wrap={false}>
+                            <View style={ps4.marginBadgeCol}>
                                 {paraBadges.map((si, i) => <SourceBadge key={i} num={si + 1} size={14} />)}
                             </View>
-                            <View style={ps.contentCol}>
+                            <View style={ps4.contentCol}>
                                 <Text>
                                     {sentences.map((sent, si) => {
                                         const matchSources = getMatchInfo(sent);
                                         if (matchSources.length > 0) {
                                             const bgColor = sourceHighlightBg(matchSources[0]);
                                             return (
-                                                <Text key={si} style={[ps.normalText, { backgroundColor: bgColor }]}>
+                                                <Text key={si} style={[ps4.normalText, { backgroundColor: bgColor }]}>
                                                     {sent}{si < sentences.length - 1 ? " " : ""}
                                                 </Text>
                                             );
                                         }
                                         return (
-                                            <Text key={si} style={ps.normalText}>
+                                            <Text key={si} style={ps4.normalText}>
                                                 {sent}{si < sentences.length - 1 ? " " : ""}
                                             </Text>
                                         );
@@ -548,13 +667,13 @@ function PlagiarismContentPage({ paragraphs, highlightedSentences, sentenceSourc
 
                 // No matches — render normally
                 return (
-                    <View key={pi} style={ps.paraBlock} wrap={false}>
-                        <Text style={ps.normalText}>{para.text}</Text>
+                    <View key={pi} style={ps4.paraBlock} wrap={false}>
+                        <Text style={ps4.normalText}>{para.text}</Text>
                     </View>
                 );
             })}
 
-            <Footer reportId={reportId} label="Integrity Submission" logoSrc={customLogoSrc} />
+            <Footer label="Integrity Submission" reportId={reportId} logoSrc={customLogoSrc} />
         </Page>
     );
 }
@@ -570,7 +689,7 @@ export function PlagiarismReportDocument(props: PlagiarismReportProps) {
             subject="Plagiarism Detection Report"
         >
             <CoverPage {...props} />
-            <OverviewPage {...props} />
+            <IntegrityOverviewPage {...props} />
             <TopSourcesPage
                 sources={props.sources}
                 reportId={props.reportId}

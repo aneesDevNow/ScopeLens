@@ -87,6 +87,53 @@ interface MatchedSource {
     sourceType: string;
 }
 
+// Detect if a sentence is enclosed in quotation marks in the original text
+function isQuoted(fullText: string, sentence: string): boolean {
+    const escaped = sentence.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    // Check for various quotation mark patterns around the sentence
+    const patterns = [
+        new RegExp(`["\u201C]\\s*${escaped}\\s*["\u201D]`),     // "sentence" or \u201Csentence\u201D
+        new RegExp(`['‘]\\s*${escaped}\\s*['’]`),     // 'sentence' or \u2018sentence\u2019
+        new RegExp(`\u00AB\\s*${escaped}\\s*\u00BB`),           // \u00ABsentence\u00BB
+    ];
+    return patterns.some(p => p.test(fullText));
+}
+
+// Detect if there's an in-text citation near a matched sentence
+function hasCitation(fullText: string, sentence: string): boolean {
+    const idx = fullText.indexOf(sentence);
+    if (idx === -1) return false;
+    // Look at 200 chars after the sentence end for nearby citation
+    const afterText = fullText.substring(idx + sentence.length, idx + sentence.length + 200);
+    const beforeText = fullText.substring(Math.max(0, idx - 100), idx);
+    const context = beforeText + afterText;
+    // Common citation patterns
+    const citationPatterns = [
+        /\([A-Z][a-z]+(?:\s(?:et\s+al\.?|and|&)\s*[A-Z][a-z]+)*,?\s*\d{4}[a-z]?\)/,  // (Author, 2020) or (Author et al., 2020)
+        /\[[\d,;\s-]+\]/,                          // [1] or [1, 2] or [1-3]
+        /\([A-Z][a-z]+\s+\d{4}[a-z]?\)/,           // (Smith 2020)
+        /\([A-Z][a-z]+(?:\s+&\s+[A-Z][a-z]+)+,?\s*\d{4}\)/, // (Smith & Jones, 2020)
+        /\((?:see|cf\.?)\s+[A-Z][a-z]+/,            // (see Author...) or (cf. Author...)
+        /\([Ii]bid\.?\)/,                           // (ibid.) or (Ibid)
+    ];
+    return citationPatterns.some(p => p.test(context));
+}
+
+// Classify source type based on CORE API work metadata
+function classifySourceType(work: Record<string, unknown>): string {
+    const doi = work.doi as string | undefined;
+    const urls = work.links as { url?: string; type?: string }[] | undefined;
+    const downloadUrl = work.downloadUrl as string | undefined;
+    const hasUrl = (urls && urls.length > 0) || !!downloadUrl;
+
+    // If it has a DOI, it's a formal publication
+    if (doi) return "Publication";
+    // If it only has URLs but no DOI, treat as Internet source
+    if (hasUrl) return "Internet";
+    // Default to publication
+    return "Publication";
+}
+
 // Call CORE API to search for works
 async function searchCoreAPI(
     apiKey: string,
@@ -270,7 +317,7 @@ export async function POST() {
                             url,
                             matchPercentage,
                             matchedSentences: matches,
-                            sourceType: "Publication",
+                            sourceType: classifySourceType(work),
                         });
                     }
                 }
@@ -288,12 +335,62 @@ export async function POST() {
                 }
                 const overallScore = Math.round((matchedSentenceIndices.size / sentences.length) * 100);
 
+                // ─── Classify matched sentences into Match Groups ───
+                let notCitedOrQuoted = 0;
+                let missingQuotations = 0;
+                let missingCitation = 0;
+                let citedAndQuoted = 0;
+
+                for (const sentIdx of matchedSentenceIndices) {
+                    const sent = sentences[sentIdx];
+                    const quoted = isQuoted(inputText, sent);
+                    const cited = hasCitation(inputText, sent);
+
+                    if (cited && quoted) {
+                        citedAndQuoted++;
+                    } else if (quoted && !cited) {
+                        missingCitation++;
+                    } else if (cited && !quoted) {
+                        missingQuotations++;
+                    } else {
+                        notCitedOrQuoted++;
+                    }
+                }
+
+                const totalMatched = matchedSentenceIndices.size || 1;
+                const matchGroups = {
+                    notCitedOrQuoted: { count: notCitedOrQuoted, percent: Math.round((notCitedOrQuoted / sentences.length) * 100) },
+                    missingQuotations: { count: missingQuotations, percent: Math.round((missingQuotations / sentences.length) * 100) },
+                    missingCitation: { count: missingCitation, percent: Math.round((missingCitation / sentences.length) * 100) },
+                    citedAndQuoted: { count: citedAndQuoted, percent: Math.round((citedAndQuoted / sentences.length) * 100) },
+                };
+
+                // ─── Source type breakdown ───
+                const topSources = matchedSources.slice(0, 20);
+                const internetPct = topSources
+                    .filter(src => src.sourceType === "Internet")
+                    .reduce((sum, src) => sum + src.matchPercentage, 0);
+                const publicationPct = topSources
+                    .filter(src => src.sourceType === "Publication")
+                    .reduce((sum, src) => sum + src.matchPercentage, 0);
+                const studentPct = topSources
+                    .filter(src => src.sourceType === "Student papers")
+                    .reduce((sum, src) => sum + src.matchPercentage, 0);
+
+                const sourceTypeBreakdown = {
+                    internet: Math.round(internetPct),
+                    publications: Math.round(publicationPct),
+                    studentPapers: Math.round(studentPct),
+                };
+
                 const result = {
                     overallScore,
                     totalSentences: sentences.length,
                     matchedSentenceCount: matchedSentenceIndices.size,
-                    sources: matchedSources.slice(0, 20), // Top 20 sources
+                    sources: topSources,
                     matchedSentenceIndices: Array.from(matchedSentenceIndices).sort((a, b) => a - b),
+                    matchGroups,
+                    sourceTypeBreakdown,
                 };
 
                 // Save results

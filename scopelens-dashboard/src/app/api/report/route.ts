@@ -241,6 +241,8 @@ export async function POST(request: NextRequest) {
                     sources: plagiarismResult.sources ?? [],
                     totalWords: scan.word_count ?? 0,
                     customLogoSrc: customLogoData,
+                    matchGroups: plagiarismResult.matchGroups ?? undefined,
+                    sourceTypeBreakdown: plagiarismResult.sourceTypeBreakdown ?? undefined,
                 }) as any
             );
 
