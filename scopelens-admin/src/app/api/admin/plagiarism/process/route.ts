@@ -14,15 +14,24 @@ function splitSentences(text: string): string[] {
     return raw;
 }
 
-// Build search queries from sentence groups
-function buildSearchQueries(sentences: string[], groupSize: number = 3): string[] {
-    const queries: string[] = [];
+// Build search queries from sentence groups, evenly sampled across the document
+function buildSearchQueries(sentences: string[], groupSize: number = 3, maxQueries: number = 15): string[] {
+    // Build all possible groups
+    const allGroups: string[] = [];
     for (let i = 0; i < sentences.length; i += groupSize) {
         const group = sentences.slice(i, i + groupSize);
-        // Take first 200 chars from each sentence for the query
         const query = group.map(s => s.substring(0, 200)).join(" ");
-        // CORE API has a query length limit, truncate to ~500 chars
-        queries.push(query.substring(0, 500));
+        allGroups.push(query.substring(0, 500));
+    }
+
+    // If within cap, return all
+    if (allGroups.length <= maxQueries) return allGroups;
+
+    // Evenly sample across the full document
+    const queries: string[] = [];
+    const step = allGroups.length / maxQueries;
+    for (let i = 0; i < maxQueries; i++) {
+        queries.push(allGroups[Math.floor(i * step)]);
     }
     return queries;
 }
@@ -305,10 +314,9 @@ export async function POST() {
                     continue;
                 }
 
-                // Build search queries from sentence groups — cap at 15 to avoid excessive API calls
-                const allQueries = buildSearchQueries(sentences, 3);
-                const searchQueries = allQueries.slice(0, 15);
-                console.log(`[PLAG]   Search queries built: ${allQueries.length}, using: ${searchQueries.length} (capped at 15)`);
+                // Build search queries — evenly sampled across document, max 15
+                const searchQueries = buildSearchQueries(sentences, 3, 15);
+                console.log(`[PLAG]   Search queries: ${searchQueries.length} (from ${Math.ceil(sentences.length / 3)} possible groups, evenly sampled)`);
                 for (let qi = 0; qi < Math.min(searchQueries.length, 3); qi++) {
                     console.log(`[PLAG]   Query ${qi + 1}: "${searchQueries[qi].substring(0, 120)}..."`);
                 }
