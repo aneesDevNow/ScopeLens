@@ -65,7 +65,9 @@ function findMatchingSentences(
     threshold: number = 0.25
 ): { index: number; sentence: string; similarity: number }[] {
     const matches: { index: number; sentence: string; similarity: number }[] = [];
-    const sourceWords = sourceText.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter(w => w.length > 2);
+    // Cap source text to first 50,000 chars to prevent huge sliding window operations
+    const cappedSource = sourceText.length > 50000 ? sourceText.substring(0, 50000) : sourceText;
+    const sourceWords = cappedSource.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter(w => w.length > 2);
 
     for (let i = 0; i < sentences.length; i++) {
         const sentWords = sentences[i].toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter(w => w.length > 2);
@@ -75,11 +77,11 @@ function findMatchingSentences(
 
         if (sourceWords.length <= 80) {
             // Short source (abstract-only): compare directly
-            bestSim = calculateSimilarity(sentences[i], sourceText);
+            bestSim = calculateSimilarity(sentences[i], cappedSource);
         } else {
             // Long source (full text): use sliding window
             const windowSize = Math.max(sentWords.length * 3, 40);
-            const step = Math.max(Math.floor(windowSize / 3), 5);
+            const step = Math.max(Math.floor(windowSize / 2), 10);
 
             for (let w = 0; w <= sourceWords.length - windowSize; w += step) {
                 const windowText = sourceWords.slice(w, w + windowSize).join(" ");
@@ -303,9 +305,10 @@ export async function POST() {
                     continue;
                 }
 
-                // Build search queries from sentence groups
-                const searchQueries = buildSearchQueries(sentences, 3);
-                console.log(`[PLAG]   Search queries built: ${searchQueries.length}`);
+                // Build search queries from sentence groups — cap at 15 to avoid excessive API calls
+                const allQueries = buildSearchQueries(sentences, 3);
+                const searchQueries = allQueries.slice(0, 15);
+                console.log(`[PLAG]   Search queries built: ${allQueries.length}, using: ${searchQueries.length} (capped at 15)`);
                 for (let qi = 0; qi < Math.min(searchQueries.length, 3); qi++) {
                     console.log(`[PLAG]   Query ${qi + 1}: "${searchQueries[qi].substring(0, 120)}..."`);
                 }
@@ -316,8 +319,13 @@ export async function POST() {
                     compareText: string;
                 }>();
 
+                const MAX_SOURCES = 50; // Cap total unique sources to avoid slow comparisons
                 let queryIdx = 0;
                 for (const query of searchQueries) {
+                    if (sourceMap.size >= MAX_SOURCES) {
+                        console.log(`[PLAG]   Source cap reached (${MAX_SOURCES}), skipping remaining queries`);
+                        break;
+                    }
                     queryIdx++;
                     const results = await searchCoreAPI(account.api_key, query, 10);
                     console.log(`[PLAG]   CORE API query ${queryIdx}/${searchQueries.length}: ${results.length} results returned`);
