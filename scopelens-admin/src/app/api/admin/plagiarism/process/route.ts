@@ -212,7 +212,27 @@ export async function POST() {
         const account = accounts[0];
         console.log(`[PLAG] ✅ Using CORE API account: ${account.id} (${account.total_requests} total requests so far)`);
 
-        // 2. Fetch waiting items from plagiarism_queue
+        // 2. Recover stale "processing" items (stuck after server restart)
+        const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000).toISOString();
+        const { data: staleItems } = await supabase
+            .from("plagiarism_queue")
+            .update({ status: "waiting", started_at: null })
+            .eq("status", "processing")
+            .lt("started_at", fiveMinAgo)
+            .select("id");
+
+        if (staleItems && staleItems.length > 0) {
+            console.log(`[PLAG] ♻️ Recovered ${staleItems.length} stale processing items: ${staleItems.map(s => s.id).join(", ")}`);
+            // Also reset their scan status
+            for (const stale of staleItems) {
+                await supabase
+                    .from("scans")
+                    .update({ status: "pending" })
+                    .eq("id", stale.id);
+            }
+        }
+
+        // 3. Fetch waiting items from plagiarism_queue
         const { data: queueItems, error: queueError } = await supabase
             .from("plagiarism_queue")
             .select("*")
