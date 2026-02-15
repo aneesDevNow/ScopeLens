@@ -61,7 +61,7 @@ function buildSearchQueries(sentences: string[], groupSize: number = 2, maxQueri
     return queries;
 }
 
-// N-gram overlap + word containment similarity between two texts
+// N-gram overlap similarity between two texts (word-level bigrams)
 function calculateSimilarity(text1: string, text2: string): number {
     const normalize = (t: string) =>
         t.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter(w => w.length > 2);
@@ -71,7 +71,7 @@ function calculateSimilarity(text1: string, text2: string): number {
 
     if (words1.length < 3 || words2.length < 3) return 0;
 
-    // Method 1: Bigram Dice coefficient
+    // Bigram Dice coefficient
     const bigrams1 = new Set<string>();
     for (let i = 0; i < words1.length - 1; i++) {
         bigrams1.add(`${words1[i]}_${words1[i + 1]}`);
@@ -84,26 +84,15 @@ function calculateSimilarity(text1: string, text2: string): number {
     for (const bg of bigrams1) {
         if (bigrams2.has(bg)) intersection++;
     }
-    const diceSim = (bigrams1.size + bigrams2.size === 0) ? 0 :
+    return (bigrams1.size + bigrams2.size === 0) ? 0 :
         (2.0 * intersection) / (bigrams1.size + bigrams2.size);
-
-    // Method 2: Word containment — what fraction of sentence words appear in source?
-    const sourceWordSet = new Set(words2);
-    let contained = 0;
-    for (const w of words1) {
-        if (sourceWordSet.has(w)) contained++;
-    }
-    const containment = contained / words1.length;
-
-    // Use the higher of the two signals (containment scaled to 0.7x to avoid false positives from common words)
-    return Math.max(diceSim, containment * 0.7);
 }
 
 // Find which sentences match a source using sliding-window comparison
 function findMatchingSentences(
     sentences: string[],
     sourceText: string,
-    threshold: number = 0.18
+    threshold: number = 0.22
 ): { index: number; sentence: string; similarity: number }[] {
     const matches: { index: number; sentence: string; similarity: number }[] = [];
     // Cap source text to first 100,000 chars for performance
@@ -409,7 +398,7 @@ export async function POST() {
 
                 for (const [, { work, compareText }] of sourceMap) {
                     sourceIdx++;
-                    const matches = findMatchingSentences(sentences, compareText, 0.18);
+                    const matches = findMatchingSentences(sentences, compareText, 0.22);
 
                     if (matches.length > 0) {
                         const matchPercentage = Math.round((matches.length / sentences.length) * 100);
@@ -430,7 +419,12 @@ export async function POST() {
                             : null;
 
                         const urls = work.links as { url?: string; type?: string }[] | undefined;
-                        const url = (urls && urls.length > 0 ? urls[0].url : (work.downloadUrl as string)) ?? null;
+                        const doi = (work.doi as string) || null;
+                        // Prefer DOI URL > source homepage > download URL (avoid raw CORE links)
+                        const url = doi
+                            ? `https://doi.org/${doi}`
+                            : (urls && urls.length > 0 ? urls[0].url : null)
+                            ?? null;
 
                         matchedSources.push({
                             title: (work.title as string) || "Untitled",
