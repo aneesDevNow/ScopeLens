@@ -210,6 +210,7 @@ export async function POST() {
         }
 
         const account = accounts[0];
+        console.log(`[PLAG] ✅ Using CORE API account: ${account.id} (${account.total_requests} total requests so far)`);
 
         // 2. Fetch waiting items from plagiarism_queue
         const { data: queueItems, error: queueError } = await supabase
@@ -224,8 +225,11 @@ export async function POST() {
         }
 
         if (!queueItems || queueItems.length === 0) {
+            console.log("[PLAG] No waiting items in queue.");
             return NextResponse.json({ processed: 0, remaining: 0 });
         }
+
+        console.log(`[PLAG] 📋 Found ${queueItems.length} waiting items in plagiarism_queue`);
 
         let processedCount = 0;
 
@@ -245,6 +249,14 @@ export async function POST() {
 
                 const inputText = item.input_text;
                 const sentences = splitSentences(inputText);
+
+                console.log(`[PLAG] ── Item ${item.id} (scan: ${item.scan_id}) ──`);
+                console.log(`[PLAG]   Input text length: ${inputText.length} chars`);
+                console.log(`[PLAG]   Sentences extracted: ${sentences.length}`);
+                if (sentences.length > 0) {
+                    console.log(`[PLAG]   First sentence: "${sentences[0].substring(0, 100)}..."`);
+                    console.log(`[PLAG]   Last sentence: "${sentences[sentences.length - 1].substring(0, 100)}..."`);
+                }
 
                 if (sentences.length === 0) {
                     // No sentences to check — mark as completed with 0%
@@ -273,6 +285,10 @@ export async function POST() {
 
                 // Build search queries from sentence groups
                 const searchQueries = buildSearchQueries(sentences, 3);
+                console.log(`[PLAG]   Search queries built: ${searchQueries.length}`);
+                for (let qi = 0; qi < Math.min(searchQueries.length, 3); qi++) {
+                    console.log(`[PLAG]   Query ${qi + 1}: "${searchQueries[qi].substring(0, 120)}..."`);
+                }
 
                 // Collect all unique sources from CORE API results
                 const sourceMap = new Map<string, {
@@ -280,8 +296,11 @@ export async function POST() {
                     compareText: string;
                 }>();
 
+                let queryIdx = 0;
                 for (const query of searchQueries) {
-                    const results = await searchCoreAPI(account.api_key, query, 5);
+                    queryIdx++;
+                    const results = await searchCoreAPI(account.api_key, query, 10);
+                    console.log(`[PLAG]   CORE API query ${queryIdx}/${searchQueries.length}: ${results.length} results returned`);
 
                     for (const work of results as Record<string, unknown>[]) {
                         const workId = (work.id as string) || (work.doi as string) || (work.title as string) || "";
@@ -298,6 +317,8 @@ export async function POST() {
 
                         if (compareText.length > 30) {
                             sourceMap.set(workId, { work, compareText });
+                            const hasFullText = fullTextField.length > 100;
+                            console.log(`[PLAG]     + Source: "${((work.title as string) || 'Untitled').substring(0, 80)}" | fullText: ${hasFullText ? 'YES (' + fullTextField.length + ' chars)' : 'NO (using abstract ' + compareText.length + ' chars)'} | type: ${classifySourceType(work)} | DOI: ${(work.doi as string) || 'none'}`);
                         }
                     }
 
@@ -312,14 +333,24 @@ export async function POST() {
                     await sleep(150);
                 }
 
+                console.log(`[PLAG]   Total unique sources collected: ${sourceMap.size}`);
+
                 // Compare each source against document sentences
                 const matchedSources: MatchedSource[] = [];
+                let sourceIdx = 0;
 
                 for (const [, { work, compareText }] of sourceMap) {
+                    sourceIdx++;
                     const matches = findMatchingSentences(sentences, compareText, 0.25);
 
                     if (matches.length > 0) {
                         const matchPercentage = Math.round((matches.length / sentences.length) * 100);
+                        const avgSim = matches.reduce((s, m) => s + m.similarity, 0) / matches.length;
+                        console.log(`[PLAG]   🔍 Source ${sourceIdx}: "${((work.title as string) || 'Untitled').substring(0, 60)}" → ${matches.length} matched sentences (${matchPercentage}%), avg similarity: ${(avgSim * 100).toFixed(1)}%`);
+                        for (const m of matches.slice(0, 3)) {
+                            console.log(`[PLAG]       Sentence #${m.index} (sim: ${(m.similarity * 100).toFixed(1)}%): "${m.sentence.substring(0, 100)}..."`);
+                        }
+                        if (matches.length > 3) console.log(`[PLAG]       ... and ${matches.length - 3} more matches`);
 
                         // Extract source metadata
                         const authors = Array.isArray(work.authors)
@@ -343,6 +374,8 @@ export async function POST() {
                             matchedSentences: matches,
                             sourceType: classifySourceType(work),
                         });
+                    } else {
+                        console.log(`[PLAG]   ⬜ Source ${sourceIdx}: "${((work.title as string) || 'Untitled').substring(0, 60)}" → 0 matches`);
                     }
                 }
 
@@ -358,6 +391,13 @@ export async function POST() {
                     }
                 }
                 const overallScore = Math.round((matchedSentenceIndices.size / sentences.length) * 100);
+
+                console.log(`[PLAG]   ═══════════════════════════════════════`);
+                console.log(`[PLAG]   📊 RESULTS: Overall Score = ${overallScore}%`);
+                console.log(`[PLAG]      Total sentences: ${sentences.length}`);
+                console.log(`[PLAG]      Matched sentences: ${matchedSentenceIndices.size}`);
+                console.log(`[PLAG]      Matched sources: ${matchedSources.length}`);
+                console.log(`[PLAG]   ═══════════════════════════════════════`);
 
                 // ─── Classify matched sentences into Match Groups ───
                 let notCitedOrQuoted = 0;
@@ -380,6 +420,8 @@ export async function POST() {
                         notCitedOrQuoted++;
                     }
                 }
+
+                console.log(`[PLAG]   Match Groups: NotCited=${notCitedOrQuoted}, MissingQuotes=${missingQuotations}, MissingCite=${missingCitation}, CitedQuoted=${citedAndQuoted}`);
 
                 const totalMatched = matchedSentenceIndices.size || 1;
                 const matchGroups = {
@@ -406,6 +448,8 @@ export async function POST() {
                     publications: Math.round(publicationPct),
                     studentPapers: Math.round(studentPct),
                 };
+
+                console.log(`[PLAG]   Source Types: Internet=${Math.round(internetPct)}%, Publications=${Math.round(publicationPct)}%, StudentPapers=${Math.round(studentPct)}%`);
 
                 const result = {
                     overallScore,
@@ -438,6 +482,7 @@ export async function POST() {
                     .eq("id", item.scan_id);
 
                 processedCount++;
+                console.log(`[PLAG]   ✅ Item ${item.id} completed. Score: ${overallScore}%`);
 
             } catch (itemError) {
                 console.error(`Error processing plagiarism queue item ${item.id}:`, itemError);
@@ -479,8 +524,8 @@ export async function POST() {
             remaining: remaining || 0,
         });
 
-    } catch (error) {
-        console.error("Plagiarism process error:", error);
+    } catch (error: unknown) {
+        console.error("[PLAG] ❌ Plagiarism process error:", error);
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });
     }
 }
