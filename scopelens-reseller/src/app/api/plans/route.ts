@@ -13,7 +13,7 @@ export async function GET() {
         // Get all active plans with reseller pricing
         const { data: plans, error } = await supabase
             .from("plans")
-            .select("id, name, slug, price_monthly, price_yearly, reseller_price_monthly, reseller_price_yearly, reseller_discount_percent, scans_per_day, features, is_active")
+            .select("id, name, slug, price_monthly, price_yearly, reseller_price_monthly, reseller_price_yearly, reseller_discount_percent, credits, features, is_active")
             .eq("is_active", true)
             .order("price_monthly", { ascending: true });
 

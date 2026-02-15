@@ -69,7 +69,7 @@ export async function POST(request: Request) {
                 slug: body.slug,
                 price_monthly: body.priceMonthly,
                 price_yearly: body.priceYearly,
-                scans_per_day: body.scansPerDay,
+                credits: body.credits,
                 features: body.features || [],
                 is_active: true,
             })

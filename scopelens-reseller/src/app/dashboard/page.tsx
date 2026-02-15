@@ -23,7 +23,7 @@ interface Plan {
     slug: string;
     price_monthly: number;
     reseller_price_monthly: number;
-    scans_per_day: number;
+    credits: number;
 }
 
 interface LicenseKey {

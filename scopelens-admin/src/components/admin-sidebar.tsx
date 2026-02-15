@@ -22,6 +22,7 @@ const allNavItems = [
     { title: "Users", url: "/users", icon: "group" },
     { title: "Plans", url: "/plans", icon: "credit_card" },
     { title: "AI Detection", url: "/ai-detection", icon: "smart_toy" },
+    { title: "Plagiarism", url: "/plagiarism", icon: "plagiarism" },
     { title: "Analytics", url: "/analytics", icon: "analytics" },
     { title: "Resellers", url: "/resellers", icon: "handshake" },
     { title: "Work Purchases", url: "/licenses", icon: "key" },
@@ -30,7 +31,7 @@ const allNavItems = [
     { title: "Settings", url: "/settings", icon: "settings" },
 ];
 
-const managerAllowedUrls = ["/licenses", "/ai-detection"];
+const managerAllowedUrls = ["/licenses", "/ai-detection", "/plagiarism"];
 
 export function AdminSidebar() {
     const pathname = usePathname();

@@ -1,13 +1,5 @@
 import { NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-
-function getAdminClient() {
-    return createSupabaseClient(
-        process.env.SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
-}
 
 export async function GET() {
     try {
@@ -52,8 +44,10 @@ export async function GET() {
                 subscription: null,
                 plan: freePlan,
                 usage: {
-                    scans_used: count || 0,
-                    scans_limit: freePlan?.scans_per_day || 1,
+                    credits_remaining: Math.max(0, (freePlan?.credits || 1) - (count || 0)),
+                    credits_total: freePlan?.credits || 1,
+                    credits_expires_at: null,
+                    is_free_tier: true,
                 },
             })
         }
@@ -80,8 +74,10 @@ export async function GET() {
                 subscription: null,
                 plan: freePlan,
                 usage: {
-                    scans_used: count || 0,
-                    scans_limit: freePlan?.scans_per_day || 1,
+                    credits_remaining: Math.max(0, (freePlan?.credits || 1) - (count || 0)),
+                    credits_total: freePlan?.credits || 1,
+                    credits_expires_at: null,
+                    is_free_tier: true,
                 },
             })
         }
@@ -93,34 +89,14 @@ export async function GET() {
             .eq('id', subscription.plan_id)
             .single()
 
-        // Lazy daily reset — if a new day has started, reset scans_used
-        let scansUsed = subscription.scans_used || 0
-        const currentPeriodStart = new Date(subscription.current_period_start)
-        const nextBillingDate = new Date(currentPeriodStart)
-        nextBillingDate.setDate(nextBillingDate.getDate() + 1)
-
-        if (now >= nextBillingDate) {
-            const adminClient = getAdminClient()
-            const { error: resetError } = await adminClient
-                .from('subscriptions')
-                .update({
-                    scans_used: 0,
-                    current_period_start: now.toISOString(),
-                    updated_at: now.toISOString()
-                })
-                .eq('id', subscription.id)
-
-            if (!resetError) {
-                scansUsed = 0
-            }
-        }
-
         return NextResponse.json({
             subscription,
             plan: plan,
             usage: {
-                scans_used: scansUsed,
-                scans_limit: plan?.scans_per_day || 0,
+                credits_remaining: subscription.credits_remaining ?? 0,
+                credits_total: plan?.credits || 0,
+                credits_expires_at: subscription.credits_expires_at || null,
+                is_free_tier: false,
             },
         })
     } catch (err) {

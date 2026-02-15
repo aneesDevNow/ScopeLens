@@ -9,7 +9,7 @@ interface Plan {
     slug: string;
     price_monthly: number;
     price_yearly: number;
-    scans_per_day: number;
+    credits: number;
     features: string[];
     is_popular?: boolean;
 }

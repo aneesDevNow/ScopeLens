@@ -8,7 +8,7 @@ interface Plan {
   slug: string;
   price_monthly: number;
   price_yearly: number | null;
-  scans_per_day: number;
+  credits: number;
   features: Record<string, boolean>;
   is_active: boolean;
 }

@@ -10,7 +10,7 @@ interface Plan {
     name: string;
     slug: string;
     price_monthly: number;
-    scans_per_day: number;
+    credits: number;
 }
 
 function ScopeLensLogo() {
@@ -136,8 +136,8 @@ function ThankYouContent() {
                                 <span className="font-medium text-slate-700">{plan?.name || "Pro Plan"}</span>
                             </div>
                             <div className="flex justify-between py-1.5 border-b border-slate-100">
-                                <span className="text-slate-500">Daily Scans</span>
-                                <span className="font-medium text-slate-700">{plan?.scans_per_day?.toLocaleString() || "Unlimited"}</span>
+                                <span className="text-slate-500">Credits</span>
+                                <span className="font-medium text-slate-700">{plan?.credits?.toLocaleString() || "Unlimited"}</span>
                             </div>
                             <div className="flex justify-between py-1.5 border-b border-slate-100">
                                 <span className="text-slate-500">Amount Paid</span>

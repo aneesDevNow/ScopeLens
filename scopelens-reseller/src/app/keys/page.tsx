@@ -11,7 +11,7 @@ interface Plan {
     price_monthly: number;
     reseller_price_monthly: number;
     reseller_discount_percent: number;
-    scans_per_day: number;
+    credits: number;
 }
 
 interface GeneratedKey {
@@ -149,7 +149,7 @@ export default function GenerateKeysPage() {
                                 >
                                     <div>
                                         <p className="font-semibold text-slate-700">{plan.name}</p>
-                                        <p className="text-sm text-slate-500">{plan.scans_per_day} scans/day</p>
+                                        <p className="text-sm text-slate-500">{plan.credits} credits</p>
                                     </div>
                                     <div className="text-right">
                                         <p className="font-bold text-primary">{formatPrice(Number(plan.reseller_price_monthly))}/key</p>

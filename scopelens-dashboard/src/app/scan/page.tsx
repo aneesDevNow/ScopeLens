@@ -7,11 +7,13 @@ interface Subscription {
   subscription: unknown | null;
   plan: {
     name: string;
-    scans_per_day: number;
+    credits: number;
   } | null;
   usage: {
-    scans_used: number;
-    scans_limit: number;
+    credits_remaining: number;
+    credits_total: number;
+    credits_expires_at: string | null;
+    is_free_tier: boolean;
   };
 }
 
@@ -20,6 +22,8 @@ interface Scan {
   file_name: string;
   status: string;
   ai_score: number | null;
+  scan_type: string;
+  plagiarism_score: number | null;
   created_at: string;
 }
 
@@ -33,6 +37,7 @@ export default function UploadHubPage() {
   const [uploadProgress, setUploadProgress] = useState<string>("");
   const [isDragging, setIsDragging] = useState(false);
   const [downloading, setDownloading] = useState<string | null>(null);
+  const [scanType, setScanType] = useState<"ai" | "plagiarism">("ai");
 
   const fetchScans = async () => {
     try {
@@ -90,8 +95,11 @@ export default function UploadHubPage() {
       return;
     }
     // Check remaining credits client-side
-    if (creditsRemaining <= 0) {
-      setUploadProgress("File limit reached. Upgrade your plan to scan more.");
+    const creditCost = scanType === "plagiarism" ? 2 : 1;
+    if (creditsRemaining < creditCost) {
+      setUploadProgress(scanType === "plagiarism"
+        ? "Plagiarism scans require 2 credits. Not enough credits remaining."
+        : "File limit reached. Upgrade your plan to scan more.");
       setTimeout(() => setUploadProgress(""), 3000);
       return;
     }
@@ -102,6 +110,7 @@ export default function UploadHubPage() {
     try {
       const formData = new FormData();
       formData.append("file", file);
+      formData.append("scanType", scanType);
 
       const response = await fetch("/api/upload", {
         method: "POST",
@@ -151,9 +160,9 @@ export default function UploadHubPage() {
     if (file) handleUpload(file);
   };
 
-  const scansCompleted = subscription?.usage?.scans_used || 0;
-  const scansLimit = subscription?.usage?.scans_limit || 5;
-  const creditsRemaining = scansLimit - scansCompleted;
+  const creditsRemaining = subscription?.usage?.credits_remaining ?? 0;
+  const creditsTotal = subscription?.usage?.credits_total ?? 0;
+  const isFreeTier = subscription?.usage?.is_free_tier ?? true;
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -182,7 +191,7 @@ export default function UploadHubPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${scan.file_name?.replace(/\.[^/.]+$/, "") || "report"}_ai_report.pdf`;
+      a.download = `${scan.file_name?.replace(/\.[^/.]+$/, "") || "report"}_${scan.scan_type === "plagiarism" ? "plagiarism" : "ai"}_report.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -201,7 +210,51 @@ export default function UploadHubPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-slate-700 mb-2">Upload Hub</h1>
-          <p className="text-slate-500">Upload documents to scan for AI-generated content</p>
+          <p className="text-slate-500">Upload documents to scan for AI-generated or plagiarized content</p>
+        </div>
+
+        {/* Scan Type Toggle */}
+        <div className="flex gap-3 mb-8">
+          <button
+            onClick={() => setScanType("ai")}
+            className={`flex-1 p-4 rounded-2xl border-2 transition-all duration-200 ${scanType === "ai"
+              ? "border-blue-500 bg-blue-50 shadow-lg shadow-blue-100"
+              : "border-slate-200 bg-white hover:border-slate-300"
+              }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${scanType === "ai" ? "bg-blue-100" : "bg-slate-100"
+                }`}>
+                <svg className={`w-5 h-5 ${scanType === "ai" ? "text-blue-600" : "text-slate-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <p className={`font-semibold ${scanType === "ai" ? "text-blue-700" : "text-slate-600"}`}>AI Detection</p>
+                <p className="text-xs text-slate-400">1 credit per scan</p>
+              </div>
+            </div>
+          </button>
+          <button
+            onClick={() => setScanType("plagiarism")}
+            className={`flex-1 p-4 rounded-2xl border-2 transition-all duration-200 ${scanType === "plagiarism"
+              ? "border-orange-500 bg-orange-50 shadow-lg shadow-orange-100"
+              : "border-slate-200 bg-white hover:border-slate-300"
+              }`}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center ${scanType === "plagiarism" ? "bg-orange-100" : "bg-slate-100"
+                }`}>
+                <svg className={`w-5 h-5 ${scanType === "plagiarism" ? "text-orange-600" : "text-slate-400"}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
+              <div className="text-left">
+                <p className={`font-semibold ${scanType === "plagiarism" ? "text-orange-700" : "text-slate-600"}`}>Plagiarism Check</p>
+                <p className="text-xs text-slate-400">2 credits per scan</p>
+              </div>
+            </div>
+          </button>
         </div>
 
         {/* Stats Cards */}
@@ -216,8 +269,8 @@ export default function UploadHubPage() {
                 </svg>
               </div>
             </div>
-            <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : scansCompleted}</div>
-            <p className="text-slate-400 text-sm">Scans Completed</p>
+            <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : (creditsTotal - creditsRemaining)}</div>
+            <p className="text-slate-400 text-sm">Credits Used</p>
           </div>
 
           {/* Scans Remaining */}
@@ -231,7 +284,7 @@ export default function UploadHubPage() {
               </div>
             </div>
             <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : creditsRemaining}</div>
-            <p className="text-slate-400 text-sm">Scans Remaining</p>
+            <p className="text-slate-400 text-sm">Credits Remaining</p>
           </div>
 
           {/* Current Plan */}
@@ -245,7 +298,7 @@ export default function UploadHubPage() {
               </div>
             </div>
             <div className="text-4xl font-bold text-slate-700 mb-1">{loading ? "..." : subscription?.plan?.name || "Free"}</div>
-            <p className="text-slate-400 text-sm">{scansLimit} scans/day</p>
+            <p className="text-slate-400 text-sm">{isFreeTier ? `${creditsTotal}/day` : `${creditsTotal} credits`}</p>
           </div>
         </div>
 
@@ -284,7 +337,7 @@ export default function UploadHubPage() {
                   {isDragging ? "Drop your file here" : "Drop your files here"}
                 </h3>
                 <p className="text-slate-500 mb-4">or click to browse from your computer</p>
-                <p className="text-sm text-slate-400">Supports DOCX, TXT up to 20MB • {creditsRemaining} scan{creditsRemaining !== 1 ? 's' : ''} remaining</p>
+                <p className="text-sm text-slate-400">Supports DOCX, TXT up to 20MB • {creditsRemaining} credit{creditsRemaining !== 1 ? 's' : ''} remaining • {scanType === "plagiarism" ? "Plagiarism" : "AI"} scan</p>
               </div>
             )}
           </div>
@@ -337,12 +390,21 @@ export default function UploadHubPage() {
                     <div className="flex items-center gap-3">
                       {scan.status === "completed" ? (
                         <>
-                          <div className={`px-3 py-1.5 rounded-full text-sm font-semibold ${(scan.ai_score || 0) > 50
-                            ? 'bg-red-100 text-red-700'
-                            : 'bg-green-100 text-green-700'
-                            }`}>
-                            {scan.ai_score}% AI
-                          </div>
+                          {scan.scan_type === "plagiarism" ? (
+                            <div className={`px-3 py-1.5 rounded-full text-sm font-semibold ${(scan.plagiarism_score || 0) > 30
+                              ? 'bg-red-100 text-red-700'
+                              : 'bg-green-100 text-green-700'
+                              }`}>
+                              {scan.plagiarism_score ?? 0}% Plagiarized
+                            </div>
+                          ) : (
+                            <div className={`px-3 py-1.5 rounded-full text-sm font-semibold ${(scan.ai_score || 0) > 50
+                              ? 'bg-red-100 text-red-700'
+                              : 'bg-green-100 text-green-700'
+                              }`}>
+                              {scan.ai_score}% AI
+                            </div>
+                          )}
                           <button
                             onClick={() => handleDownloadReport(scan)}
                             disabled={downloading === scan.id}

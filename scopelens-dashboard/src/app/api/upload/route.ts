@@ -69,7 +69,28 @@ function countWords(text: string): number {
 }
 
 const MAX_FILE_SIZE = 20 * 1024 * 1024; // 20MB
-const MAX_WORD_COUNT = 5000;
+const DEFAULT_WORD_LIMIT = 5000;
+
+// Fetch word limit from system_settings table (fallback to default)
+async function getWordLimit(): Promise<number> {
+    try {
+        const adminClient = getAdminClient();
+        const { data, error } = await adminClient
+            .from("system_settings")
+            .select("value")
+            .eq("key", "word_limit")
+            .single();
+
+        if (!error && data?.value) {
+            const limit = parseInt(data.value);
+            if (!isNaN(limit) && limit >= 100) return limit;
+        }
+    } catch {
+        // Silently fall back to default
+    }
+    return DEFAULT_WORD_LIMIT;
+}
+
 
 export async function POST(request: NextRequest) {
     try {
@@ -94,6 +115,14 @@ export async function POST(request: NextRequest) {
         // Parse form data
         const formData = await request.formData();
         const file = formData.get("file") as File | null;
+        const scanType = (formData.get("scanType") as string) || "ai";
+
+        // Validate scan type
+        if (!["ai", "plagiarism"].includes(scanType)) {
+            return NextResponse.json({ error: "Invalid scan type. Must be 'ai' or 'plagiarism'." }, { status: 400 });
+        }
+
+        const creditCost = scanType === "plagiarism" ? 2 : 1;
 
         if (!file) {
             return NextResponse.json({ error: "No file provided" }, { status: 400 });
@@ -131,7 +160,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // --- File count enforcement against subscription plan ---
+        // --- Credit-based scan enforcement ---
         const now = new Date();
 
         // Get user's active subscription and plan limits
@@ -146,51 +175,37 @@ export async function POST(request: NextRequest) {
             console.error("Error fetching subscription:", subError);
         }
 
-        let scansLimit = 1; // Free tier default
-        let scansUsed = 0;
         let isFreeTier = true;
 
         if (subscription && subscription.plans) {
             const currentPeriodEnd = new Date(subscription.current_period_end);
 
-            // Check STRICT Expiry
             if (currentPeriodEnd < now) {
                 // Subscription expired — fall back to free tier
                 console.log(`Subscription ${subscription.id} expired on ${currentPeriodEnd.toISOString()}`);
                 isFreeTier = true;
             } else {
-                // Subscription is valid
                 isFreeTier = false;
-                scansLimit = (subscription.plans as { scans_per_day: number }).scans_per_day || 1;
 
-                // --- LAZY RESET LOGIC ---
-                // Check if we need to start a new billing day
-                const currentPeriodStart = new Date(subscription.current_period_start);
-                const nextBillingDate = new Date(currentPeriodStart);
-                nextBillingDate.setDate(nextBillingDate.getDate() + 1);
+                // Check credit expiration
+                const creditsExpiresAt = subscription.credits_expires_at
+                    ? new Date(subscription.credits_expires_at)
+                    : null;
 
-                if (now >= nextBillingDate) {
-                    // It's a new day! Reset usage.
-                    console.log(`Resetting usage for subscription ${subscription.id}. New day starts.`);
+                if (creditsExpiresAt && creditsExpiresAt < now) {
+                    return NextResponse.json(
+                        { error: "Your credits have expired. Please renew your plan or purchase more credits." },
+                        { status: 403 }
+                    );
+                }
 
-                    const adminClient = getAdminClient();
-                    const { error: resetError } = await adminClient
-                        .from("subscriptions")
-                        .update({
-                            scans_used: 0,
-                            current_period_start: now.toISOString(),
-                            updated_at: now.toISOString()
-                        })
-                        .eq("id", subscription.id);
-
-                    if (!resetError) {
-                        scansUsed = 0; // Successfully reset
-                    } else {
-                        console.error("Failed to reset subscription usage:", resetError);
-                        scansUsed = subscription.scans_used || 0;
-                    }
-                } else {
-                    scansUsed = subscription.scans_used || 0;
+                // Check credits remaining
+                const creditsRemaining = subscription.credits_remaining ?? 0;
+                if (creditsRemaining < creditCost) {
+                    return NextResponse.json(
+                        { error: `Not enough credits. ${scanType === "plagiarism" ? "Plagiarism scans require 2 credits" : "AI scans require 1 credit"}. You have ${creditsRemaining} credit${creditsRemaining === 1 ? "" : "s"} remaining.` },
+                        { status: 403 }
+                    );
                 }
             }
         }
@@ -199,10 +214,10 @@ export async function POST(request: NextRequest) {
             // No valid subscription or expired — check free plan limit
             const { data: freePlan } = await supabase
                 .from("plans")
-                .select("scans_per_day")
+                .select("credits")
                 .eq("slug", "free")
                 .single();
-            scansLimit = freePlan?.scans_per_day || 1;
+            const freeLimit = freePlan?.credits || 1;
 
             // Count scans today for free users (calendar day)
             const startOfDay = new Date();
@@ -212,14 +227,14 @@ export async function POST(request: NextRequest) {
                 .select("*", { count: "exact", head: true })
                 .eq("user_id", user.id)
                 .gte("created_at", startOfDay.toISOString());
-            scansUsed = count || 0;
-        }
+            const scansUsed = count || 0;
 
-        if (scansUsed >= scansLimit) {
-            return NextResponse.json(
-                { error: `File limit reached. Your plan allows ${scansLimit} file${scansLimit === 1 ? '' : 's'} per day. Upgrade your plan to scan more.` },
-                { status: 403 }
-            );
+            if (scansUsed >= freeLimit) {
+                return NextResponse.json(
+                    { error: `Daily limit reached. Free plan allows ${freeLimit} scan${freeLimit === 1 ? '' : 's'} per day. Upgrade your plan for more credits.` },
+                    { status: 403 }
+                );
+            }
         }
 
         // Extract text content
@@ -238,12 +253,13 @@ export async function POST(request: NextRequest) {
             }
         }
 
-        // Validate word count (5,000 max)
+        // Validate word count against configurable limit
         if (textContent) {
             const wordCount = countWords(textContent);
-            if (wordCount > MAX_WORD_COUNT) {
+            const maxWordCount = await getWordLimit();
+            if (wordCount > maxWordCount) {
                 return NextResponse.json(
-                    { error: `Document exceeds the ${MAX_WORD_COUNT.toLocaleString()} word limit. Your document has ${wordCount.toLocaleString()} words. Please shorten it and try again.` },
+                    { error: `Document exceeds the ${maxWordCount.toLocaleString()} word limit. Your document has ${wordCount.toLocaleString()} words. Please shorten it and try again.` },
                     { status: 400 }
                 );
             }
@@ -278,6 +294,7 @@ export async function POST(request: NextRequest) {
                 file_type: file.type,
                 file_path: uploadResult.path,
                 status: "pending",
+                scan_type: scanType,
                 ai_score: null
             })
             .select()
@@ -290,11 +307,12 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Failed to create scan record", details: scanError.message }, { status: 500 });
         }
 
-        // Insert into scan_queue for processing (use admin client to bypass RLS)
+        // Insert into appropriate queue for processing (use admin client to bypass RLS)
         if (textContent && textContent.length > 0) {
             const adminClient = getAdminClient();
+            const queueTable = scanType === "plagiarism" ? "plagiarism_queue" : "scan_queue";
             const { error: queueError } = await adminClient
-                .from("scan_queue")
+                .from(queueTable)
                 .insert({
                     scan_id: scan.id,
                     input_text: textContent,
@@ -302,25 +320,21 @@ export async function POST(request: NextRequest) {
                 });
 
             if (queueError) {
-                console.error("Failed to insert into scan_queue:", queueError);
+                console.error(`Failed to insert into ${queueTable}:`, queueError);
             }
         }
 
-        // Increment scan usage (for paid plans)
+        // Decrement credits for paid plans
         if (!isFreeTier && subscription) {
-            // Use admin client to bypass RLS
             const adminClient = getAdminClient();
-            const { error: incError } = await adminClient
-                .rpc('increment_scans_used', { sub_id: subscription.id });
-
-            // If RPC doesn't exist, try direct update
-            if (incError) {
-                // Fallback to direct update (race condition possible but better than nothing)
-                await adminClient
-                    .from("subscriptions")
-                    .update({ scans_used: (scansUsed || 0) + 1 })
-                    .eq("id", subscription.id);
-            }
+            const currentCredits = subscription.credits_remaining ?? 0;
+            await adminClient
+                .from("subscriptions")
+                .update({
+                    credits_remaining: Math.max(0, currentCredits - creditCost),
+                    updated_at: now.toISOString()
+                })
+                .eq("id", subscription.id);
         }
 
         return NextResponse.json({

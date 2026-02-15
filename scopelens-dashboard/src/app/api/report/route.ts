@@ -5,6 +5,7 @@ import JSZip from "jszip";
 import { createElement } from "react";
 import { renderToBuffer } from "@react-pdf/renderer";
 import { ReportDocument } from "@/components/pdf/ReportDocument";
+import { PlagiarismReportDocument } from "@/components/pdf/PlagiarismReportDocument";
 import type { DocParagraph } from "@/components/pdf/reportStyles";
 import fs from "fs";
 import path from "path";
@@ -114,6 +115,143 @@ export async function POST(request: NextRequest) {
 
         if (scanError || !scan) {
             return NextResponse.json({ error: "Scan not found" }, { status: 404 });
+        }
+
+        // ═══════════════════════════════════════
+        //  PLAGIARISM REPORT — separate path
+        // ═══════════════════════════════════════
+        if (scan.scan_type === "plagiarism") {
+            // Get profile data
+            const { data: profile } = await supabase
+                .from("profiles")
+                .select("first_name, last_name")
+                .eq("id", user.id)
+                .single();
+            const authorName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") || "Author";
+
+            const plagiarismResult = scan.plagiarism_result || {};
+            const submissionDate = new Date(scan.created_at).toLocaleDateString("en-US", {
+                year: "numeric", month: "short", day: "numeric"
+            }) + ", " + new Date(scan.created_at).toLocaleTimeString("en-US", {
+                hour: "numeric", minute: "2-digit", hour12: true
+            });
+            const downloadDate = new Date().toLocaleDateString("en-US", {
+                year: "numeric", month: "short", day: "numeric"
+            }) + ", " + new Date().toLocaleTimeString("en-US", {
+                hour: "numeric", minute: "2-digit", hour12: true
+            });
+
+            // ─── Parse original document for content pages ───
+            let docParagraphs: DocParagraph[] = [];
+            try {
+                if (scan.file_path) {
+                    const { data: origFile, error: origError } = await downloadFromS3(
+                        getDocumentsFolder(),
+                        scan.file_path
+                    );
+                    if (!origError && origFile) {
+                        const origBuffer = new Uint8Array(origFile).buffer as ArrayBuffer;
+                        const fileType = scan.file_type || "";
+                        if (fileType.includes("wordprocessingml") || scan.file_name?.endsWith(".docx")) {
+                            docParagraphs = await parseDocxStructure(origBuffer);
+                        } else if (fileType === "text/plain" || scan.file_name?.endsWith(".txt")) {
+                            const plainText = new TextDecoder().decode(origBuffer);
+                            docParagraphs = parsePlainTextStructure(plainText);
+                        }
+                    }
+                }
+            } catch (parseErr) {
+                console.error("Plagiarism report: document parsing failed (non-blocking):", parseErr);
+            }
+
+            // Fallback: build paragraphs from the input text stored in the queue
+            if (docParagraphs.length === 0) {
+                const { data: queueItem } = await supabase
+                    .from("plagiarism_queue")
+                    .select("input_text")
+                    .eq("scan_id", scan.id)
+                    .single();
+                if (queueItem?.input_text) {
+                    docParagraphs = parsePlainTextStructure(queueItem.input_text);
+                }
+            }
+
+            // ─── Extract highlighted sentences & build sentenceSourceMap ───
+            const highlightedSentences: string[] = [];
+            const sentenceSourceMap: Record<string, number[]> = {};
+            if (plagiarismResult.sources && Array.isArray(plagiarismResult.sources)) {
+                for (let sourceIdx = 0; sourceIdx < plagiarismResult.sources.length; sourceIdx++) {
+                    const source = plagiarismResult.sources[sourceIdx];
+                    if (source.matchedSentences && Array.isArray(source.matchedSentences)) {
+                        for (const ms of source.matchedSentences) {
+                            if (!ms.sentence) continue;
+                            if (!highlightedSentences.includes(ms.sentence)) {
+                                highlightedSentences.push(ms.sentence);
+                            }
+                            if (!sentenceSourceMap[ms.sentence]) {
+                                sentenceSourceMap[ms.sentence] = [];
+                            }
+                            if (!sentenceSourceMap[ms.sentence].includes(sourceIdx)) {
+                                sentenceSourceMap[ms.sentence].push(sourceIdx);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ─── Get custom logo ───
+            let customLogoData: string | undefined;
+            const { data: logoSetting } = await supabase
+                .from("site_settings")
+                .select("value")
+                .eq("key", "report_logo")
+                .single();
+            if (logoSetting?.value) {
+                try {
+                    const { data: logoFile } = await supabase.storage
+                        .from("report-logos")
+                        .download(logoSetting.value);
+                    if (logoFile) {
+                        const logoBuffer = await logoFile.arrayBuffer();
+                        const base64 = Buffer.from(logoBuffer).toString("base64");
+                        const mimeType = logoSetting.value.endsWith(".svg") ? "image/svg+xml" :
+                            logoSetting.value.endsWith(".png") ? "image/png" :
+                                logoSetting.value.endsWith(".webp") ? "image/webp" : "image/jpeg";
+                        customLogoData = `data:${mimeType};base64,${base64}`;
+                    }
+                } catch (err) {
+                    console.error("Failed to load site logo for plagiarism report:", err);
+                }
+            }
+
+            const pdfBuffer = await renderToBuffer(
+                createElement(PlagiarismReportDocument, {
+                    authorName,
+                    fileName: scan.file_name || "Untitled Document",
+                    fileSize: formatFileSize(scan.file_size || 0),
+                    submissionDate,
+                    downloadDate,
+                    reportId: scan.id,
+                    plagiarismPercent: scan.plagiarism_score ?? 0,
+                    paragraphs: docParagraphs,
+                    highlightedSentences,
+                    sentenceSourceMap,
+                    totalSentences: plagiarismResult.totalSentences ?? 0,
+                    matchedSentenceCount: plagiarismResult.matchedSentenceCount ?? 0,
+                    sources: plagiarismResult.sources ?? [],
+                    totalWords: scan.word_count ?? 0,
+                    customLogoSrc: customLogoData,
+                }) as any
+            );
+
+            const fileName = `${scan.file_name?.replace(/\.[^/.]+$/, "") || "report"}_plagiarism_report.pdf`;
+            return new NextResponse(new Uint8Array(pdfBuffer), {
+                status: 200,
+                headers: {
+                    "Content-Type": "application/pdf",
+                    "Content-Disposition": `attachment; filename="${fileName}"`,
+                },
+            });
         }
 
         // TODO: Re-enable S3 caching after testing

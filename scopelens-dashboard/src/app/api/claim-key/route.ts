@@ -84,6 +84,17 @@ export async function POST(request: Request) {
             .eq("user_id", user.id)
             .single();
 
+        // Fetch plan to get credits info
+        const { data: planDetails } = await adminClient
+            .from("plans")
+            .select("credits, credit_expiration_days")
+            .eq("id", licenseKey.plan_id)
+            .single();
+
+        const planCredits = planDetails?.credits || 0;
+        const creditExpirationDays = planDetails?.credit_expiration_days || 30;
+        const creditsExpiresAt = new Date(now.getTime() + creditExpirationDays * 24 * 60 * 60 * 1000);
+
         if (existingSub) {
             // Update existing subscription
             await adminClient
@@ -91,7 +102,8 @@ export async function POST(request: Request) {
                 .update({
                     plan_id: licenseKey.plan_id,
                     status: "active",
-                    scans_used: 0,
+                    credits_remaining: planCredits,
+                    credits_expires_at: creditsExpiresAt.toISOString(),
                     current_period_end: expiresAt.toISOString(),
                     updated_at: now.toISOString(),
                 })
@@ -104,16 +116,17 @@ export async function POST(request: Request) {
                     user_id: user.id,
                     plan_id: licenseKey.plan_id,
                     status: "active",
-                    scans_used: 0,
+                    credits_remaining: planCredits,
+                    credits_expires_at: creditsExpiresAt.toISOString(),
                     current_period_start: now.toISOString(),
                     current_period_end: expiresAt.toISOString(),
                 });
         }
 
-        // Fetch plan details separately to avoid PostgREST relationship issues
+        // Fetch plan name for response
         const { data: plan } = await adminClient
             .from("plans")
-            .select("name, slug, scans_per_month")
+            .select("name, slug")
             .eq("id", licenseKey.plan_id)
             .single();
 
@@ -121,7 +134,8 @@ export async function POST(request: Request) {
             message: `Plan "${plan?.name || "Premium"}" activated successfully!`,
             plan_name: plan?.name,
             expires_at: expiresAt.toISOString(),
-            scans_per_month: plan?.scans_per_month,
+            credits: planCredits,
+            credits_expires_at: creditsExpiresAt.toISOString(),
         });
     } catch {
         return NextResponse.json({ error: "Internal server error" }, { status: 500 });

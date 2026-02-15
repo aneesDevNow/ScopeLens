@@ -17,7 +17,8 @@ interface Plan {
     reseller_price_monthly: number;
     reseller_price_yearly: number;
     reseller_discount_percent: number;
-    scans_per_day: number;
+    credits: number;
+    credit_expiration_days: number;
     features: Record<string, boolean>;
     is_active: boolean;
 }
@@ -33,7 +34,8 @@ export default function PlansPage() {
         price_monthly: 0,
         price_yearly: 0,
         reseller_discount_percent: 20,
-        scans_per_day: 100,
+        credits: 100,
+        credit_expiration_days: 30,
         features: "",
     });
 
@@ -63,7 +65,8 @@ export default function PlansPage() {
             price_monthly: 0,
             price_yearly: 0,
             reseller_discount_percent: 20,
-            scans_per_day: 100,
+            credits: 100,
+            credit_expiration_days: 30,
             features: "",
         });
         setShowModal(true);
@@ -78,7 +81,8 @@ export default function PlansPage() {
             price_monthly: plan.price_monthly,
             price_yearly: plan.price_yearly,
             reseller_discount_percent: plan.reseller_discount_percent || 20,
-            scans_per_day: plan.scans_per_day,
+            credits: plan.credits || 0,
+            credit_expiration_days: plan.credit_expiration_days || 30,
             features: featuresArray.join("\n"),
         });
         setShowModal(true);
@@ -102,7 +106,8 @@ export default function PlansPage() {
             reseller_price_monthly,
             reseller_price_yearly,
             reseller_discount_percent: formData.reseller_discount_percent,
-            scans_per_day: formData.scans_per_day,
+            credits: formData.credits,
+            credit_expiration_days: formData.credit_expiration_days,
             features,
             is_active: true,
         };
@@ -175,7 +180,7 @@ export default function PlansPage() {
                                 <span className="text-sm text-muted-foreground">/mo</span>
                             </div>
                             <p className="text-sm text-muted-foreground">
-                                {plan.scans_per_day === -1 ? "Unlimited" : plan.scans_per_day} scans/day
+                                {plan.credits === -1 ? "Unlimited" : plan.credits} credits · {plan.credit_expiration_days || 30} day expiry
                             </p>
                             {plan.price_yearly > 0 && (
                                 <p className="text-xs text-muted-foreground">
@@ -294,12 +299,21 @@ export default function PlansPage() {
                                     />
                                 </div>
                                 <div className="space-y-1.5">
-                                    <Label className="text-xs text-muted-foreground uppercase tracking-wide">Scans/day</Label>
+                                    <Label className="text-xs text-muted-foreground uppercase tracking-wide">Credits</Label>
                                     <Input
                                         type="number"
-                                        value={formData.scans_per_day}
-                                        onChange={(e) => setFormData({ ...formData, scans_per_day: parseInt(e.target.value) || 0 })}
+                                        value={formData.credits}
+                                        onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) || 0 })}
                                         placeholder="100"
+                                    />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <Label className="text-xs text-muted-foreground uppercase tracking-wide">Credit Expiration (days)</Label>
+                                    <Input
+                                        type="number"
+                                        value={formData.credit_expiration_days}
+                                        onChange={(e) => setFormData({ ...formData, credit_expiration_days: parseInt(e.target.value) || 30 })}
+                                        placeholder="30"
                                     />
                                 </div>
                             </div>
@@ -346,7 +360,7 @@ export default function PlansPage() {
                                     className="w-full p-3 rounded-md border bg-background min-h-[120px] text-sm resize-none focus:outline-none focus:ring-2 focus:ring-ring"
                                     value={formData.features}
                                     onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                                    placeholder={"15 AI scans per day\nAdvanced plagiarism detection\nDetailed originality reports\nEmail support"}
+                                    placeholder={"100 credits included\nAdvanced plagiarism detection\nDetailed originality reports\nEmail support"}
                                 />
                             </div>
                         </CardContent>

@@ -11,7 +11,7 @@ interface Plan {
     slug: string;
     price_monthly: number;
     price_yearly: number | null;
-    scans_per_day: number;
+    credits: number;
     features: Record<string, boolean>;
     is_active: boolean;
 }
@@ -158,7 +158,7 @@ export default function PricingSection({ plans }: { plans: Plan[] }) {
                                         </span>
                                         <span className={style.periodClass}>/mo</span>
                                     </div>
-                                    <p className={style.descClass}>{planDescriptions[plan.slug] || `${plan.scans_per_day} scans/day`}</p>
+                                    <p className={style.descClass}>{planDescriptions[plan.slug] || `${plan.credits} credits`}</p>
                                 </div>
                                 <ul className="space-y-4 mb-8">
                                     <li className="flex items-center gap-3">
@@ -167,7 +167,7 @@ export default function PricingSection({ plans }: { plans: Plan[] }) {
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
                                             </svg>
                                         </div>
-                                        <span className={style.featureText}>{plan.scans_per_day} scans per day</span>
+                                        <span className={style.featureText}>{plan.credits} credits</span>
                                     </li>
                                     {features.map((feature) => (
                                         <li key={feature} className="flex items-center gap-3">
